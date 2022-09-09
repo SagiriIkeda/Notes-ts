@@ -2,7 +2,6 @@ export default interface Folder {
     id: string,
     name: string,
     order: number,
-   
 }
 
 export class FolderBuilder implements Folder {

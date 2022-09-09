@@ -5,7 +5,14 @@ import { Mat } from "../prefabs";
 import Folder from "../../interfaces/folder";
 import FolderItem from "../../components/folders/FolderItem";
 
-export default function FolderSection() {
+import UI from "../UI";
+
+
+interface FolderSectionProps {
+    UI: UI
+}
+
+export default function FolderSection({UI} : FolderSectionProps) {
 
     let Folders = DB.Folders.Content as Folder[];
 
@@ -15,12 +22,12 @@ export default function FolderSection() {
         <React.Fragment>
             <div className="container">
                 <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
-                {/* <Folder key={0} data={DB.Folders.Obtain(0)}/> */}
+                <FolderItem  UI={UI} key={0} data={DB.Folders.Obtain("0") as Folder}/>
                 {/* <div className="DragableFolders" ref={drgSection}> */}
                 <div className="DragableFolders">
                     {Folders.map((fold) => {
                         if(fold.id != "0"){
-                            return (<FolderItem key={fold.id} data={fold} />)
+                            return (<FolderItem  UI={UI} key={fold.id} data={fold} />)
                         }
                     })}
                 </div>

@@ -3,13 +3,14 @@ import DB from "../db/database";
 import { Mat } from "./prefabs";
 
 import FolderSection from "./folders/FolderSection";
+import Folder from "../interfaces/folder";
 
 export default class UI extends React.Component {
 
     state = {
         Notes: DB.Notes.Content,
         Folders: DB.Folders.Content,
-        activeFolder: 0,
+        activeFolder: "0",
         Editors: [],
         SelectMode: false,
         selectes: [],
@@ -50,6 +51,12 @@ export default class UI extends React.Component {
 
     }
 
+    changeSelectedFolder(id: Folder["id"]) {
+        this.setState({
+            activeFolder: id
+        })
+    }
+
     reloadData(sendUpdateToBc = true) {
         // sendUpdateToBc == true && bc.postMessage("UpdateApplication");
         this.setState({
@@ -70,7 +77,7 @@ export default class UI extends React.Component {
                     <div className="folders-section"
                     // onAuxClick={this.AuxForFolderSection}
                     >
-                        <FolderSection/>
+                        <FolderSection UI={this} />
                     </div>
                     <div className="notes-sections">
                         {/* <NotesSection/> */}
