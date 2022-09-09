@@ -6,19 +6,21 @@ import FolderSection from "./folders/FolderSection";
 import Folder from "../interfaces/folder";
 
 import NotesSection from "./notes/NotesSection";
-import { NoteBuilder } from "../interfaces/notes";
+import OpenEditor from "./notes/Editor/OpenEditor";
+import Editor, { Editors } from "./notes/Editor/Editor";
+// import { NoteBuilder } from "../interfaces/notes";
 
 
 // DB.Notes.Add(new NoteBuilder("0"))
 
 
-export default class UI extends React.Component {
+export default class UINOTES extends React.Component {
 
     state = {
         Notes: DB.Notes.Content,
         Folders: DB.Folders.Content,
         activeFolder: "0",
-        Editors: [],
+        Editors: new Map(),
         SelectMode: false,
         selectes: [],
         findText: ""
@@ -111,10 +113,11 @@ export default class UI extends React.Component {
                     <Mat>add</Mat>
                 </div>
                 <div className="Editors" id="Editors">
+                    <Editors UI={this} />
                 </div>
                 {/* <div className={`SelectBox ${(this.state.SelectMode == true)? "visible":""}`}> */}
                 <div className={`SelectBox `}>
-                    <span className="titles" >¿Que Desea hacer?</span>
+                    <span className="titles" >¿Qué Desea hacer?</span>
                     <div className="div">
                         {/* <div className="item" onClick={Application.DeleteSelectes} ><Mat>delete</Mat> Borrar</div>
                         <div className="item" onClick={OpenMoveFolder}><Mat>drive_file_move_rtl</Mat> Mover a...</div>

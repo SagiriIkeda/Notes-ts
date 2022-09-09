@@ -3,6 +3,8 @@ import DB from "../../db/database";
 import UI from "../UI";
 import { Mat, Btn } from "../prefabs"
 import NoteItem from "./NoteItem";
+import OpenEditor from "./Editor/OpenEditor";
+import Tab from "./Editor/Tab";
 
 
 interface NoteSectionProps {
@@ -98,6 +100,9 @@ export default function NotesSection({ UI }: NoteSectionProps) {
             </div>
             <div className="activeEditorsContainer">
                 <div className="activeEditors">
+                    {[...UI.state.Editors.entries()].map(([id,item] : [string,OpenEditor] ) => {
+                        return <Tab invoker={item} key={id} />
+                    })}
                 </div>
             </div>
         </>

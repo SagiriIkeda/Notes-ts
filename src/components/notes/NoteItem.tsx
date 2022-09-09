@@ -1,7 +1,8 @@
-import React, { createRef } from "react";
+import React, { createRef, MouseEventHandler } from "react";
 import Note from "../../interfaces/notes";
 import timeAgo from "../timeAgo";
 import UI from "../UI"
+import OpenEditor from "./Editor/OpenEditor";
 // import Note from "../../interfaces/notes";
 
 interface NoteItemProps {
@@ -14,10 +15,12 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
 
     constructor(props: NoteItemProps) {
         super(props)
-        // this.Click = this.Click.bind(this);
-        // this.OpenNote = this.OpenNote.bind(this);
+
+        this.Click = this.Click.bind(this);
+        this.OpenNote = this.OpenNote.bind(this);
         // this.SelectThis = this.SelectThis.bind(this);
         // this.AuxEvent = this.AuxEvent.bind(this);
+
         // refs
         // this.note = React.createRef();
     }
@@ -139,59 +142,68 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             }
         }
         SetOpenAuxClick(obj,event,"NotesAux")
-    }
-    Click(event) {
-        if(event.buttons == 1) {
-            clearTimeout(globalInterval)
-            let bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)'
-            this.note.current.animate([{transform: `scale(0.9)`},{transform: `scale(0.98)`},{transform: `scale(1)`}],{
-                duration: 1000,
-                easing: bezier,
-                fill: "forwards",
-            })
-            //timer
-            let ms = 0;
-            let menutime = 150;
-            let clicks = setInterval(() => {
-                ms += 1;
-                if (ms >= menutime){
-                    clearInterval(clicks);
-                    this.SelectThis();
-                    Application.setSelectMode(true);
-                }
-            }, 3);
-            const mouseup = (e) => {
-                this.note.current.removeEventListener('mouseleave',mouseup)
-                this.note.current.removeEventListener('mouseup',mouseup)
-                clearInterval(clicks);
-                ms = 0;
-                if(ms < menutime && e.type != "mouseleave") {
-                    if(Application.state.SelectMode == false){
-                        this.OpenNote();
-                    }else {
-                        if(!Application.state.selectes.includes(this.props.data.id)){
-                            this.SelectThis();
-                        }else {
-                            if(firstSelected == true){
-                                firstSelected = false;
-                            }else {
-                                this.DeselectThis();
-                            }
-                        }
-                        Application.reloadData();   
-                    }
-                }
+    }**/
+
+    Click(event : any ) {
+        // console.log(event);
+        // const {UI,data} = this.props;
+        // console.log(event);
         
-            }
-            this.note.current.addEventListener('mouseleave',mouseup)
-            this.note.current.addEventListener('mouseup',mouseup)
-        }
+        this.OpenNote();
+        // if(event.buttons == 1) {
+        //     clearTimeout(globalInterval)
+        //     let bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)'
+        //     this.note.current.animate([{transform: `scale(0.9)`},{transform: `scale(0.98)`},{transform: `scale(1)`}],{
+        //         duration: 1000,
+        //         easing: bezier,
+        //         fill: "forwards",
+        //     })
+        //     //timer
+        //     let ms = 0;
+        //     let menutime = 150;
+        //     let clicks = setInterval(() => {
+        //         ms += 1;
+        //         if (ms >= menutime){
+        //             clearInterval(clicks);
+        //             this.SelectThis();
+        //             Application.setSelectMode(true);
+        //         }
+        //     }, 3);
+        //     const mouseup = (e) => {
+        //         this.note.current.removeEventListener('mouseleave',mouseup)
+        //         this.note.current.removeEventListener('mouseup',mouseup)
+        //         clearInterval(clicks);
+        //         ms = 0;
+        //         if(ms < menutime && e.type != "mouseleave") {
+        //             if(Application.state.SelectMode == false){
+        //                 this.OpenNote();
+        //             }else {
+        //                 if(!Application.state.selectes.includes(this.props.data.id)){
+        //                     this.SelectThis();
+        //                 }else {
+        //                     if(firstSelected == true){
+        //                         firstSelected = false;
+        //                     }else {
+        //                         this.DeselectThis();
+        //                     }
+        //                 }
+        //                 Application.reloadData();   
+        //             }
+        //         }
+        
+        //     }
+        //     // this.note.current.addEventListener('mouseleave',mouseup)
+        //     // this.note.current.addEventListener('mouseup',mouseup)
+        // }
     }
+    
     OpenNote() {
-        if(!Application.state.Editors.includes(this.props.data.id)) {
-            new Editor(this.props.data.id);
-        }
-    } **/
+        const {UI,data} = this.props;
+
+        new OpenEditor(UI,data.id);
+        // if(!Application.state.Editors.includes(this.props.data.id)) {
+        // }
+    } 
 
     render() {
         const { data } = this.props
@@ -205,7 +217,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             <div
                 // className={`note-preview${(Application.state.selectes.includes(this.props.data.id)? " selected":"")}${(firstLoad == true)? " first":""}`} 
                 className={`note-preview`}
-                // onMouseDown={this.Click} 
+                onMouseDown={this.Click}
                 // onAuxClick={this.AuxEvent}
                 ref={this.note}
             // theme={this.props.data.theme}

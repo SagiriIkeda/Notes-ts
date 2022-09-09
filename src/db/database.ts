@@ -55,7 +55,11 @@ class DATABASE<Type> implements DATABASECONFIG {
         }
     }
 
-    get(id: string) : Type | false {
+    get(id?: string) : Type | false {
+        if(typeof id != "string") {
+            return false;
+        }
+        
         this.Load();
 
         let find = this.Content.find((e : any) => e[this.identifier] == id);
