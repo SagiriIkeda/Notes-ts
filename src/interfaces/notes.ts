@@ -3,7 +3,7 @@ import { version } from "./config"
 export type Themes = "dark" | "red" | "blue" | "yellow" | "green";
 
 export default interface Note {
-    id?: string,
+    id: string,
     content: string,
     folder: string,
     theme: Themes,
@@ -19,7 +19,7 @@ export default interface Note {
 }
 
 export class NoteBuilder implements Note {
-    id?: string;
+    id: string;
     content: string;
     folder: string;
     theme: Themes;
@@ -28,13 +28,14 @@ export class NoteBuilder implements Note {
     position: { width: number; height: number; left: number; top: number; };
     v: string;
 
-    constructor() {
+    constructor(folder: string) {
 
         const windowHeight = document.documentElement.scrollHeight;
         const windowWidth = document.documentElement.scrollWidth;
 
+        this.id = "";
         this.content = "Write Here...";
-        this.folder = "Application.state.activeFolder";
+        this.folder = folder;
         this.theme = "dark";
         this.time = Date.now();
         this.title = "Note title";

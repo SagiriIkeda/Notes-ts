@@ -1,3 +1,6 @@
+import Note from "../interfaces/notes";
+import Folder from "../interfaces/folder";
+
 interface DATABASECONFIG {
     storage: string,
     identifier: string,
@@ -5,14 +8,13 @@ interface DATABASECONFIG {
 }
 
 
-class DATABASE {
+class DATABASE<Type> implements DATABASECONFIG {
 
     readonly storage: string;
     readonly Default: DATABASECONFIG["Default"];
     readonly identifier: string;
-    Content: Array<Object>;
+    Content: Array<Type>;
 
-    // constructor({ storage = "", identifier = "id", Default  }) {
     constructor(config: DATABASECONFIG) {
         this.storage = config.storage;
         this.Default = config.Default;
@@ -33,7 +35,7 @@ class DATABASE {
     Save() {
         localStorage.setItem(this.storage, JSON.stringify(this.Content));
     }
-    Add(content: any) {
+    Add(content: any): string {
         this.Load();
         let uuid = `${Date.now()}-${this.Content.length}`;
         content[this.identifier] = `${Date.now()}-${this.Content.length}`;
@@ -41,6 +43,8 @@ class DATABASE {
         this.Save();
         return uuid;
     }
+
+    /** @deprecated */
     Obtain(id: string) {
         this.Load();
         let find = this.Content.findIndex((e: any) => e[this.identifier] == id);
@@ -50,6 +54,19 @@ class DATABASE {
             return false;
         }
     }
+
+    get(id: string) : Type | false {
+        this.Load();
+
+        let find = this.Content.find((e : any) => e[this.identifier] == id);
+
+        if (find) {
+            return find;
+        } else {
+            return false;
+        }
+    }
+
     Update(id: string, content = {}) {
         this.Load();
         let find = this.Content.findIndex((e: any) => e[this.identifier] == id);
@@ -82,30 +99,30 @@ class DATABASE {
         return this.Content.filter((e: any) => e[key] == value);
     }
 
-    get() {
+    getAll() {
         return this.Content;
     }
 
-    Filter(filterFn: () => void) {
+    Filter(filterFn: (item: Type) => void) {
         this.Load()
         return this.Content.filter(filterFn);
     }
 }
 
-export default {
-    Folders: new DATABASE({
-        storage: "Folders",
-        identifier: "id",
-        Default: () => {
-            return [{ name: "Notas", id: "0" }]
-        }
-    }),
-    Notes: new DATABASE({
-        storage: "Notes",
-        identifier: "id",
-        Default: false
-    })
-}
+
+export const Folders = new DATABASE<Folder>({
+    storage: "Folders",
+    identifier: "id",
+    Default: () => {
+        return [{ name: "Notas", id: "0" }]
+    }
+});
+export const Notes = new DATABASE<Note>({
+    storage: "Notes",
+    identifier: "id",
+    Default: false
+});
+export default {Folders,Notes}
 
 // export default DB;
 

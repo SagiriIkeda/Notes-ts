@@ -5,6 +5,13 @@ import { Mat } from "./prefabs";
 import FolderSection from "./folders/FolderSection";
 import Folder from "../interfaces/folder";
 
+import NotesSection from "./notes/NotesSection";
+import { NoteBuilder } from "../interfaces/notes";
+
+
+// DB.Notes.Add(new NoteBuilder("0"))
+
+
 export default class UI extends React.Component {
 
     state = {
@@ -17,7 +24,7 @@ export default class UI extends React.Component {
         findText: ""
     }
 
-    SearchInput = createRef();
+    SearchInput = createRef<HTMLInputElement>();
 
     constructor(props: {}) {
         super(props)
@@ -65,6 +72,20 @@ export default class UI extends React.Component {
         })
     }
 
+    CloseSelectMode() {
+
+    }
+
+    ShowSelectes() {
+
+    }
+    changeFindText() {
+    }
+
+    cancelFind() {
+
+    }
+
     render() {
 
         return (
@@ -80,7 +101,7 @@ export default class UI extends React.Component {
                         <FolderSection UI={this} />
                     </div>
                     <div className="notes-sections">
-                        {/* <NotesSection/> */}
+                        <NotesSection UI={this} />
                     </div>
                 </div>
                 {/* <div className={`FloatBtn ${(Application.state.SelectMode == true)? "ocult":""}`} */}

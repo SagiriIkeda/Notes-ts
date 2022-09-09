@@ -1,6 +1,6 @@
-import React, {createRef, useEffect} from "react";
+import React, { createRef, useEffect } from "react";
 import Folder from "../../interfaces/folder";
-import {Mat} from "../prefabs"
+import { Mat } from "../prefabs"
 import DB from "../../db/database";
 
 import UI from "../UI";
@@ -14,7 +14,7 @@ interface HTMLFolderElement extends HTMLDivElement {
     identifier?: string
 }
 
-export default function FolderItem({UI,data} : FolderProp) {
+export default function FolderItem({ UI, data }: FolderProp) {
 
     let itemfolder = createRef<HTMLFolderElement>();
 
@@ -26,7 +26,7 @@ export default function FolderItem({UI,data} : FolderProp) {
 
     let classes = "folder";
 
-    if(UI.state.activeFolder == data.id) {
+    if (UI.state.activeFolder == data.id) {
         classes += " active";
     }
 
@@ -35,17 +35,15 @@ export default function FolderItem({UI,data} : FolderProp) {
     }
 
     return (
-    <div 
-        className={classes}
-        // className={`folder${(Application.state.activeFolder == prop.data.id)?" active":""}`}
-        // className={`folder`}
-        onMouseDown={SelectThis}
-        // onAuxClick={AuxEvent}
-        ref={itemfolder}>
-        <span className="folder__name">
-            <Mat>arrow_forward_io</Mat>{data.name}
-        </span>
-        {DB.Notes.Search("folder",data.id).length}
-    </div>
+        <div
+            className={classes}
+            onMouseDown={SelectThis}
+            // onAuxClick={AuxEvent}
+            ref={itemfolder}>
+            <span className="folder__name">
+                <Mat>arrow_forward_io</Mat>{data.name}
+            </span>
+            {DB.Notes.Search("folder", data.id).length}
+        </div>
     )
 }

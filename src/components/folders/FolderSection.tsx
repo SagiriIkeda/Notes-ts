@@ -14,7 +14,7 @@ interface FolderSectionProps {
 
 export default function FolderSection({UI} : FolderSectionProps) {
 
-    let Folders = DB.Folders.Content as Folder[];
+    let Folders = DB.Folders.Content;
 
     Folders.sort((a,b) => a.order-b.order);
 
@@ -22,7 +22,7 @@ export default function FolderSection({UI} : FolderSectionProps) {
         <React.Fragment>
             <div className="container">
                 <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
-                <FolderItem  UI={UI} key={0} data={DB.Folders.Obtain("0") as Folder}/>
+                <FolderItem  UI={UI} key={0} data={DB.Folders.get("0") as Folder}/>
                 {/* <div className="DragableFolders" ref={drgSection}> */}
                 <div className="DragableFolders">
                     {Folders.map((fold) => {
