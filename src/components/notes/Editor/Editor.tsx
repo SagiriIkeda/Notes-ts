@@ -6,6 +6,7 @@ import OpenEditor from "./OpenEditor";
 
 import iconReact from "../../../assets/icon-react.jpg";
 import UINOTES from "../../UI";
+import EditorMovement from "./Movement";
 
 interface EditorProps {
     invoker: OpenEditor,
@@ -42,12 +43,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     note__info = createRef<HTMLDivElement>();
     note__header = createRef<HTMLDivElement>();
 
-
-    pos1 = 0;
-    pos2 = 0;
-    pos3 = 0;
-    pos4 = 0;
-    timetorange = 0;
+    Movement = new EditorMovement({Editor: this})
 
     constructor(props: EditorProps) {
         super(props);
@@ -77,7 +73,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         this.props.invoker.EditorInstance = this;
 
-        this.DragWindow = this.DragWindow.bind(this);
+        // this.DragWindow = this.DragWindow.bind(this);
         this.UpdateCharact = this.UpdateCharact.bind(this);
         this.UpdateName = this.UpdateName.bind(this);
         
@@ -171,80 +167,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     //         themeMenu: false
     //     })
     // }
-    DragWindow(e : any) {
-        const windowEditor = this.windowEditor.current;
-
-        if(!windowEditor) return;
-
-        if ((e.target?.classList[0] == "wbtn") == false) {
-
-            e.preventDefault();
-            // setIndex();
-            this.pos3 = e.clientX;
-            this.pos4 = e.clientY;
-            const elementDrag = (e : any ) => {
-                e.preventDefault();
-                this.pos1 = this.pos3 - e.clientX;
-                this.pos2 = this.pos4 - e.clientY;
-                this.pos3 = e.clientX;
-                this.pos4 = e.clientY;
-                let dy = windowEditor.offsetTop - this.pos2;
-                let dx = windowEditor.offsetLeft - this.pos1;
-                let pagewidth = document.documentElement.scrollWidth;
-                let pageheight = document.documentElement.scrollHeight - 123;
-                let width = windowEditor.getBoundingClientRect().width;
-                let height = windowEditor.getBoundingClientRect().height;
-                if (dy + height > pageheight) dy = pageheight - height;
-                if (dy < 0) dy = 0;
-                if (dx + width > pagewidth) dx = pagewidth - width;
-                if (dx < 0) dx = 0;
-                windowEditor.style.top = `${dy}px`;
-                windowEditor.style.left = `${dx}px`;
-                // SavePosition();
-            }
-
-            function closeDragElement(e : any ) {
-                document.removeEventListener('mouseup', closeDragElement)
-                document.removeEventListener('mousemove', elementDrag)
-            }
-            document.addEventListener('mouseup', closeDragElement)
-            document.addEventListener('mousemove', elementDrag)
-        }
-    }
-    // ResizeWindow(e) {
-    //     e.preventDefault();
-    //     let maxscreenw = document.documentElement.scrollWidth;
-    //     let maxscreenh = document.documentElement.scrollHeight;
-    //     const changet = (e) => {
-    //         let ny = e.clientY;
-    //         let nx = e.clientX;
-    //         let rect = windowEditor.getBoundingClientRect();
-    //         let wetop = rect.top;
-    //         let weleft = rect.left;
-    //         let width = nx - weleft;
-    //         let height = ny - wetop;
-    //         let top = rect.top;
-    //         let left = rect.left;
-    //         let minheight = 272;
-    //         let minwidth = 360;
-    //         if (height < minheight) height = minheight;
-    //         if (width < minwidth) width = minwidth;
-    //         windowEditor.style.maxHeight = `${maxscreenh - top}px`;
-    //         windowEditor.style.maxWidth = `${maxscreenw - left}px`;
-    //         windowEditor.style.height = `${height}px`;
-    //         windowEditor.style.width = `${width}px`;
-    //         SavePosition();
-    //         this.MaxCampHeight();
-
-    //     }
-    //     document.addEventListener('mouseup', up)
-    //     document.addEventListener('mousemove', changet)
-    //     function up() {
-    //         // MaxCampHeight();
-    //         document.removeEventListener('mousemove', up)
-    //         document.removeEventListener('mousemove', changet)
-    //     }
-    // }
+    
     // MaxCampHeight(s) {
     //     let usereditorheight = this.usereditor.current.getBoundingClientRect().height;
 
@@ -497,7 +420,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     // }
 
     render() {
-        const { state } = this;
+        const { state,Movement } = this;
         const { data } = this.props.invoker;
 
         let time = new Date(data.time);
@@ -505,8 +428,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             return (
                 <div className="Editor" ref={this.windowEditor} >
 
-                    <div className="window" ref={this.windowElm} onMouseDown={this.DragWindow} >
-                    {/* <div className="window" ref={this.windowElm} > */}
+                    <div className="window" ref={this.windowElm} onMouseDown={Movement.DragWindow} >
                         <div className="title">
                             <img src={iconReact} alt="editor" />
                             <span>{state.title}</span>
@@ -562,7 +484,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     className="note-capm"
                                     contentEditable="true"
                                     ref={this.InputCamp}
-                                onKeyUp={this.UpdateCharact}
+                                    onKeyUp={this.UpdateCharact}
                                 // onKeyDown={this.SaveKey}
                                 // onPaste={this.preventPasteHTML}
                                 // onAuxClick={this.AuxForCamp}
@@ -596,7 +518,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                         </div>
                     </div>
                     {/* <div className="expandiblewindow" onMouseDown={this.ResizeWindow} ></div> */}
-                    <div className="expandiblewindow"></div>
+                    <div className="expandiblewindow" onMouseDown={Movement.ResizeWindow} ></div>
 
                 </div>
             )
