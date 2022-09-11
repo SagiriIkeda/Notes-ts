@@ -22,9 +22,7 @@ export default class OpenEditor {
         if (id) {
             // console.log(UI);
             UI.state.Editors.set(id, this);
-
             UI.setState({});
-
         }
         this.id = id;
 
@@ -77,10 +75,6 @@ export default class OpenEditor {
         //SAVE FUNCTIONS
 
         // this.TabEditor.addEventListener('click', this.setIndex)
-
-
-
-
     }
 
     setIndex() {

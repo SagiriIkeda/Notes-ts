@@ -1,4 +1,4 @@
-import React, { createRef,ReactNode, SyntheticEvent } from "react";
+import React, { createRef,FormEventHandler,KeyboardEvent,ReactNode, SyntheticEvent } from "react";
 import Note, { Themes } from "../../../interfaces/notes";
 import { Mat } from "../../prefabs";
 import { months } from "../../timeAgo";
@@ -34,6 +34,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     InputName = createRef<HTMLInputElement>();
     InputCamp = createRef<HTMLInputElement>();
     windowElm = createRef<HTMLDivElement>();
+    data: Note;
 
     windowEditor = createRef<HTMLDivElement>();
 
@@ -56,12 +57,12 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (localStorage.getItem('AutoUp') != undefined) {
             autoup = JSON.parse(localStorage.getItem('AutoUp') ?? "false");
         }
-        const { data } = props.invoker;
+        this.data = props.invoker.data;
+        const { data } = this;
 
         this.state = {
             title: data.title,
             theme: data.theme,
-
             charact: 0,
             texturize: false,
             force: false,
@@ -71,7 +72,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             italic: false,
             themeMenu: false,
             autoOpen: autoup,
-
             updateReceived: false,
         }
 
@@ -105,23 +105,21 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     //     SetTheme(data.theme);
     // }
 
-    UpdateName(event : any ) {
+    UpdateName(event : SyntheticEvent<HTMLInputElement, InputEvent> ) {
         const {invoker} = this.props;
         const {data} = this.props.invoker;
-        let value = event.target.value;
-        data.title = event.target.value;
-        this.setState({ title: value })
-        data.title = value;
-
-        const {TabInstance} = invoker;
-        // console.log(invoker);
-        
-
-        if(TabInstance) {
-            TabInstance.setState({ title: value })
+        const target = event.target as HTMLInputElement;
+        if(target) {
+            const {TabInstance} = invoker;
+            let value = target.value;
+            data.title = target.value;
+            this.setState({ title: value })
+            if(TabInstance) {
+                TabInstance.setState({ title: value })
+            }
         }
     }
-    UpdateCharact(e : SyntheticEvent ) {
+    UpdateCharact() {
         const InputCamp = this.InputCamp.current;
         if(InputCamp) {
             this.props.invoker.data.content = InputCamp.innerHTML;
@@ -146,12 +144,17 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     //         Save();
     //     }
     // }
-    // componentDidMount() {
-    //     this.InputName.current.value = data.title;
-    //     this.InputCamp.current.innerHTML = data.content;
-    //     LastestSave = this.InputCamp.current.innerHTML;
-    //     this.UpdateCharact();
-    // }
+    componentDidMount() {
+        const {InputName,InputCamp,data} = this;
+        if(InputName.current) {
+            InputName.current.value = data.title;
+        }
+        if(InputCamp.current) {
+            InputCamp.current.innerHTML = data.content;
+        }
+        // LastestSave = this.InputCamp.current.innerHTML;
+        this.UpdateCharact();
+    }
     // saveAutoUp(type) {
     //     localStorage.setItem('AutoUp', JSON.stringify(type));
     // }
