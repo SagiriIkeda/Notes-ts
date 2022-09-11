@@ -2,4 +2,4 @@
 
 App de Notas, esta vez utilizando `React` y `TypeScript`
 
-<img src="screenshot.png"/>
+<img src="https://github.com/SagiriIkeda/Notes-ts/blob/main/screenshot.PNG?raw=true"/>
