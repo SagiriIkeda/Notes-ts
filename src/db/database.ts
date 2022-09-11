@@ -55,14 +55,14 @@ class DATABASE<Type> implements DATABASECONFIG {
         }
     }
 
-    get(id?: string) : Type | false {
-        if(typeof id != "string") {
+    get(id?: string): Type | false {
+        if (typeof id != "string") {
             return false;
         }
-        
+
         this.Load();
 
-        let find = this.Content.find((e : any) => e[this.identifier] == id);
+        let find = this.Content.find((e: any) => e[this.identifier] == id);
 
         if (find) {
             return find;
@@ -126,43 +126,7 @@ export const Notes = new DATABASE<Note>({
     identifier: "id",
     Default: false
 });
-export default {Folders,Notes}
 
-// export default DB;
+const DB = { Folders, Notes }
 
-
-// function simulate(create : number) {
-//     const themes = ["green", "red", "yellow", "blue"]
-
-//     for (let i = 0; i < create; i++) {
-//         const useTheme = themes[Math.floor(Math.random() * themes.length)];
-
-//         const note = DefaultNoteGenerate();
-
-//         note.content = `Note #${i}+ ${crypto.randomUUID()}`
-//         note.theme = useTheme;
-//         note.content = crypto.randomUUID().repeat(2700)
-//         note.position.width = 300;
-//         note.position.height = 200;
-
-//         DB.Notes.Add(note);
-//         // note.
-//     }
-
-//     Application.reloadData();
-
-//     return getStorageBytes();
-// }
-
-// function getStorageBytes() {
-//     let cached  = ""
-//     for (const name in DB) {
-//         const database = DB[name];
-
-//         const storage = localStorage.getItem(database.storage);
-
-//         cached += storage;
-//     }
-
-//     return (cached.length / 1024 / 1024).toFixed(2) + "MB's";
-// }
+export default DB;

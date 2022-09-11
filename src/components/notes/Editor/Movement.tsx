@@ -16,8 +16,7 @@ export default class EditorMovement {
     top = 0;
     clientX = 0;
     clientY = 0;
-    timetorange = 0;
-
+    
     constructor({ Editor }: EditorMovementProperties) {
         this.Editor = Editor;
         this.windowEditor = Editor.windowEditor;
@@ -36,7 +35,8 @@ export default class EditorMovement {
 
         const target = e.target as HTMLDivElement;
 
-        if ((target.classList[0] == "wbtn") == false) {
+        // if ((target.classList[0] == "wbtn") == false) {
+        if (target.classList[0] != "wbtn") {
 
             e.preventDefault();
             // setIndex();
@@ -68,6 +68,8 @@ export default class EditorMovement {
 
                 windowEditor.style.top = `${dy}px`;
                 windowEditor.style.left = `${dx}px`;
+
+                Editor.SavePosition()
             }
 
             function closeDragElement(e: MouseEvent) {
@@ -108,22 +110,20 @@ export default class EditorMovement {
 
             position.width = width;
             position.height = height;
-
-            console.log(Editor.data.position);
             
             windowEditor.style.maxHeight = `${maxscreenh - top}px`;
             windowEditor.style.maxWidth = `${maxscreenw - left}px`;
             windowEditor.style.height = `${height}px`;
             windowEditor.style.width = `${width}px`;
-            // SavePosition();
-            // this.MaxCampHeight();
+            Editor.SavePosition();
+            Editor.MaxCampHeight();
 
         }
 
         document.addEventListener('mouseup', up)
         document.addEventListener('mousemove', changet)
         function up() {
-            // MaxCampHeight();
+            Editor.MaxCampHeight();
             document.removeEventListener('mousemove', up)
             document.removeEventListener('mousemove', changet)
         }

@@ -1,5 +1,5 @@
 import React from "react";
-import Note from "../../../interfaces/notes";
+import Note, { Themes } from "../../../interfaces/notes";
 import OpenEditor from "./OpenEditor";
 
 import iconReact from "../../../assets/icon-react.jpg";
@@ -10,6 +10,7 @@ interface TabProps {
 }
 interface TabState {
     title: string,
+    theme: Themes,
     closed: Boolean
 }
 
@@ -26,6 +27,7 @@ export default class Tab extends React.Component<TabProps, TabState> {
 
         this.state = {
             title: data.title,
+            theme: data.theme,
             closed: false
         }
         this.props.invoker.TabInstance = this;
@@ -36,9 +38,10 @@ export default class Tab extends React.Component<TabProps, TabState> {
         this.setState({ closed: true })
     }
     render() {
-        if (this.state.closed == false) {
+        const {theme,closed} = this.state;
+        if (closed == false) {
             return (
-                <div className="editortab" >
+                <div className="editortab" data-theme={theme} >
                     <div className="icon">
                         <img src={iconReact} alt="editor" />
                     </div>
@@ -47,7 +50,7 @@ export default class Tab extends React.Component<TabProps, TabState> {
                 </div>
             )
         }
-        return (<div></div>)
+        // return (<div></div>)
 
     }
 }

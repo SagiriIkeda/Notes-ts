@@ -18,11 +18,12 @@ export default function NotesSection({ UI }: NoteSectionProps) {
     let Reg = new RegExp(state.findText.replace(/\W/gim, "\\$&"), 'gim');
 
     let NotesSearched = Notes.filter(note => {
-        if (Reg.test(note.content) == true || Reg.test(note.title) == true) {
-            return true;
-        } else {
-            return false;
-        }
+        return Reg.test(note.content) == true || Reg.test(note.title) == true;
+        // if (Reg.test(note.content) == true || Reg.test(note.title) == true) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     })
     // function AuxForNotesSection(event : MouseEventHandler ) {
     //     if(event.target.classList.contains("notes-preview-container")){

@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import DB from "../../../db/database";
-import Note, { NoteBuilder } from "../../../interfaces/notes";
+import Note, { NoteBuilder, Themes } from "../../../interfaces/notes";
 import UI from "../../UI";
 import Editor from "./Editor";
 import Tab from "./Tab";
-
+import Swal from "sweetalert2";
 
 export default class OpenEditor {
 
@@ -18,7 +18,7 @@ export default class OpenEditor {
     // windowEditor: HTMLDivElement;
     // TabEditor: HTMLDivElement;
 
-    constructor(UI: UI, id?: string) {
+    constructor(public UI: UI, id?: string) {
         if (id) {
             // console.log(UI);
             UI.state.Editors.set(id, this);
@@ -34,12 +34,16 @@ export default class OpenEditor {
         this.data = { ...DefaultData, ...DB.Notes.get(id) };
 
         if (!id) {
-            this.data = JSON.parse(JSON.stringify(DefaultData)) as Note ;
+            this.data = JSON.parse(JSON.stringify(DefaultData)) as Note;
         }
 
         const { data } = this;
 
         this.LastestSave = data.content;
+
+        this.Close = this.Close.bind(this);
+        this.closeAnimation = this.closeAnimation.bind(this);
+
         //references
         // this.windowEditor = document.createElement('div');
         // this.windowEditor.className = "Editor";
@@ -49,7 +53,7 @@ export default class OpenEditor {
         // (document.querySelector('.Editors') as HTMLDivElement).appendChild(this.windowEditor);
 
         // ReactDOM.createRoot(this.windowEditor).render(<Editor invoker={this} />);
-        
+
 
         // (document.querySelector('.activeEditors') as HTMLDivElement).appendChild(this.TabEditor)
         // ReactDOM.createRoot(this.TabEditor).render(<Tab invoker={this}/>);
@@ -82,36 +86,51 @@ export default class OpenEditor {
         // document.querySelector('.Editors').appendChild(windowEditor);
     }
 
-    SavePosition() {
-        const { data, id } = this;
-        // if (id) {
-        //     let construct = JSON.parse(JSON.stringify(data)) as Note;
+    // SavePosition() {
+    //     const { data, id } = this;
+    //     // if (id) {
+    //     //     let construct = JSON.parse(JSON.stringify(data)) as Note;
 
-        //     let rect = this.windowEditor.getBoundingClientRect();
-        //     let wswidth = rect.width
-        //     let wsheight = rect.height;
-        //     let wsleft = rect.left;
-        //     let wstop = rect.top
-        //     DB.Notes.Update(construct.id, {
-        //         position: {
-        //             width: wswidth,
-        //             height: wsheight,
-        //             top: wstop,
-        //             left: wsleft
-        //         }
-        //     });
-        // }
+    //     //     let rect = this.windowEditor.getBoundingClientRect();
+    //     //     let wswidth = rect.width
+    //     //     let wsheight = rect.height;
+    //     //     let wsleft = rect.left;
+    //     //     let wstop = rect.top
+    //     //     DB.Notes.Update(construct.id, {
+    //     //         position: {
+    //     //             width: wswidth,
+    //     //             height: wsheight,
+    //     //             top: wstop,
+    //     //             left: wsleft
+    //     //         }
+    //     //     });
+    //     // }
+    // }
+
+    setTheme(theme: Themes) {
+        const { EditorInstance, TabInstance, data } = this;
+
+        if(EditorInstance && TabInstance){
+            data.theme = theme;
+
+            EditorInstance.setState({theme})
+            TabInstance.setState({theme})
+        }
+
     }
+
 
     Save() {
         const { data, id } = this;
 
         this.LastestSave = data.content;
         // EditInstance.SaveAnimation();
-        let construct = JSON.parse(JSON.stringify(data));
+        let construct = JSON.parse(JSON.stringify(data)); // Crear copia de los Datos de la nota
         construct.time = Date.now();
+        console.log(construct);
+
         try {
-            if (id) {//la nota no existe
+            if (!id) {//la nota no existe
                 // let uuid = DB.Notes.Add(construct);
                 // this.id = uuid;
                 // data.id = uuid;
@@ -119,7 +138,7 @@ export default class OpenEditor {
                 // Application.state.Editors.push(id);
             } else {//la nota si existe
                 // construct.folder = DB.Notes.Obtain(data.id).folder;
-                DB.Notes.Update(construct.id, construct)
+                DB.Notes.Update(construct.id, construct);
 
             }
         } catch (error: any) {
@@ -149,49 +168,50 @@ export default class OpenEditor {
         // EditInstance.chachedUpdate = null;
         // EditInstance.setState({ updateReceived: false })
 
-        this.SavePosition();
+        // this.SavePosition();
 
-        // Application.reloadData();
+        this.UI.reloadData();
     }
 
     //Close
-    CloseTotal(forceClose = false) {
+    Close(force: React.MouseEvent | boolean = false) {
         const { data } = this;
 
         let construct = JSON.parse(JSON.stringify(data));
-        if (forceClose == true) {
-            closeanim();
+        if (force == true) {
+            this.closeAnimation();
         } else {
             if (construct.content != this.LastestSave) {
-                console.log("No es igual");
-
-                // swal.fire({
-                //     icon: 'warning',
-                //     showCancelButton: true,
-                //     cancelButtonText: "Cancelar",
-                //     reverseButtons: true,
-                //     html: 'Aún no haz guardado<br> <b>¿estas seguro que deseas cerrar?</b>',
-                //     confirmButtonText: 'cerrar'
-                // }).then((result) => {
-                //     if (result.isConfirmed) {
-                //         closeanim();
-                //     }
-                // })
+                Swal.fire({
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: "Cancelar",
+                    reverseButtons: true,
+                    html: 'Aún no haz guardado<br> <b>¿estas seguro que deseas cerrar?</b>',
+                    confirmButtonText: 'cerrar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.closeAnimation();
+                    }
+                })
             } else {
-                closeanim();
+                this.closeAnimation();
             }
         }
-        function closeanim() {
-            // bc.removeEventListener('message', BcReceivedUpdate)
+    }
 
-            // TabEditor.removeEventListener('click', setIndex)
-            // EditInstance.closeWindow();
-            // TabInstance.closeTab();
-            // TabEditor.parentNode.removeChild(TabEditor);
-            // setTimeout(e => {
-            //     windowEditor.parentNode.removeChild(windowEditor);
-            // }, 310)
-        }
+    async closeAnimation() {
+         // bc.removeEventListener('message', BcReceivedUpdate)
+
+        // TabEditor.removeEventListener('click', setIndex)
+        const {TabInstance, EditorInstance, UI, data} = this;
+
+        await EditorInstance?.closeWindow();
+        TabInstance?.closeTab();
+
+        UI.state.Editors.delete(data.id);
+
+        UI.setState({})
     }
 
 }

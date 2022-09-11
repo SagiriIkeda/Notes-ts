@@ -67,11 +67,11 @@ export default class UINOTES extends React.Component {
     }
 
     reloadData(sendUpdateToBc = true) {
-        // sendUpdateToBc == true && bc.postMessage("UpdateApplication");
         this.setState({
             Notes: DB.Notes.Content,
             Folders: DB.Folders.Content
         })
+        
     }
 
     CloseSelectMode() {

@@ -208,7 +208,10 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     render() {
         const { data } = this.props
 
-        let content = data.content.replace(/<div>(.*?)<\/div>/gim, ' $1').replace(/<.+?>/gim, "").substr(0, 61);
+        let content = data.content
+            .replace(/<.+?>/gim, "")
+            .substr(0, 61)
+            
         let more = false;
         if (content.length >= 61) {
             more = true;
@@ -220,9 +223,10 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 onMouseDown={this.Click}
                 // onAuxClick={this.AuxEvent}
                 ref={this.note}
-            // theme={this.props.data.theme}
+                data-theme={data.theme}
             >
-                <div className="note__content">{content}</div>
+                <div className="note__content" dangerouslySetInnerHTML={{__html:content}}></div>
+                {/* <div className="note__content">{content}</div> */}
                 {(more == true) && (<div className="more">...</div>)}
                 <div className="note__date">{timeAgo(data.time)}</div>
                 {/* <div className="note__date">Dios Sabrá</div> */}

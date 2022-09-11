@@ -1,4 +1,4 @@
-import React, { createRef,FormEventHandler,KeyboardEvent,ReactNode, SyntheticEvent } from "react";
+import React, { createRef, FormEventHandler, KeyboardEvent, ReactNode, SyntheticEvent } from "react";
 import Note, { Themes } from "../../../interfaces/notes";
 import { Mat } from "../../prefabs";
 import { months } from "../../timeAgo";
@@ -7,6 +7,8 @@ import OpenEditor from "./OpenEditor";
 import iconReact from "../../../assets/icon-react.jpg";
 import UINOTES from "../../UI";
 import EditorMovement from "./Movement";
+import EditorSelection from "./Selection";
+import DB from "../../../db/database";
 
 interface EditorProps {
     invoker: OpenEditor,
@@ -33,9 +35,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
     note_name_container = createRef<HTMLDivElement>();
     InputName = createRef<HTMLInputElement>();
-    InputCamp = createRef<HTMLInputElement>();
+    InputCamp = createRef<HTMLDivElement>();
     windowElm = createRef<HTMLDivElement>();
     data: Note;
+
+    invoker: OpenEditor;
 
     windowEditor = createRef<HTMLDivElement>();
 
@@ -43,7 +47,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     note__info = createRef<HTMLDivElement>();
     note__header = createRef<HTMLDivElement>();
 
-    Movement = new EditorMovement({Editor: this})
+    Movement = new EditorMovement({ Editor: this });
+    Selection = new EditorSelection({ Editor: this });
 
     constructor(props: EditorProps) {
         super(props);
@@ -53,7 +58,10 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (localStorage.getItem('AutoUp') != undefined) {
             autoup = JSON.parse(localStorage.getItem('AutoUp') ?? "false");
         }
-        this.data = props.invoker.data;
+        this.invoker = props.invoker;
+
+        this.data = this.invoker.data;
+
         const { data } = this;
 
         this.state = {
@@ -73,10 +81,19 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         this.props.invoker.EditorInstance = this;
 
-        // this.DragWindow = this.DragWindow.bind(this);
+        // functions
         this.UpdateCharact = this.UpdateCharact.bind(this);
         this.UpdateName = this.UpdateName.bind(this);
-        
+        this.SaveKey = this.SaveKey.bind(this);
+        this.SaveAnimation = this.SaveAnimation.bind(this);
+        this.Save = this.Save.bind(this);
+
+        this.toggleMenuTheme = this.toggleMenuTheme.bind(this);
+        this.toggleTexturizeCamp = this.toggleTexturizeCamp.bind(this);
+        this.MaxCampHeight = this.MaxCampHeight.bind(this);
+        this.SavePosition = this.SavePosition.bind(this);
+
+
         // EditInstance = this;
         //functions
         //References 
@@ -84,6 +101,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         // this.chachedUpdate = null;
     }
+
 
     // ClickUpdateReceived() {
 
@@ -101,224 +119,163 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     //     SetTheme(data.theme);
     // }
 
-    UpdateName(event : SyntheticEvent<HTMLInputElement, InputEvent> ) {
-        const {invoker} = this.props;
-        const {data} = this.props.invoker;
+    UpdateName(event: SyntheticEvent<HTMLInputElement, InputEvent>) {
+        const { invoker } = this.props;
+        const { data } = this.props.invoker;
         const target = event.target as HTMLInputElement;
-        if(target) {
-            const {TabInstance} = invoker;
+        if (target) {
+            const { TabInstance } = invoker;
             let value = target.value;
             data.title = target.value;
             this.setState({ title: value })
-            if(TabInstance) {
+            if (TabInstance) {
                 TabInstance.setState({ title: value })
             }
         }
     }
     UpdateCharact() {
         const InputCamp = this.InputCamp.current;
-        if(InputCamp) {
+        if (InputCamp) {
             this.props.invoker.data.content = InputCamp.innerHTML;
             let value = InputCamp.innerText;
             this.setState({ charact: value.length })
         }
     }
-    // SaveAnimation() {
-    //     this.note_name_container.current.classList.add('saving')
-    //     setTimeout(() => {
-    //         if (this.note_name_container.current != undefined) {
-    //             this.note_name_container.current.classList.remove('saving');
-    //         }
-    //     }, 3000);
-    // }
-    // SaveKey(e) {
-    //     const keyCode = e.keyCode || e.which;
 
-    //     if (keyCode === 116) {
-    //         e.returnValue = false;
-    //         if (e.preventDefault) e.preventDefault();
-    //         Save();
-    //     }
-    // }
+    SavePosition() {
+        const { invoker } = this;
+        const { data, id } = invoker;
+
+        if (id) {
+            DB.Notes.Update(id, { position: data.position });
+        }
+    }
+
+    Save() {
+        this.SaveAnimation();
+        this.invoker.Save();
+    }
+
+    SaveAnimation() {
+        const note_name_container = this.note_name_container.current;
+        if (note_name_container) {
+            note_name_container.classList.add('saving');
+            setTimeout(() => {
+                note_name_container.classList.remove('saving');
+            }, 3000);
+        }
+    }
+
+    SaveKey(e: KeyboardEvent) {
+        const keyCode = e.keyCode;
+
+        if (keyCode === 116) {
+            // e.returnValue = false;
+            e?.preventDefault();
+            this.Save();
+        }
+    }
+
     componentDidMount() {
-        const {InputName,InputCamp,data} = this;
-        if(InputName.current) {
+        const { InputName, InputCamp, data, Selection } = this;
+        const windowEditor = this.windowEditor.current;
+        if (InputName.current) {
             InputName.current.value = data.title;
         }
-        if(InputCamp.current) {
+        if (InputCamp.current) {
             InputCamp.current.innerHTML = data.content;
         }
+        document.addEventListener('selectionchange', Selection.SelectionChange);
+        this.MaxCampHeight();
+
+        if (windowEditor) {
+            windowEditor.style.height = `${data.position.height}px`;
+            windowEditor.style.width = `${data.position.width}px`;
+            windowEditor.style.left = `${data.position.left}px`;
+            windowEditor.style.top = `${data.position.top}px`;
+        }
+
+
         // LastestSave = this.InputCamp.current.innerHTML;
         this.UpdateCharact();
     }
-    // saveAutoUp(type) {
-    //     localStorage.setItem('AutoUp', JSON.stringify(type));
-    // }
-    // toggleMenuTheme(e) {
-    //     this.setState({
-    //         themeMenu: !this.state.themeMenu,
-    //         force: false,
-    //         texturize: false
-    //     })
-    // }
-    // toggleTexturizeCamp() {
-    //     this.setState({
-    //         force: !this.state.force,
-    //         themeMenu: false
-    //     })
-    // }
-    
-    // MaxCampHeight(s) {
-    //     let usereditorheight = this.usereditor.current.getBoundingClientRect().height;
+    toggleMenuTheme() {
+        this.setState({
+            themeMenu: !this.state.themeMenu,
+            force: false,
+            texturize: false
+        })
+    }
+    toggleTexturizeCamp() {
+        this.setState({
+            force: !this.state.force,
+            themeMenu: false
+        })
+    }
 
-    //     let characterheight = this.note__info.current.getBoundingClientRect().height;
-    //     let editorheaderHeight = this.note__header.current.getBoundingClientRect().height;
-    //     let avaibleHeight = usereditorheight - characterheight - editorheaderHeight;
+    MaxCampHeight(s?: boolean) {
+        const usereditor = this.usereditor.current;
+        const note__info = this.note__info.current as HTMLDivElement;
+        const note__header = this.note__info.current as HTMLDivElement;
+        const InputCamp = this.note__info.current as HTMLInputElement;
+        if (usereditor) {
+            let usereditorheight = usereditor.getBoundingClientRect().height;
 
-    //     avaibleHeight -= 1;
-    //     if (s == true) {
-    //         avaibleHeight = avaibleHeight * 1.2;
-    //     }
-    //     this.InputCamp.current.style.maxHeight = `${avaibleHeight}px`;
-    // }
-    // SelectionChange(e) {
-    //     // console.log(this.getSelectionHtml());
-    //     let that = this;
-    //     if (e.path[0].activeElement == this.InputCamp.current) {
-    //         clearInterval(this.timetorange);
-    //         let range = document.getSelection().toString();
-    //         //estilizar los botones
-    //         function IdentifierPropertis() {
-    //             let html = that.getSelectionHtml();
-    //             let parenttag = document.getSelection().anchorNode.parentNode.tagName;
+            let characterheight = note__info.getBoundingClientRect().height;
+            let editorheaderHeight = note__header.getBoundingClientRect().height;
+            let avaibleHeight = usereditorheight - characterheight - editorheaderHeight;
 
-    //             if (html.search(/<i>.*?<\/i>/gim) != -1 || parenttag == "I") {
-    //                 that.state.italic = true;
-    //             } else {
-    //                 that.state.italic = false;
-    //             }
+            avaibleHeight -= 1;
+            if (s === true) {
+                avaibleHeight = avaibleHeight * 1.2;
+            }
+            InputCamp.style.maxHeight = `${avaibleHeight}px`;
 
-    //             if (html.search(/<u>.*?<\/u>/gim) != -1 || parenttag == "U") {
-    //                 that.state.underline = true;
+        }
+    }
 
-    //             } else {
-    //                 that.state.underline = false;
-    //             }
+    closeWindow() {
+        return new Promise((resolve, reject) => {
+            const { Selection, invoker } = this;
 
-    //             if (html.search(/<b>.*?<\/b>/gim) != -1 || parenttag == "B") {
-    //                 that.state.bold = true;
+            const windowEditor = this.windowEditor.current;
 
-    //             } else {
-    //                 that.state.bold = false;
-    //             }
+            const ANIMATION_TIME = 300;
 
-    //             if (parenttag == "B" || parenttag == "I" || parenttag == "U") {
-    //                 let actualparent = document.getSelection().anchorNode.parentNode;
-    //                 let array = [];
-    //                 let tag = actualparent.tagName;
-    //                 array.push(tag)
-    //                 if (actualparent.parentNode.tagName != "DIV") {
-    //                     array.push(actualparent.parentNode.tagName)
-    //                     if (actualparent.parentNode.parentNode.tagName != "DIV") {
-    //                         array.push(actualparent.parentNode.parentNode.tagName)
-    //                     }
-    //                 }
-    //                 if (array.includes("I")) {
-    //                     that.state.italic = true;
-    //                 }
-    //                 if (array.includes("U")) {
-    //                     that.state.underline = true;
-    //                 }
-    //                 if (array.includes("B")) {
-    //                     that.state.bold = true;
-    //                 }
-    //                 that.setState({})
-    //             }
+            document.removeEventListener('selectionchange', Selection.SelectionChange);
 
-    //         }
-    //         //abrir y cerrar el menu de textura
-    //         if (range.length != 0) {
-    //             let ms = 0;
-    //             this.timetorange = setInterval(() => {
-    //                 ms++;
-    //                 if (ms >= 100) {
-    //                     clearInterval(this.timetorange);
-    //                     this.setState({
-    //                         texturize: true
-    //                     })
-    //                     ms = 0;
-    //                 }
-    //             }, 1);
+            windowEditor?.classList.add("closing");
+            windowEditor?.animate([
+                { transform: `scale(1)`, opacity: "1" },
+                { transform: `scale(0.8)`, opacity: "0" },
+            ], {
+                duration: ANIMATION_TIME,
+                easing: "ease",
+                fill: "forwards",
+            })
 
-    //         } else {
-    //             this.setState({
-    //                 texturize: false
-    //             })
-    //         }
-    //         IdentifierPropertis();
-    //     }
+            setTimeout(() => {
+                this.setState({
+                    closed: true
+                })
+                resolve(true)
 
-    // }
-    // getSelectionHtml() {
-    //     var html = "";
-    //     if (typeof window.getSelection != "undefined") {
-    //         var sel = window.getSelection();
-    //         if (sel.rangeCount) {
-    //             var container = document.createElement("div");
-    //             for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-    //                 container.appendChild(sel.getRangeAt(i).cloneContents());
-    //             }
-    //             html = container.innerHTML;
-    //         }
-    //     } else if (typeof document.selection != "undefined") {
-    //         if (document.selection.type == "Text") {
-    //             html = document.selection.createRange().htmlText;
-    //         }
-    //     }
-    //     return html;
-    // }
-    // preventPasteHTML(e) {
-    //     e.preventDefault();
-    //     let text = e.clipboardData.getData("text/plain");
-    //     document.execCommand('insertText', false, text);
-    // }
-    // componentWillMount() {
-    //     setTimeout(() => {
-    //         this.MaxCampHeight(true);
-    //     }, 1);
-    //     document.addEventListener('selectionchange', this.SelectionChange);
-    // }
-    // closeWindow() {
-    //     document.removeEventListener('selectionchange', this.SelectionChange);
+            }, ANIMATION_TIME);
 
-    //     windowEditor.classList.add("closing");
-    //     windowEditor.animate([
-    //         { transform: `scale(1)`, opacity: "1" },
-    //         { transform: `scale(0.8)`, opacity: "0" },
-    //     ], {
-    //         duration: 300,
-    //         easing: "ease",
-    //         fill: "forwards",
-    //     })
-    //     setTimeout(() => {
-    //         this.setState({
-    //             closed: true
-    //         })
-    //         Application.state.Editors.splice(Application.state.Editors.findIndex(e => e == id), 1)
-    //     }, 300);
-    // }
-    // setAutoOpen(e : boolean) {
-    //     this.setState({
-    //         autoOpen: true
-    //     })
-    //     this.saveAutoUp(true);
-    // }
-    // setAutoOpenClose() {
-    //     this.setState({
-    //         autoOpen: false
-    //     })
-    //     this.saveAutoUp(false);
-    // }
+        })
+    }
+
+    saveAutoUp(type: boolean) {
+        localStorage.setItem('AutoUp', JSON.stringify(type));
+    }
+
+    setAutoOpen(e = true) {
+        this.setState({
+            autoOpen: e
+        })
+        this.saveAutoUp(e);
+    }
+
     // AuxForInput(event) {
     //     let input = this.InputName.current;
     //     // let obj = [
@@ -420,13 +377,14 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     // }
 
     render() {
-        const { state,Movement } = this;
+        const { state, Movement, Selection, invoker } = this;
         const { data } = this.props.invoker;
 
         let time = new Date(data.time);
+
         if (state.closed == false) {
             return (
-                <div className="Editor" ref={this.windowEditor} >
+                <div className="Editor" ref={this.windowEditor} data-theme={state.theme} >
 
                     <div className="window" ref={this.windowElm} onMouseDown={Movement.DragWindow} >
                         <div className="title">
@@ -434,15 +392,14 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             <span>{state.title}</span>
                         </div>
                         <div className="btns">
-                            {/* <div className="wbtn" onClick={CloseTotal.bind(false)} ><Mat>close</Mat></div> */}
-                            <div className="wbtn" ><Mat>close</Mat></div>
+                            <div className="wbtn" onClick={invoker.Close}><Mat>close</Mat></div>
+                            {/* <div className="wbtn" ><Mat>close</Mat></div> */}
                         </div>
                     </div>
                     <div className="usereditor" ref={this.usereditor}>
                         <div className="note-editor-capm">
                             <div className="editor-header" ref={this.note__header}>
-                                {/* <div className="atras" onClick={CloseTotal}>  <Mat>keyboard_arrow_left</Mat></div> */}
-                                <div className="atras">  <Mat>keyboard_arrow_left</Mat></div>
+                                <div className="atras" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
                                 <div className="note_name">
                                     <div className="container" ref={this.note_name_container}>
                                         <div className="saved">Guardando...</div>
@@ -450,7 +407,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                             maxLength={23}
                                             onInput={this.UpdateName}
                                             ref={this.InputName}
-                                        // onKeyDown={this.SaveKey}
+                                            onKeyDown={this.SaveKey}
                                         // onAuxClick={this.AuxForInput}
                                         />
                                     </div>
@@ -469,13 +426,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                         </div>
                                     )}
 
-                                    {/* <div className="OpenSubMenu" onClick={this.toggleTexturizeCamp} data-actived={String(state.force)}> <Mat>title</Mat></div> */}
-                                    <div className="OpenSubMenu" data-actived={String(state.force)}> <Mat>title</Mat></div>
-                                    {/* <div className="OpenSubMenu" onClick={this.toggleMenuTheme} data-actived={String(state.themeMenu)}> <Mat>format_paint</Mat></div> */}
-                                    <div className="OpenSubMenu" data-actived={String(state.themeMenu)}> <Mat>format_paint</Mat></div>
-                                    {/* <div className="save" onClick={Save}> <Mat>done</Mat></div> */}
-                                    <div className="save"> <Mat>done</Mat></div>
-
+                                    <div className="OpenSubMenu" onClick={this.toggleTexturizeCamp} data-actived={String(state.force)}> <Mat>title</Mat></div>
+                                    <div className="OpenSubMenu" onClick={this.toggleMenuTheme} data-actived={String(state.themeMenu)}> <Mat>format_paint</Mat></div>
+                                    <div className="save" onClick={this.Save}><Mat>done</Mat></div>
                                 </div>
                             </div>
                             <div className="note-editor">
@@ -485,8 +438,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     contentEditable="true"
                                     ref={this.InputCamp}
                                     onKeyUp={this.UpdateCharact}
-                                // onKeyDown={this.SaveKey}
-                                // onPaste={this.preventPasteHTML}
+                                    onKeyDown={this.SaveKey}
+                                    onPaste={Selection.preventPasteHTML}
                                 // onAuxClick={this.AuxForCamp}
                                 ></div>
                                 <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoOpen == true) ? state.texturize : false}>
@@ -496,73 +449,49 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                         <CampBtn underline ad={state.underline}>format_underline</CampBtn>
                                         <CampBtn italic ad={state.italic}>format_italic</CampBtn>
                                     </div>
-                                    {(state.autoOpen == true) ? (
-                                        // <div className="material-icons AutoOpenBtn" onClick={this.setAutoOpenClose}>expand_more</div>
-                                        <div className="material-icons AutoOpenBtn">expand_more</div>
-                                    ) : (
-                                        // <div className="material-icons AutoOpenBtn" onClick={this.setAutoOpen}>expand_less</div>
-                                        <div className="material-icons AutoOpenBtn">expand_less</div>
-                                    )}
+
+                                    <div className="material-icons AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoOpen)}>{(state.autoOpen) ? "expand_less" : "expand_more"}</div>
                                 </div>
                                 <div className="selected_theme" data-active={String(state.themeMenu)}>
                                     <span className="titles">Selecciona Temas</span>
                                     <div className="div">
-                                        <ThemeBtn theme="dark">Oscuro</ThemeBtn>
-                                        <ThemeBtn theme="yellow">Amarillo</ThemeBtn>
-                                        <ThemeBtn theme="blue">Azul</ThemeBtn>
-                                        <ThemeBtn theme="green">Verde</ThemeBtn>
-                                        <ThemeBtn theme="red">Rojo</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="dark">Oscuro</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="yellow">Amarillo</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="blue">Azul</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="green">Verde</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="red">Rojo</ThemeBtn>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {/* <div className="expandiblewindow" onMouseDown={this.ResizeWindow} ></div> */}
                     <div className="expandiblewindow" onMouseDown={Movement.ResizeWindow} ></div>
 
                 </div>
             )
-        } else {
-            return (<div></div>);
         }
     }
 }
 
-function SetTheme(theme: Themes) {
-    // data.theme = theme;
-    // windowEditor.setAttribute('theme', theme);
-    // TabEditor.setAttribute('theme', theme)
-    // EditInstance.setState({ theme: theme })
-}
-function ThemeBtn(props: { theme: Themes, children: ReactNode }) {
-    const data: Note = {
-        id: "",
-        content: "",
-        folder: "",
-        theme: "dark",
-        time: 0,
-        title: "",
-        position: {
-            width: 0,
-            height: 0,
-            left: 0,
-            top: 0
-        },
-        v: ""
-    }
+function ThemeBtn({ Editor, theme, children }: { theme: Themes, children: ReactNode, Editor: Editor }) {
+
+    const { data } = Editor;
+
     function changeTheme() {
-        SetTheme(props.theme)
+        Editor.invoker.setTheme(theme)
     }
+
     return (
-        <div className="themeBtn" data-theme={props.theme} onClick={changeTheme} data-selected={data.theme == props.theme}>
+        <div className="themeBtn" data-theme={theme} onClick={changeTheme} data-selected={data.theme == theme}>
             <div className="icon-theme">
                 T
             </div>
-            <div className="name-theme">{props.children}</div>
+            <div className="name-theme">{children}</div>
         </div>
     )
 }
 //Butons para bold,Italic,underline etc
+
 function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?: boolean, underline?: boolean }) {
     let type = Object.keys(props)[0];
     function Texturize() {

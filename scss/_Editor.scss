@@ -307,6 +307,7 @@
             right: 10px;
             position: absolute;
             cursor: pointer;
+            color: white;
             &:hover {
                 color: var(--primary);
             }
@@ -402,28 +403,28 @@
                 color: #b8b8b8;
                 user-select: none;
             }
-            &[theme="yellow"] {
+            &[data-theme="yellow"] {
                 .icon-theme {
                     border-color: #6e693a;
                     background: #faf9b2;
                     color: #8d864a;
                 }
             }
-            &[theme="red"] {
+            &[data-theme="red"] {
                 .icon-theme {
                     border-color: #6e3a3a;
                     background: #fac7c7;
                     color: #8d4a4a;
                 }
             }
-            &[theme="green"] {
+            &[data-theme="green"] {
                 .icon-theme {
                     border-color: #5a6e3a;
                     background: #e2fac3;
                     color: #738d4a;
                 }
             }
-            &[theme="blue"] {
+            &[data-theme="blue"] {
                 .icon-theme {
                     border-color: #2f434b;
                     background: #c3edfd;
@@ -436,7 +437,7 @@
         pointer-events: none;
     }
     //TEMAS
-    &[theme="green"] {
+    &[data-theme="green"] {
         --primary:#738d4a;
         --menucolor:#454e2b;
         .note-editor-capm {
@@ -476,7 +477,7 @@
             }
         }
     }
-    &[theme="red"] {
+    &[data-theme="red"] {
         --primary:#6e3a3a;
         --menucolor:#4e2f2b;
         .note-editor-capm {
@@ -516,7 +517,7 @@
             }
         }
     }
-    &[theme="blue"] {
+    &[data-theme="blue"] {
         --primary:#3d555e;
         --menucolor:#273d44;
         .note-editor-capm {
@@ -556,7 +557,7 @@
             }
         }
     }
-    &[theme="yellow"] {
+    &[data-theme="yellow"] {
         --primary:#6e693a;
         --menucolor:#5a562f;
         .note-editor-capm {

@@ -193,7 +193,7 @@ body {
                         background: #ffffff56;
                     }
                 }
-                &[theme="red"] {
+                &[data-theme="red"] {
                     border-color: #4e2f2b;
                     background: #fac7c7;
                     span,i {
@@ -203,7 +203,7 @@ body {
                         background: #ad38386e;
                     }
                 }
-                &[theme="green"] {
+                &[data-theme="green"] {
                     border-color: #8dbf4d;
                     background: #e2fac3;
                     span,i {
@@ -213,7 +213,7 @@ body {
                         background: #8dbf4d6e;
                     }
                 }
-                &[theme="yellow"] {
+                &[data-theme="yellow"] {
                     border-color: #8d864a;
                     background: #faf9b2;
                     span,i {
@@ -223,7 +223,7 @@ body {
                         background: #837a2e6e;
                     }
                 }
-                &[theme="blue"] {
+                &[data-theme="blue"] {
                     border-color: #8d864a;
                     background: #c3edfd;
                     span,i {
@@ -451,7 +451,7 @@ body {
             }
         }
     }
-    &[theme="green"] {
+    &[data-theme="green"] {
         background: #e2fac3;
         .note__content,.more {
             color: #738d4a;
@@ -470,7 +470,7 @@ body {
             background: #738d4a;
         }
     }
-    &[theme="red"] {
+    &[data-theme="red"] {
         background: #fac7c7;
         .note__content,.more {
             color: #6e3a3a;
@@ -489,7 +489,7 @@ body {
             background: #6e3a3a;
         }
     }
-    &[theme="blue"] {
+    &[data-theme="blue"] {
         background: #c3edfd;
         .note__content,.more {
             color: #517280;
@@ -508,7 +508,7 @@ body {
             background: #517280;
         }
     }
-    &[theme="yellow"] {
+    &[data-theme="yellow"] {
         background: #faf9b2;
         .note__content,.more {
             color: #8d864a;
@@ -629,6 +629,7 @@ body {
     }
     .swal2-actions {
         display: flex;
+        width:100%;
         justify-content: flex-end;
         padding-right: 10px;
         padding-bottom: 10px;
@@ -648,6 +649,9 @@ body {
            user-select: none;
        }
     }
+    .swal2-html-container {
+        color: #aeaeae;
+    }
     .swal2-cancel {
         color: #aeaeae !important;
         background: transparent !important;
@@ -658,7 +662,8 @@ body {
         }
     }
     .swal2-content {
-        color: #aeaeae !important;
+        // color: #aeaeae !important;
+        color: white !important;
     }
     .swal2-confirm {
         padding: 10px !important;
