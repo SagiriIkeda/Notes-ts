@@ -29,6 +29,7 @@ interface EditorState {
     autoOpen: boolean,
 
     updateReceived: boolean,
+    zIndex: number,
 }
 
 export default class Editor extends React.Component<EditorProps, EditorState> {
@@ -77,6 +78,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             themeMenu: false,
             autoOpen: autoup,
             updateReceived: false,
+            zIndex: this.invoker.zIndex,
         }
 
         this.props.invoker.EditorInstance = this;
@@ -384,6 +386,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         if (state.closed == false) {
             return (
+                // <div className="Editor" ref={this.windowEditor} style={{zIndex: state.zIndex}}  data-theme={state.theme} >
                 <div className="Editor" ref={this.windowEditor} data-theme={state.theme} >
 
                     <div className="window" ref={this.windowElm} onMouseDown={Movement.DragWindow} >
@@ -504,6 +507,23 @@ function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?
     )
 }
 
+// export class Editors extends React.Component {
+
+//     UI: UINOTES;
+
+//     constructor({ UI }: { UI: UINOTES }) {
+
+//         super(props);
+//         this.UI = UI;
+//     }
+//     render() {
+//         return (<>
+//         {[...this.UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {
+//             return <Editor invoker={item} key={item.temporalId ?? item.data.id} />
+//         })}
+//     </>)
+//     }
+// }
 export function Editors({ UI }: { UI: UINOTES }) {
     return (<>
         {[...UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {

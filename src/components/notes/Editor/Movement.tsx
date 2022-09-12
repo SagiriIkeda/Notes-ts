@@ -1,12 +1,13 @@
 import React from "react";
+import { EDITORCONFIG } from "../../../interfaces/config";
 import Editor from "./Editor";
 
 interface EditorMovementProperties {
     Editor: Editor;
 }
 
-const MIN_WIDTH = 360;
-const MIN_HEIGHT = 272;
+// const MIN_WIDTH = 360;
+// const MIN_HEIGHT = 272;
 
 export default class EditorMovement {
     Editor: Editor;
@@ -35,13 +36,14 @@ export default class EditorMovement {
 
         const target = e.target as HTMLDivElement;
 
-        // if ((target.classList[0] == "wbtn") == false) {
         if (target.classList[0] != "wbtn") {
 
             e.preventDefault();
             // setIndex();
             this.clientX = e.clientX;
             this.clientY = e.clientY;
+
+            Editor.invoker.setTopZIndex();
 
             const elementDrag = (e: MouseEvent) => {
                 e.preventDefault();
@@ -105,8 +107,8 @@ export default class EditorMovement {
             let top = rect.top;
             let left = rect.left;
 
-            if (height < MIN_HEIGHT) height = MIN_HEIGHT;
-            if (width < MIN_WIDTH) width = MIN_WIDTH;
+            if (height < EDITORCONFIG.MIN_HEIGHT) height = EDITORCONFIG.MIN_HEIGHT;
+            if (width < EDITORCONFIG.MIN_WIDTH) width = EDITORCONFIG.MIN_WIDTH;
 
             position.width = width;
             position.height = height;

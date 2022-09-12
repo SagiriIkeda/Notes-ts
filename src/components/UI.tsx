@@ -6,7 +6,7 @@ import FolderSection from "./folders/FolderSection";
 import Folder from "../interfaces/folder";
 
 import NotesSection from "./notes/NotesSection";
-import OpenEditor from "./notes/Editor/OpenEditor";
+import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import Editor, { Editors } from "./notes/Editor/Editor";
 // import { NoteBuilder } from "../interfaces/notes";
 
@@ -108,7 +108,7 @@ export default class UINOTES extends React.Component {
                 </div>
                 <div className={`FloatBtn${(state.SelectMode)? " ocult":""}`}
                 //* <div className={`FloatBtn`} 
-                onClick={() => new OpenEditor(this)}
+                onClick={() => OpenLimitedEditor(this)}
                 >
                     <Mat>add</Mat>
                 </div>

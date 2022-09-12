@@ -41,12 +41,13 @@ export default class Tab extends React.Component<TabProps, TabState> {
         const {theme,closed} = this.state;
         if (closed == false) {
             return (
-                <div className="editortab" data-theme={theme} >
+                // <div className="editortab" data-theme={theme}  onClick={() => this.invoker.setTopZIndex()} >
+                <div className="editortab" data-theme={theme}  onClick={this.invoker.setTopZIndex} >
                     <div className="icon">
                         <img src={iconReact} alt="editor" />
                     </div>
                     <span>{this.state.title}</span>
-                    <i className="material-icons">close</i>
+                    <i className="material-icons" onClick={this.invoker.Close} >close</i>
                 </div>
             )
         }

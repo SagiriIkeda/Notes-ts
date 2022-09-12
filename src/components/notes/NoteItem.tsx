@@ -2,7 +2,7 @@ import React, { createRef, MouseEventHandler } from "react";
 import Note from "../../interfaces/notes";
 import timeAgo from "../timeAgo";
 import UI from "../UI"
-import OpenEditor from "./Editor/OpenEditor";
+import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
 // import Note from "../../interfaces/notes";
 
 interface NoteItemProps {
@@ -211,7 +211,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         const {UI,data} = this.props;
 
         if(!UI.state.Editors.has(data.id)){
-            new OpenEditor(UI,data.id);
+            OpenLimitedEditor(UI,data.id);
         }
     } 
 

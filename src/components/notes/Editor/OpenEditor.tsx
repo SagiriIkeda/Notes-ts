@@ -5,6 +5,9 @@ import UI from "../../UI";
 import Editor from "./Editor";
 import Tab from "./Tab";
 import Swal from "sweetalert2";
+import { EDITORCONFIG } from "../../../interfaces/config";
+
+export let zIndexs = 40;
 
 export default class OpenEditor {
 
@@ -13,8 +16,11 @@ export default class OpenEditor {
     LastestSave: string;
     TabInstance?: Tab;
     EditorInstance?: Editor;
-
     temporalId?: number;
+
+    createdAt = Date.now();
+
+    zIndex = zIndexs++;
 
     constructor(public UI: UI, id?: string) {
         //open
@@ -24,7 +30,7 @@ export default class OpenEditor {
             this.data = new NoteBuilder(activeFolder, DB.Notes.get(id))
 
             UI.state.Editors.set(id, this);
-        } else {//la nota no existe
+        } else {//la nota no existe (colocarle una id temporal)
             this.data = new NoteBuilder(activeFolder);
 
             this.temporalId = Date.now();
@@ -33,23 +39,33 @@ export default class OpenEditor {
 
         UI.setState({});
 
-        console.log(this.data,"jad");
-
         const { data } = this;
 
         this.LastestSave = data.content;
 
         this.Close = this.Close.bind(this);
         this.closeAnimation = this.closeAnimation.bind(this);
-        //FINderid
-        // if (id) {
-        //     this.windowEditor.setAttribute('identifier', id)
-        // }
+        this.setTopZIndex = this.setTopZIndex.bind(this);
     }
 
-    setIndex() {
-        // this.windowEditor.classList.add("noanimation");
-        // document.querySelector('.Editors').appendChild(windowEditor);
+    setTopZIndex(e?: React.MouseEvent) {
+        if (e) {//anti tab close btn-click
+            const target = e.target as HTMLDivElement;
+            if (target.classList.contains("material-icons")) {
+                return;
+            }
+        }
+
+        const { UI, EditorInstance } = this;
+
+        const { Editors } = UI.state;
+
+        Editors.delete(this.id ?? this.temporalId);
+        Editors.set(this.id ?? this.temporalId, this);
+
+        EditorInstance?.windowEditor.current?.classList.add("noanimation");
+
+        UI.setState({});
     }
 
     setTheme(theme: Themes) {
@@ -63,8 +79,8 @@ export default class OpenEditor {
     }
 
     Save() {
-        const { data, id,UI } = this;
-        const {Editors} = UI.state;
+        const { data, id, UI } = this;
+        const { Editors } = UI.state;
 
         this.LastestSave = data.content;
 
@@ -100,11 +116,11 @@ export default class OpenEditor {
             }
 
             console.error(error)
-            // Swal.fire({
-            //     title: "A ocurrido un error",
-            //     icon: "error",
-            //     text: message
-            // })
+            Swal.fire({
+                title: "A ocurrido un error",
+                icon: "error",
+                text: message
+            })
         }
 
         // bc.postMessage(new NoteUpdateData(construct));
@@ -145,9 +161,8 @@ export default class OpenEditor {
     async closeAnimation() {
         // bc.removeEventListener('message', BcReceivedUpdate)
 
-        // TabEditor.removeEventListener('click', setIndex)
         const { TabInstance, EditorInstance, UI, data } = this;
-        const {Editors} = UI.state;
+        const { Editors } = UI.state;
 
         await EditorInstance?.closeWindow();
         TabInstance?.closeTab();
@@ -158,4 +173,18 @@ export default class OpenEditor {
         UI.setState({})
     }
 
+}
+
+export function OpenLimitedEditor(UI: UI, id?: string) {
+    if (UI.state.Editors.size + 1 >= EDITORCONFIG.MAX_EDITORS_OPENDS) {
+        Swal.fire({
+            // title: "A ocurrido un error",
+            icon: "warning",
+            text: `No puedes Abrir más ${EDITORCONFIG.MAX_EDITORS_OPENDS} Editores a la vez`
+        })
+        return false;
+    }
+
+    new OpenEditor(UI, id);
+    return true;
 }

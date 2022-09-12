@@ -101,7 +101,9 @@ export default function NotesSection({ UI }: NoteSectionProps) {
             </div>
             <div className="activeEditorsContainer">
                 <div className="activeEditors">
-                    {[...UI.state.Editors.entries()].map(([id,item] : [string,OpenEditor] ) => {
+                    {([...UI.state.Editors.entries()] as [string,OpenEditor][])
+                        .sort(([ia,a],[ib,b]) => a.createdAt-b.createdAt )
+                        .map(([id,item]) => {
                         return <Tab invoker={item} key={id} />
                     })}
                 </div>
