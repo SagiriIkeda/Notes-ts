@@ -33,7 +33,7 @@ export default class OpenEditor {
 
         UI.setState({});
 
-        console.log(this.data);
+        console.log(this.data,"jad");
 
         const { data } = this;
 
@@ -41,22 +41,10 @@ export default class OpenEditor {
 
         this.Close = this.Close.bind(this);
         this.closeAnimation = this.closeAnimation.bind(this);
-
-        // windowEditor.CloseEditor = CloseTotal;
-
-        // this.TabEditor.setAttribute('theme', data.theme)
-        // this.windowEditor.setAttribute('theme', data.theme);
-
-
-        // const self = this;
-
         //FINderid
         // if (id) {
         //     this.windowEditor.setAttribute('identifier', id)
         // }
-        //SAVE FUNCTIONS
-
-        // this.TabEditor.addEventListener('click', this.setIndex)
     }
 
     setIndex() {
@@ -75,7 +63,8 @@ export default class OpenEditor {
     }
 
     Save() {
-        const { data, id } = this;
+        const { data, id,UI } = this;
+        const {Editors} = UI.state;
 
         this.LastestSave = data.content;
 
@@ -88,6 +77,11 @@ export default class OpenEditor {
                 let uuid = DB.Notes.Add(construct);
                 this.id = uuid;
                 data.id = uuid;
+
+                Editors.delete(this.temporalId);//eliminar la instancia temporal
+                Editors.set(this.id, this);// volver a crearla usando la id real
+
+                // this.temporalId = undefined;
             } else {//la nota si existe
                 DB.Notes.Update(construct.id, construct);
             }
@@ -153,11 +147,13 @@ export default class OpenEditor {
 
         // TabEditor.removeEventListener('click', setIndex)
         const { TabInstance, EditorInstance, UI, data } = this;
+        const {Editors} = UI.state;
 
         await EditorInstance?.closeWindow();
         TabInstance?.closeTab();
 
-        UI.state.Editors.delete(this.temporalId ?? data.id);
+        this.temporalId && Editors.delete(this.temporalId);
+        data.id && Editors.delete(data.id);
 
         UI.setState({})
     }

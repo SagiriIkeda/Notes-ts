@@ -35,10 +35,10 @@ class DATABASE<Type> implements DATABASECONFIG {
     Save() {
         localStorage.setItem(this.storage, JSON.stringify(this.Content));
     }
-    Add(content: any): string {
+    Add(content: Type): string {
         this.Load();
         let uuid = `${Date.now()}-${this.Content.length}`;
-        content[this.identifier] = `${Date.now()}-${this.Content.length}`;
+        (content as any)[this.identifier] = `${Date.now()}-${this.Content.length}`;
         this.Content.push(content)
         this.Save();
         return uuid;
@@ -60,7 +60,7 @@ class DATABASE<Type> implements DATABASECONFIG {
         return this.Content.find((e: any) => e[this.identifier] == id);
     }
 
-    Update(id: string, content = {}) {
+    Update(id: string, content: Partial<Type> = {}) {
         this.Load();
         let find = this.Content.findIndex((e: any) => e[this.identifier] == id);
         if (find != -1) {
