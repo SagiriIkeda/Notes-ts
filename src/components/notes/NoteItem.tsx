@@ -11,7 +11,8 @@ interface NoteItemProps {
 }
 
 export default class NoteItem extends React.Component<NoteItemProps>  {
-    note = createRef<HTMLDivElement>()
+    note = createRef<HTMLDivElement>();
+    isAnimating = false;
 
     constructor(props: NoteItemProps) {
         super(props)
@@ -26,7 +27,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     }
     UpdateContentPrev() {
         const {current} = this.note;
-        if (current) {
+        if (current && this.isAnimating === false) {
             let height = Math.round(current.getBoundingClientRect().height / 10);
             if (height == 7) height = 8;
             if (height == 9) height = 10;
@@ -38,7 +39,6 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UpdateContentPrev();
     }
     componentDidMount() {
-        // firstLoad = false;
         this.UpdateContentPrev();
     }
 
@@ -144,20 +144,30 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         SetOpenAuxClick(obj,event,"NotesAux")
     }**/
 
-    Click(event : any ) {
+    Click(event : React.MouseEvent ) {
         // console.log(event);
         // const {UI,data} = this.props;
         // console.log(event);
         
+        // if(){
+
+        // }
         this.OpenNote();
+
+        const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
+
+        this.isAnimating = true;
+
+        this.note.current?.animate([{scale: 0.9},{scale: 1}],{
+            duration: 1000,
+            easing: bezier,
+        })
+        .addEventListener("finish", () => {
+            this.isAnimating = false;
+        })
+
         // if(event.buttons == 1) {
         //     clearTimeout(globalInterval)
-        //     let bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)'
-        //     this.note.current.animate([{transform: `scale(0.9)`},{transform: `scale(0.98)`},{transform: `scale(1)`}],{
-        //         duration: 1000,
-        //         easing: bezier,
-        //         fill: "forwards",
-        //     })
         //     //timer
         //     let ms = 0;
         //     let menutime = 150;
@@ -200,9 +210,9 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     OpenNote() {
         const {UI,data} = this.props;
 
-        new OpenEditor(UI,data.id);
-        // if(!Application.state.Editors.includes(this.props.data.id)) {
-        // }
+        if(!UI.state.Editors.has(data.id)){
+            new OpenEditor(UI,data.id);
+        }
     } 
 
     render() {

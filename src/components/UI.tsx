@@ -89,12 +89,12 @@ export default class UINOTES extends React.Component {
     }
 
     render() {
+        const {state} = this;
 
         return (
             <div className="UI-manager" >
                 <div className="header">
-                    {/* <div className="foldername">{DB.Folders.Obtain(this.state.activeFolder).name}</div> */}
-                    <div className="foldername">Notes</div>
+                    <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name }</div>
                 </div>
                 <div className="sections">
                     <div className="folders-section"
@@ -106,9 +106,9 @@ export default class UINOTES extends React.Component {
                         <NotesSection UI={this} />
                     </div>
                 </div>
-                {/* <div className={`FloatBtn ${(Application.state.SelectMode == true)? "ocult":""}`} */}
-                <div className={`FloatBtn`}
-                // onClick={NewNote}
+                <div className={`FloatBtn${(state.SelectMode)? " ocult":""}`}
+                //* <div className={`FloatBtn`} 
+                onClick={() => new OpenEditor(this)}
                 >
                     <Mat>add</Mat>
                 </div>

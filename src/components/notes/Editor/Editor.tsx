@@ -507,7 +507,7 @@ function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?
 export function Editors({ UI }: { UI: UINOTES }) {
     return (<>
         {[...UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {
-            return <Editor invoker={item} key={id} />
+            return <Editor invoker={item} key={item.temporalId ?? item.data.id} />
         })}
     </>)
 }

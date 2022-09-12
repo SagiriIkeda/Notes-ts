@@ -28,22 +28,22 @@ export class NoteBuilder implements Note {
     position: { width: number; height: number; left: number; top: number; };
     v: string;
 
-    constructor(folder: string) {
+    constructor(folder: string, from?: Note) {
 
         const windowHeight = document.documentElement.scrollHeight;
         const windowWidth = document.documentElement.scrollWidth;
 
-        this.id = "";
-        this.content = "Write Here...";
-        this.folder = folder;
-        this.theme = "dark";
-        this.time = Date.now();
-        this.title = "Note title";
+        this.id = from?.id || "";
+        this.content = from?.content || "Write Here...";
+        this.folder = from?.folder || folder;
+        this.theme = from?.theme || "dark";
+        this.time = from?.time || Date.now();
+        this.title = from?.title || "Note title";
         this.position = {
-            width: 700,
-            height: 600,
-            left: (windowWidth / 2) - (700 / 2),
-            top: (windowHeight / 2.3) - (600 / 2)
+            width: from?.position.width || 700,
+            height: from?.position.height || 600,
+            left: from?.position.left || (windowWidth / 2) - (700 / 2),
+            top: from?.position.top || (windowHeight / 2.3) - (600 / 2)
         };
 
         this.v = version;

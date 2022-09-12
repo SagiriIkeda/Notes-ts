@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
 import DB from "../../../db/database";
 import Note, { NoteBuilder, Themes } from "../../../interfaces/notes";
 import UI from "../../UI";
@@ -15,27 +14,26 @@ export default class OpenEditor {
     TabInstance?: Tab;
     EditorInstance?: Editor;
 
-    // windowEditor: HTMLDivElement;
-    // TabEditor: HTMLDivElement;
+    temporalId?: number;
 
     constructor(public UI: UI, id?: string) {
-        if (id) {
-            // console.log(UI);
-            UI.state.Editors.set(id, this);
-            UI.setState({});
-        }
+        //open
+        const { activeFolder } = UI.state;
         this.id = id;
+        if (id) {// se está abriendo una nota existente
+            this.data = new NoteBuilder(activeFolder, DB.Notes.get(id))
 
-        // super(id);
-        //information;
+            UI.state.Editors.set(id, this);
+        } else {//la nota no existe
+            this.data = new NoteBuilder(activeFolder);
 
-        let DefaultData = new NoteBuilder(UI.state.activeFolder);
-
-        this.data = { ...DefaultData, ...DB.Notes.get(id) };
-
-        if (!id) {
-            this.data = JSON.parse(JSON.stringify(DefaultData)) as Note;
+            this.temporalId = Date.now();
+            UI.state.Editors.set(this.temporalId, this);
         }
+
+        UI.setState({});
+
+        console.log(this.data);
 
         const { data } = this;
 
@@ -43,26 +41,6 @@ export default class OpenEditor {
 
         this.Close = this.Close.bind(this);
         this.closeAnimation = this.closeAnimation.bind(this);
-
-        //references
-        // this.windowEditor = document.createElement('div');
-        // this.windowEditor.className = "Editor";
-        // this.TabEditor = document.createElement('div');
-        // this.TabEditor.className = "editortab";
-
-        // (document.querySelector('.Editors') as HTMLDivElement).appendChild(this.windowEditor);
-
-        // ReactDOM.createRoot(this.windowEditor).render(<Editor invoker={this} />);
-
-
-        // (document.querySelector('.activeEditors') as HTMLDivElement).appendChild(this.TabEditor)
-        // ReactDOM.createRoot(this.TabEditor).render(<Tab invoker={this}/>);
-
-        //LOAD POSITION
-        // this.windowEditor.style.height = `${data.position.height}px`;
-        // this.windowEditor.style.width = `${data.position.width}px`;
-        // this.windowEditor.style.left = `${data.position.left}px`;
-        // this.windowEditor.style.top = `${data.position.top}px`;
 
         // windowEditor.CloseEditor = CloseTotal;
 
@@ -86,60 +64,32 @@ export default class OpenEditor {
         // document.querySelector('.Editors').appendChild(windowEditor);
     }
 
-    // SavePosition() {
-    //     const { data, id } = this;
-    //     // if (id) {
-    //     //     let construct = JSON.parse(JSON.stringify(data)) as Note;
-
-    //     //     let rect = this.windowEditor.getBoundingClientRect();
-    //     //     let wswidth = rect.width
-    //     //     let wsheight = rect.height;
-    //     //     let wsleft = rect.left;
-    //     //     let wstop = rect.top
-    //     //     DB.Notes.Update(construct.id, {
-    //     //         position: {
-    //     //             width: wswidth,
-    //     //             height: wsheight,
-    //     //             top: wstop,
-    //     //             left: wsleft
-    //     //         }
-    //     //     });
-    //     // }
-    // }
-
     setTheme(theme: Themes) {
         const { EditorInstance, TabInstance, data } = this;
 
-        if(EditorInstance && TabInstance){
+        if (EditorInstance && TabInstance) {
             data.theme = theme;
-
-            EditorInstance.setState({theme})
-            TabInstance.setState({theme})
+            EditorInstance.setState({ theme })
+            TabInstance.setState({ theme })
         }
-
     }
-
 
     Save() {
         const { data, id } = this;
 
         this.LastestSave = data.content;
-        // EditInstance.SaveAnimation();
-        let construct = JSON.parse(JSON.stringify(data)); // Crear copia de los Datos de la nota
+
+        // Crear copia de los Datos de la nota
+        let construct = JSON.parse(JSON.stringify(data));
         construct.time = Date.now();
-        console.log(construct);
 
         try {
-            if (!id) {//la nota no existe
-                // let uuid = DB.Notes.Add(construct);
-                // this.id = uuid;
-                // data.id = uuid;
-                // this.windowEditor.setAttribute('identifier', id);
-                // Application.state.Editors.push(id);
+            if (!id) {//la nota no existe, crearla
+                let uuid = DB.Notes.Add(construct);
+                this.id = uuid;
+                data.id = uuid;
             } else {//la nota si existe
-                // construct.folder = DB.Notes.Obtain(data.id).folder;
                 DB.Notes.Update(construct.id, construct);
-
             }
         } catch (error: any) {
             QuotaLimit(error)
@@ -167,8 +117,6 @@ export default class OpenEditor {
 
         // EditInstance.chachedUpdate = null;
         // EditInstance.setState({ updateReceived: false })
-
-        // this.SavePosition();
 
         this.UI.reloadData();
     }
@@ -201,15 +149,15 @@ export default class OpenEditor {
     }
 
     async closeAnimation() {
-         // bc.removeEventListener('message', BcReceivedUpdate)
+        // bc.removeEventListener('message', BcReceivedUpdate)
 
         // TabEditor.removeEventListener('click', setIndex)
-        const {TabInstance, EditorInstance, UI, data} = this;
+        const { TabInstance, EditorInstance, UI, data } = this;
 
         await EditorInstance?.closeWindow();
         TabInstance?.closeTab();
 
-        UI.state.Editors.delete(data.id);
+        UI.state.Editors.delete(this.temporalId ?? data.id);
 
         UI.setState({})
     }
