@@ -7,8 +7,6 @@ import Tab from "./Tab";
 import Swal from "sweetalert2";
 import { EDITORCONFIG } from "../../../interfaces/config";
 
-export let zIndexs = 40;
-
 export default class OpenEditor {
 
     id?: string;
@@ -20,7 +18,6 @@ export default class OpenEditor {
 
     createdAt = Date.now();
 
-    zIndex = zIndexs++;
 
     constructor(public UI: UI, id?: string) {
         //open

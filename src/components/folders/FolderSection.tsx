@@ -14,7 +14,7 @@ interface FolderSectionProps {
 
 export default function FolderSection({UI} : FolderSectionProps) {
 
-    let Folders = DB.Folders.Content;
+    let Folders = DB.Folders.content;
 
     Folders.sort((a,b) => a.order-b.order);
 

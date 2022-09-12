@@ -8,6 +8,8 @@ import Folder from "../interfaces/folder";
 import NotesSection from "./notes/NotesSection";
 import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import Editor, { Editors } from "./notes/Editor/Editor";
+import { firstSelected } from "./notes/NoteItem";
+// firstSelected
 // import { NoteBuilder } from "../interfaces/notes";
 
 
@@ -17,12 +19,12 @@ import Editor, { Editors } from "./notes/Editor/Editor";
 export default class UINOTES extends React.Component {
 
     state = {
-        Notes: DB.Notes.Content,
-        Folders: DB.Folders.Content,
+        Notes: DB.Notes.getAll(),
+        Folders: DB.Folders.getAll(),
         activeFolder: "0",
         Editors: new Map(),
         SelectMode: false,
-        selectes: [],
+        selectes: new Set(),
         findText: ""
     }
 
@@ -57,30 +59,64 @@ export default class UINOTES extends React.Component {
         // this.built = "0d21cae2-701b-43da-affc-2e017cc118af"
 
         // bc.addEventListener("message",UpdateInfoBC)
+        this.reloadData({
+            update: false,
+        });
+
+        this.SelectAll = this.SelectAll.bind(this);
 
     }
 
     changeSelectedFolder(id: Folder["id"]) {
-        this.setState({
-            activeFolder: id
-        })
+        // this.reloadData(false,false);
+        this.state.activeFolder = id;
+
+        this.reloadData();
+    }
+    // send is sendUpdateToBC
+    reloadData(config: { send?: boolean, update?: boolean } = { update: true, send: false }) {
+
+        const { state } = this;
+
+        const Notes = DB.Notes.getAll()
+            .filter((note) => note.folder == state.activeFolder)
+            .sort((a, b) => b.time - a.time);
+
+        this.state.Notes = Notes;
+        this.state.Folders = DB.Folders.getAll();
+
+        config?.update && this.setState({})
     }
 
-    reloadData(sendUpdateToBc = true) {
-        this.setState({
-            Notes: DB.Notes.Content,
-            Folders: DB.Folders.Content
-        })
-        
+    setSelectMode(type: boolean) {
+        if (this.state.SelectMode != type) {
+            if (type == false) {
+                this.state.selectes.clear();
+                firstSelected.mode = true;
+            }
+            this.setState({ SelectMode: type })
+        }
     }
 
-    CloseSelectMode() {
+    // CloseSelectMode() {
 
+    // }
+
+    SelectAll() {
+        const { state } = this;
+        // const filtered = this.state.Notes;
+
+        if (state.selectes.size == state.Notes.length) {
+            this.state.selectes.clear();
+            this.setState({})
+        } else {
+            this.setState({
+                //!NOTE: remover filtrado a tiempo real
+                selectes: new Set(state.Notes.map((note) => note.id))
+            })
+        }
     }
 
-    ShowSelectes() {
-
-    }
     changeFindText() {
     }
 
@@ -89,12 +125,12 @@ export default class UINOTES extends React.Component {
     }
 
     render() {
-        const {state} = this;
+        const { state } = this;
 
         return (
             <div className="UI-manager" >
                 <div className="header">
-                    <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name }</div>
+                    <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name}</div>
                 </div>
                 <div className="sections">
                     <div className="folders-section"
@@ -106,9 +142,9 @@ export default class UINOTES extends React.Component {
                         <NotesSection UI={this} />
                     </div>
                 </div>
-                <div className={`FloatBtn${(state.SelectMode)? " ocult":""}`}
-                //* <div className={`FloatBtn`} 
-                onClick={() => OpenLimitedEditor(this)}
+                <div className={`FloatBtn${(state.SelectMode) ? " ocult" : ""}`}
+                    //* <div className={`FloatBtn`} 
+                    onClick={() => OpenLimitedEditor(this)}
                 >
                     <Mat>add</Mat>
                 </div>

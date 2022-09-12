@@ -8,7 +8,7 @@ import iconReact from "../../../assets/icon-react.jpg";
 import UINOTES from "../../UI";
 import EditorMovement from "./Movement";
 import EditorSelection from "./Selection";
-import DB from "../../../db/database";
+import DB, { AutoUP } from "../../../db/database";
 
 interface EditorProps {
     invoker: OpenEditor,
@@ -26,10 +26,9 @@ interface EditorState {
     underline: boolean,
     italic: boolean,
     themeMenu: boolean,
-    autoOpen: boolean,
+    autoUP: boolean,
 
     updateReceived: boolean,
-    zIndex: number,
 }
 
 export default class Editor extends React.Component<EditorProps, EditorState> {
@@ -65,6 +64,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         const { data } = this;
 
+        
         this.state = {
             title: data.title,
             theme: data.theme,
@@ -76,9 +76,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             underline: false,
             italic: false,
             themeMenu: false,
-            autoOpen: autoup,
+            autoUP: AutoUP.get(),
             updateReceived: false,
-            zIndex: this.invoker.zIndex,
         }
 
         this.props.invoker.EditorInstance = this;
@@ -94,11 +93,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.toggleTexturizeCamp = this.toggleTexturizeCamp.bind(this);
         this.MaxCampHeight = this.MaxCampHeight.bind(this);
         this.SavePosition = this.SavePosition.bind(this);
-
-
+        
         // EditInstance = this;
         //functions
         //References 
+
 
 
         // this.chachedUpdate = null;
@@ -267,15 +266,20 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         })
     }
 
-    saveAutoUp(type: boolean) {
-        localStorage.setItem('AutoUp', JSON.stringify(type));
-    }
+    // saveAutoUp(type: boolean) {
+    //     // localStorage.setItem('AutoUp', JSON.stringify(type));
+    //     AutoUP.set(type)
+    // }
 
-    setAutoOpen(e = true) {
-        this.setState({
-            autoOpen: e
-        })
-        this.saveAutoUp(e);
+    setAutoOpen(type = true) {
+        if(type != this.state.autoUP) {
+            this.setState({
+                autoUP: type
+            })
+            AutoUP.set(type)
+
+            // this.saveAutoUp(type);
+        }
     }
 
     // AuxForInput(event) {
@@ -386,7 +390,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         if (state.closed == false) {
             return (
-                // <div className="Editor" ref={this.windowEditor} style={{zIndex: state.zIndex}}  data-theme={state.theme} >
                 <div className="Editor" ref={this.windowEditor} data-theme={state.theme} >
 
                     <div className="window" ref={this.windowElm} onMouseDown={Movement.DragWindow} >
@@ -445,7 +448,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     onPaste={Selection.preventPasteHTML}
                                 // onAuxClick={this.AuxForCamp}
                                 ></div>
-                                <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoOpen == true) ? state.texturize : false}>
+                                <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoUP == true) ? state.texturize : false}>
                                     <span className="titles">Seleccione estilo...</span>
                                     <div className="div">
                                         <CampBtn bold ad={state.bold}>format_bold</CampBtn>
@@ -453,7 +456,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                         <CampBtn italic ad={state.italic}>format_italic</CampBtn>
                                     </div>
 
-                                    <div className="material-icons AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoOpen)}>{(state.autoOpen) ? "expand_less" : "expand_more"}</div>
+                                    <div className="material-icons AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoUP)}>{(state.autoUP) ? "expand_less" : "expand_more"}</div>
                                 </div>
                                 <div className="selected_theme" data-active={String(state.themeMenu)}>
                                     <span className="titles">Selecciona Temas</span>
@@ -507,23 +510,6 @@ function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?
     )
 }
 
-// export class Editors extends React.Component {
-
-//     UI: UINOTES;
-
-//     constructor({ UI }: { UI: UINOTES }) {
-
-//         super(props);
-//         this.UI = UI;
-//     }
-//     render() {
-//         return (<>
-//         {[...this.UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {
-//             return <Editor invoker={item} key={item.temporalId ?? item.data.id} />
-//         })}
-//     </>)
-//     }
-// }
 export function Editors({ UI }: { UI: UINOTES }) {
     return (<>
         {[...UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {

@@ -13,17 +13,13 @@ interface NoteSectionProps {
 
 export default function NotesSection({ UI }: NoteSectionProps) {
     const { state } = UI;
-    // let state = React.usestate(Data);
-    let Notes = DB.Notes.Filter(e => e.folder == state.activeFolder).sort((a, b) => b.time - a.time);
+    
+    let Notes = UI.state.Notes;
+
     let Reg = new RegExp(state.findText.replace(/\W/gim, "\\$&"), 'gim');
 
     let NotesSearched = Notes.filter(note => {
         return Reg.test(note.content) == true || Reg.test(note.title) == true;
-        // if (Reg.test(note.content) == true || Reg.test(note.title) == true) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
     })
     // function AuxForNotesSection(event : MouseEventHandler ) {
     //     if(event.target.classList.contains("notes-preview-container")){
@@ -42,11 +38,11 @@ export default function NotesSection({ UI }: NoteSectionProps) {
     return (
         <>
             <div className={`selectedIndicate ${(state.SelectMode == true) ? "visible" : ""}`}>
-                <div className="item" onClick={UI.CloseSelectMode}><Mat>close</Mat></div>
-                <span className="numsels"><div id="NumSelections">{state.selectes.length}</div>notas Seleccionadas</span>
+                <div className="item" onClick={() => UI.setSelectMode(false)}><Mat>close</Mat></div>
+                <span className="numsels"><div id="NumSelections">{state.selectes.size}</div>notas Seleccionadas</span>
                 <div
-                    className={`item ${(state.selectes.length == Notes.length) ? "active" : ""}`}
-                    onClick={UI.ShowSelectes}
+                    className={`item ${(state.selectes.size == Notes.length) ? "active" : ""}`}
+                    onClick={UI.SelectAll}
                     id="ButtonSelectAll"
                 ><Mat>grading</Mat></div>
             </div>

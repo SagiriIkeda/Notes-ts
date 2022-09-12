@@ -1,25 +1,32 @@
 import React, { createRef, MouseEventHandler } from "react";
 import Note from "../../interfaces/notes";
 import timeAgo from "../timeAgo";
-import UI from "../UI"
+import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
 // import Note from "../../interfaces/notes";
 
 interface NoteItemProps {
     data: Note,
-    UI: UI
+    UI: UINOTES
 }
+export let firstSelected = {mode:true};
+
+let globalInterval = 0;
 
 export default class NoteItem extends React.Component<NoteItemProps>  {
     note = createRef<HTMLDivElement>();
     isAnimating = false;
+    UI: UINOTES;
+    id: string
 
     constructor(props: NoteItemProps) {
         super(props)
 
         this.Click = this.Click.bind(this);
         this.OpenNote = this.OpenNote.bind(this);
-        // this.SelectThis = this.SelectThis.bind(this);
+        this.UI = props.UI;
+        this.SelectThis = this.SelectThis.bind(this);
+        this.id = props.data.id;
         // this.AuxEvent = this.AuxEvent.bind(this);
 
         // refs
@@ -42,20 +49,36 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UpdateContentPrev();
     }
 
-    /*
     SelectThis() {
-        if(!Application.state.selectes.includes(this.props.data.id)){
-            Application.state.selectes.push(this.props.data.id);
-            this.note.current.classList.add("selected");
-        }
+        const {UI,id} = this;
+        const {selectes} = UI.state;
+
+        selectes.add(id);
+
+        UI.setState({});
+
+        // if(!Application.state.selectes.includes(this.props.data.id)){
+        //     Application.state.selectes.push(this.props.data.id);
+        //     this.note.current.classList.add("selected");
+        // }
     }
     DeselectThis() {
-        if(Application.state.selectes.includes(this.props.data.id)){
-            let s = Application.state.selectes;
-            s.splice(s.findIndex(e => e == this.props.data.id),1);
-            this.note.current.classList.remove("selected");
-        }
+        const {UI,id} = this;
+        const {selectes} = UI.state;
+
+        selectes.delete(id);
+
+        UI.setState({})
+
+
+        // if(Application.state.selectes.includes(this.props.data.id)){
+        //     let s = Application.state.selectes;
+        //     s.splice(s.findIndex(e => e == this.props.data.id),1);
+        //     this.note.current?.classList.remove("selected");
+        // }
     }
+
+    /*
     AuxEvent(event) {
         event.preventDefault();
         let ProcesedContent = this.props.data.content
@@ -145,6 +168,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     }**/
 
     Click(event : React.MouseEvent ) {
+        const {UI} = this;
         // console.log(event);
         // const {UI,data} = this.props;
         // console.log(event);
@@ -152,59 +176,60 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         // if(){
 
         // }
-        this.OpenNote();
+        // this.OpenNote();
 
-        const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
+        if(event.buttons == 1) {
+            const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
 
-        this.isAnimating = true;
+            this.isAnimating = true;
 
-        this.note.current?.animate([{scale: 0.9},{scale: 1}],{
-            duration: 1000,
-            easing: bezier,
-        })
-        .addEventListener("finish", () => {
-            this.isAnimating = false;
-        })
+            this.note.current?.animate([{scale: 0.9},{scale: 1}],{
+                duration: 1000,
+                easing: bezier,
+            })
+            .addEventListener("finish", () => {
+                this.isAnimating = false;
+            })
 
-        // if(event.buttons == 1) {
-        //     clearTimeout(globalInterval)
-        //     //timer
-        //     let ms = 0;
-        //     let menutime = 150;
-        //     let clicks = setInterval(() => {
-        //         ms += 1;
-        //         if (ms >= menutime){
-        //             clearInterval(clicks);
-        //             this.SelectThis();
-        //             Application.setSelectMode(true);
-        //         }
-        //     }, 3);
-        //     const mouseup = (e) => {
-        //         this.note.current.removeEventListener('mouseleave',mouseup)
-        //         this.note.current.removeEventListener('mouseup',mouseup)
-        //         clearInterval(clicks);
-        //         ms = 0;
-        //         if(ms < menutime && e.type != "mouseleave") {
-        //             if(Application.state.SelectMode == false){
-        //                 this.OpenNote();
-        //             }else {
-        //                 if(!Application.state.selectes.includes(this.props.data.id)){
-        //                     this.SelectThis();
-        //                 }else {
-        //                     if(firstSelected == true){
-        //                         firstSelected = false;
-        //                     }else {
-        //                         this.DeselectThis();
-        //                     }
-        //                 }
-        //                 Application.reloadData();   
-        //             }
-        //         }
+            clearTimeout(globalInterval)
+            //timer
+            let ms = 0;
+            let menutime = 150;
+            let clicks = setInterval(() => {
+                ms += 1;
+                if (ms >= menutime){
+                    clearInterval(clicks);
+                    this.SelectThis();
+                    UI.setSelectMode(true);
+                }
+            }, 3);
+
+            const mouseup = (e: MouseEvent) => {
+                this.note.current?.removeEventListener('mouseleave',mouseup)
+                this.note.current?.removeEventListener('mouseup',mouseup)
+                clearInterval(clicks);
+                ms = 0;
+                if(ms < menutime && e.type != "mouseleave") {
+                    if(UI.state.SelectMode == false){
+                        this.OpenNote();
+                    }else {
+                        if(!UI.state.selectes.has(this.props.data.id)){
+                            this.SelectThis();
+                        }else {
+                            if(firstSelected.mode == true){
+                                firstSelected.mode = false;
+                            }else {
+                                this.DeselectThis();
+                            }
+                        }
+                        UI.reloadData();   
+                    }
+                }
         
-        //     }
-        //     // this.note.current.addEventListener('mouseleave',mouseup)
-        //     // this.note.current.addEventListener('mouseup',mouseup)
-        // }
+            }
+            this.note.current?.addEventListener('mouseleave',mouseup)
+            this.note.current?.addEventListener('mouseup',mouseup)
+        }
     }
     
     OpenNote() {
@@ -216,6 +241,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     } 
 
     render() {
+        const {selectes} = this.UI.state;
+
         const { data } = this.props
 
         let content = data.content
@@ -228,18 +255,17 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         }
         return (
             <div
-                // className={`note-preview${(Application.state.selectes.includes(this.props.data.id)? " selected":"")}${(firstLoad == true)? " first":""}`} 
-                className={`note-preview`}
+                // className={`note-preview${(selectes.has(this.props.data.id)? " selected":"")}${(firstLoad == true)? " first":""}`} 
+                className={`note-preview${(selectes.has(this.props.data.id)? " selected":"")}`} 
+                // className={`note-preview`}
                 onMouseDown={this.Click}
                 // onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}
             >
                 <div className="note__content" dangerouslySetInnerHTML={{__html:content}}></div>
-                {/* <div className="note__content">{content}</div> */}
                 {(more == true) && (<div className="more">...</div>)}
                 <div className="note__date">{timeAgo(data.time)}</div>
-                {/* <div className="note__date">Dios Sabrá</div> */}
                 <div className="select"><div className="line"></div></div>
             </div>
         )
