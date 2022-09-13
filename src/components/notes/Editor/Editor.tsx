@@ -64,7 +64,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         const { data } = this;
 
-        
+
         this.state = {
             title: data.title,
             theme: data.theme,
@@ -93,7 +93,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.toggleTexturizeCamp = this.toggleTexturizeCamp.bind(this);
         this.MaxCampHeight = this.MaxCampHeight.bind(this);
         this.SavePosition = this.SavePosition.bind(this);
-        
+
         // EditInstance = this;
         //functions
         //References 
@@ -272,7 +272,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     // }
 
     setAutoOpen(type = true) {
-        if(type != this.state.autoUP) {
+        if (type != this.state.autoUP) {
             this.setState({
                 autoUP: type
             })

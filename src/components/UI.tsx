@@ -8,7 +8,7 @@ import Folder from "../interfaces/folder";
 import NotesSection from "./notes/NotesSection";
 import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import Editor, { Editors } from "./notes/Editor/Editor";
-import { firstSelected } from "./notes/NoteItem";
+import SelectMode from "./notes/controllers/SelectMode";
 // firstSelected
 // import { NoteBuilder } from "../interfaces/notes";
 
@@ -22,11 +22,13 @@ export default class UINOTES extends React.Component {
         Notes: DB.Notes.getAll(),
         Folders: DB.Folders.getAll(),
         activeFolder: "0",
-        Editors: new Map(),
+        Editors: new Map<string,OpenEditor>(),
         SelectMode: false,
-        selectes: new Set(),
+        selectes: new Set<string>(),
         findText: ""
     }
+
+    SelectMode = new SelectMode({UI: this});
 
     SearchInput = createRef<HTMLInputElement>();
 
@@ -63,8 +65,6 @@ export default class UINOTES extends React.Component {
             update: false,
         });
 
-        this.SelectAll = this.SelectAll.bind(this);
-
     }
 
     changeSelectedFolder(id: Folder["id"]) {
@@ -88,34 +88,30 @@ export default class UINOTES extends React.Component {
         config?.update && this.setState({})
     }
 
-    setSelectMode(type: boolean) {
-        if (this.state.SelectMode != type) {
-            if (type == false) {
-                this.state.selectes.clear();
-                firstSelected.mode = true;
-            }
-            this.setState({ SelectMode: type })
-        }
-    }
-
-    // CloseSelectMode() {
-
+    // setSelectMode(type: boolean) {
+    //     if (this.state.SelectMode != type) {
+    //         if (type == false) {
+    //             this.state.selectes.clear();
+    //             firstSelected.mode = true;
+    //         }
+    //         this.setState({ SelectMode: type })
+    //     }
     // }
 
-    SelectAll() {
-        const { state } = this;
-        // const filtered = this.state.Notes;
+    // SelectAll() {
+    //     const { state } = this;
+    //     // const filtered = this.state.Notes;
 
-        if (state.selectes.size == state.Notes.length) {
-            this.state.selectes.clear();
-            this.setState({})
-        } else {
-            this.setState({
-                //!NOTE: remover filtrado a tiempo real
-                selectes: new Set(state.Notes.map((note) => note.id))
-            })
-        }
-    }
+    //     if (state.selectes.size == state.Notes.length) {
+    //         this.state.selectes.clear();
+    //         this.setState({})
+    //     } else {
+    //         this.setState({
+    //             //!NOTE: remover filtrado a tiempo real
+    //             selectes: new Set(state.Notes.map((note) => note.id))
+    //         })
+    //     }
+    // }
 
     changeFindText() {
     }
@@ -143,7 +139,6 @@ export default class UINOTES extends React.Component {
                     </div>
                 </div>
                 <div className={`FloatBtn${(state.SelectMode) ? " ocult" : ""}`}
-                    //* <div className={`FloatBtn`} 
                     onClick={() => OpenLimitedEditor(this)}
                 >
                     <Mat>add</Mat>
@@ -152,12 +147,12 @@ export default class UINOTES extends React.Component {
                     <Editors UI={this} />
                 </div>
                 {/* <div className={`SelectBox ${(this.state.SelectMode == true)? "visible":""}`}> */}
-                <div className={`SelectBox `}>
+                <div className={`SelectBox${(state.SelectMode == true)? " visible":""}`}>
                     <span className="titles" >¿Qué Desea hacer?</span>
                     <div className="div">
-                        {/* <div className="item" onClick={Application.DeleteSelectes} ><Mat>delete</Mat> Borrar</div>
-                        <div className="item" onClick={OpenMoveFolder}><Mat>drive_file_move_rtl</Mat> Mover a...</div>
-                        <div className="item" onClick={Application.CloseSelectMode}><Mat>close</Mat> Cancelar</div> */}
+                        <div className="item" onClick={this.SelectMode.deleteSelectes} ><Mat>delete</Mat> Borrar</div>
+                        {/* <div className="item" onClick={OpenMoveFolder}><Mat>drive_file_move_rtl</Mat> Mover a...</div> */}
+                        <div className="item" onClick={() => this.SelectMode.setMode(false)}><Mat>close</Mat> Cancelar</div>
                     </div>
                 </div>
             </div>

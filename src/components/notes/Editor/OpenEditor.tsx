@@ -14,7 +14,7 @@ export default class OpenEditor {
     LastestSave: string;
     TabInstance?: Tab;
     EditorInstance?: Editor;
-    temporalId?: number;
+    temporalId?: string;
 
     createdAt = Date.now();
 
@@ -30,7 +30,7 @@ export default class OpenEditor {
         } else {//la nota no existe (colocarle una id temporal)
             this.data = new NoteBuilder(activeFolder);
 
-            this.temporalId = Date.now();
+            this.temporalId = Date.now().toString();
             UI.state.Editors.set(this.temporalId, this);
         }
 
@@ -41,7 +41,7 @@ export default class OpenEditor {
         this.LastestSave = data.content;
 
         this.Close = this.Close.bind(this);
-        this.closeAnimation = this.closeAnimation.bind(this);
+        this.forceClose = this.forceClose.bind(this);
         this.setTopZIndex = this.setTopZIndex.bind(this);
     }
 
@@ -57,8 +57,8 @@ export default class OpenEditor {
 
         const { Editors } = UI.state;
 
-        Editors.delete(this.id ?? this.temporalId);
-        Editors.set(this.id ?? this.temporalId, this);
+        Editors.delete((this.id ?? this.temporalId) as string);
+        Editors.set((this.id ?? this.temporalId) as string, this);
 
         EditorInstance?.windowEditor.current?.classList.add("noanimation");
 
@@ -91,7 +91,7 @@ export default class OpenEditor {
                 this.id = uuid;
                 data.id = uuid;
 
-                Editors.delete(this.temporalId);//eliminar la instancia temporal
+                Editors.delete(this.temporalId as string);//eliminar la instancia temporal
                 Editors.set(this.id, this);// volver a crearla usando la id real
 
                 // this.temporalId = undefined;
@@ -129,12 +129,12 @@ export default class OpenEditor {
     }
 
     //Close
-    Close(force: React.MouseEvent | boolean = false) {
+    Close(force: React.MouseEvent | boolean = false,update = true) {
         const { data } = this;
 
         let construct = JSON.parse(JSON.stringify(data));
         if (force == true) {
-            this.closeAnimation();
+            this.forceClose(update);
         } else {
             if (construct.content != this.LastestSave) {
                 Swal.fire({
@@ -146,16 +146,16 @@ export default class OpenEditor {
                     confirmButtonText: 'cerrar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.closeAnimation();
+                        this.forceClose(update);
                     }
                 })
             } else {
-                this.closeAnimation();
+                this.forceClose(update);
             }
         }
     }
 
-    async closeAnimation() {
+    async forceClose(update = true) {
         // bc.removeEventListener('message', BcReceivedUpdate)
 
         const { TabInstance, EditorInstance, UI, data } = this;
@@ -167,7 +167,7 @@ export default class OpenEditor {
         this.temporalId && Editors.delete(this.temporalId);
         data.id && Editors.delete(data.id);
 
-        UI.setState({})
+        update && UI.setState({})
     }
 
 }

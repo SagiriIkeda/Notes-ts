@@ -1,5 +1,4 @@
-import React, { MouseEventHandler } from "react";
-import DB from "../../db/database";
+import React from "react";
 import UI from "../UI";
 import { Mat, Btn } from "../prefabs"
 import NoteItem from "./NoteItem";
@@ -13,7 +12,7 @@ interface NoteSectionProps {
 
 export default function NotesSection({ UI }: NoteSectionProps) {
     const { state } = UI;
-    
+
     let Notes = UI.state.Notes;
 
     let Reg = new RegExp(state.findText.replace(/\W/gim, "\\$&"), 'gim');
@@ -38,11 +37,11 @@ export default function NotesSection({ UI }: NoteSectionProps) {
     return (
         <>
             <div className={`selectedIndicate ${(state.SelectMode == true) ? "visible" : ""}`}>
-                <div className="item" onClick={() => UI.setSelectMode(false)}><Mat>close</Mat></div>
+                <div className="item" onClick={() => UI.SelectMode.setMode(false)}><Mat>close</Mat></div>
                 <span className="numsels"><div id="NumSelections">{state.selectes.size}</div>notas Seleccionadas</span>
                 <div
                     className={`item ${(state.selectes.size == Notes.length) ? "active" : ""}`}
-                    onClick={UI.SelectAll}
+                    onClick={() => UI.SelectMode.toggleAll()}
                     id="ButtonSelectAll"
                 ><Mat>grading</Mat></div>
             </div>
@@ -97,11 +96,11 @@ export default function NotesSection({ UI }: NoteSectionProps) {
             </div>
             <div className="activeEditorsContainer">
                 <div className="activeEditors">
-                    {([...UI.state.Editors.entries()] as [string,OpenEditor][])
-                        .sort(([ia,a],[ib,b]) => a.createdAt-b.createdAt )
-                        .map(([id,item]) => {
-                        return <Tab invoker={item} key={id} />
-                    })}
+                    {([...UI.state.Editors.entries()] as [string, OpenEditor][])
+                        .sort(([ia, a], [ib, b]) => a.createdAt - b.createdAt)
+                        .map(([id, item]) => {
+                            return <Tab invoker={item} key={id} />
+                        })}
                 </div>
             </div>
         </>

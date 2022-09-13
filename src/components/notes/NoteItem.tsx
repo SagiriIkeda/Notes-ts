@@ -1,4 +1,4 @@
-import React, { createRef, MouseEventHandler } from "react";
+import React, { createRef } from "react";
 import Note from "../../interfaces/notes";
 import timeAgo from "../timeAgo";
 import UINOTES from "../UI"
@@ -9,7 +9,6 @@ interface NoteItemProps {
     data: Note,
     UI: UINOTES
 }
-export let firstSelected = {mode:true};
 
 let globalInterval = 0;
 
@@ -28,12 +27,9 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.SelectThis = this.SelectThis.bind(this);
         this.id = props.data.id;
         // this.AuxEvent = this.AuxEvent.bind(this);
-
-        // refs
-        // this.note = React.createRef();
     }
     UpdateContentPrev() {
-        const {current} = this.note;
+        const { current } = this.note;
         if (current && this.isAnimating === false) {
             let height = Math.round(current.getBoundingClientRect().height / 10);
             if (height == 7) height = 8;
@@ -50,32 +46,12 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     }
 
     SelectThis() {
-        const {UI,id} = this;
-        const {selectes} = UI.state;
-
-        selectes.add(id);
-
-        UI.setState({});
-
-        // if(!Application.state.selectes.includes(this.props.data.id)){
-        //     Application.state.selectes.push(this.props.data.id);
-        //     this.note.current.classList.add("selected");
-        // }
+        const { UI, id } = this;
+        UI.SelectMode.add(id);
     }
     DeselectThis() {
-        const {UI,id} = this;
-        const {selectes} = UI.state;
-
-        selectes.delete(id);
-
-        UI.setState({})
-
-
-        // if(Application.state.selectes.includes(this.props.data.id)){
-        //     let s = Application.state.selectes;
-        //     s.splice(s.findIndex(e => e == this.props.data.id),1);
-        //     this.note.current?.classList.remove("selected");
-        // }
+        const { UI, id } = this;
+        UI.SelectMode.delete(id);
     }
 
     /*
@@ -167,29 +143,21 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         SetOpenAuxClick(obj,event,"NotesAux")
     }**/
 
-    Click(event : React.MouseEvent ) {
-        const {UI} = this;
-        // console.log(event);
-        // const {UI,data} = this.props;
-        // console.log(event);
-        
-        // if(){
+    Click(event: React.MouseEvent) {
+        const { UI } = this;
 
-        // }
-        // this.OpenNote();
-
-        if(event.buttons == 1) {
+        if (event.buttons == 1) {
             const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
 
             this.isAnimating = true;
 
-            this.note.current?.animate([{scale: 0.9},{scale: 1}],{
+            this.note.current?.animate([{ scale: 0.9 }, { scale: 1 }], {
                 duration: 1000,
                 easing: bezier,
             })
-            .addEventListener("finish", () => {
-                this.isAnimating = false;
-            })
+                .addEventListener("finish", () => {
+                    this.isAnimating = false;
+                })
 
             clearTimeout(globalInterval)
             //timer
@@ -197,58 +165,58 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             let menutime = 150;
             let clicks = setInterval(() => {
                 ms += 1;
-                if (ms >= menutime){
+                if (ms >= menutime) {
                     clearInterval(clicks);
                     this.SelectThis();
-                    UI.setSelectMode(true);
+                    UI.SelectMode.setMode(true);
                 }
             }, 3);
 
             const mouseup = (e: MouseEvent) => {
-                this.note.current?.removeEventListener('mouseleave',mouseup)
-                this.note.current?.removeEventListener('mouseup',mouseup)
+                this.note.current?.removeEventListener('mouseleave', mouseup)
+                this.note.current?.removeEventListener('mouseup', mouseup)
                 clearInterval(clicks);
                 ms = 0;
-                if(ms < menutime && e.type != "mouseleave") {
-                    if(UI.state.SelectMode == false){
+                if (ms < menutime && e.type != "mouseleave") {
+                    if (UI.state.SelectMode == false) {
                         this.OpenNote();
-                    }else {
-                        if(!UI.state.selectes.has(this.props.data.id)){
+                    } else {
+                        if (!UI.state.selectes.has(this.props.data.id)) {
                             this.SelectThis();
-                        }else {
-                            if(firstSelected.mode == true){
-                                firstSelected.mode = false;
-                            }else {
+                        } else {
+                            if (UI.SelectMode.first == true) {
+                                UI.SelectMode.first = false;
+                            } else {
                                 this.DeselectThis();
                             }
                         }
-                        UI.reloadData();   
+                        UI.reloadData();
                     }
                 }
-        
+
             }
-            this.note.current?.addEventListener('mouseleave',mouseup)
-            this.note.current?.addEventListener('mouseup',mouseup)
+            this.note.current?.addEventListener('mouseleave', mouseup)
+            this.note.current?.addEventListener('mouseup', mouseup)
         }
     }
-    
-    OpenNote() {
-        const {UI,data} = this.props;
 
-        if(!UI.state.Editors.has(data.id)){
-            OpenLimitedEditor(UI,data.id);
+    OpenNote() {
+        const { UI, data } = this.props;
+
+        if (!UI.state.Editors.has(data.id)) {
+            OpenLimitedEditor(UI, data.id);
         }
-    } 
+    }
 
     render() {
-        const {selectes} = this.UI.state;
+        const { selectes } = this.UI.state;
 
         const { data } = this.props
 
         let content = data.content
             .replace(/<.+?>/gim, "")
             .substr(0, 61)
-            
+
         let more = false;
         if (content.length >= 61) {
             more = true;
@@ -256,14 +224,14 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         return (
             <div
                 // className={`note-preview${(selectes.has(this.props.data.id)? " selected":"")}${(firstLoad == true)? " first":""}`} 
-                className={`note-preview${(selectes.has(this.props.data.id)? " selected":"")}`} 
+                className={`note-preview${(selectes.has(this.props.data.id) ? " selected" : "")}`}
                 // className={`note-preview`}
                 onMouseDown={this.Click}
                 // onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}
             >
-                <div className="note__content" dangerouslySetInnerHTML={{__html:content}}></div>
+                <div className="note__content" dangerouslySetInnerHTML={{ __html: content }}></div>
                 {(more == true) && (<div className="more">...</div>)}
                 <div className="note__date">{timeAgo(data.time)}</div>
                 <div className="select"><div className="line"></div></div>
