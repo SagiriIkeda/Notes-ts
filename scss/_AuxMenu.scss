@@ -20,7 +20,7 @@
             padding-bottom: 0px;
         }
     }
-    .option {
+    .aux-option {
         pointer-events: initial;
         padding: 5px 0px;
         color: #c0c0c0;
@@ -32,7 +32,14 @@
         margin-bottom: 5px !important;
         user-select: none;
         animation: InitOption ease .5s;
-        min {
+        .material-icons {
+            pointer-events: none;
+        }
+        span {
+            pointer-events: none;
+        }
+        .min {
+            pointer-events: none;
             font-size: 12px;
             color: #898989;
         }

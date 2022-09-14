@@ -9,12 +9,7 @@ import NotesSection from "./notes/NotesSection";
 import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import Editor, { Editors } from "./notes/Editor/Editor";
 import SelectMode from "./notes/controllers/SelectMode";
-// firstSelected
-// import { NoteBuilder } from "../interfaces/notes";
-
-
-// DB.Notes.Add(new NoteBuilder("0"))
-
+import AuxMenu from "./AuxMenu/Menu";
 
 export default class UINOTES extends React.Component {
 
@@ -31,6 +26,8 @@ export default class UINOTES extends React.Component {
     SelectMode = new SelectMode({UI: this});
 
     SearchInput = createRef<HTMLInputElement>();
+
+    AUX?: AuxMenu;
 
     constructor(props: {}) {
         super(props)
@@ -88,31 +85,6 @@ export default class UINOTES extends React.Component {
         config?.update && this.setState({})
     }
 
-    // setSelectMode(type: boolean) {
-    //     if (this.state.SelectMode != type) {
-    //         if (type == false) {
-    //             this.state.selectes.clear();
-    //             firstSelected.mode = true;
-    //         }
-    //         this.setState({ SelectMode: type })
-    //     }
-    // }
-
-    // SelectAll() {
-    //     const { state } = this;
-    //     // const filtered = this.state.Notes;
-
-    //     if (state.selectes.size == state.Notes.length) {
-    //         this.state.selectes.clear();
-    //         this.setState({})
-    //     } else {
-    //         this.setState({
-    //             //!NOTE: remover filtrado a tiempo real
-    //             selectes: new Set(state.Notes.map((note) => note.id))
-    //         })
-    //     }
-    // }
-
     changeFindText() {
     }
 
@@ -146,7 +118,7 @@ export default class UINOTES extends React.Component {
                 <div className="Editors" id="Editors">
                     <Editors UI={this} />
                 </div>
-                {/* <div className={`SelectBox ${(this.state.SelectMode == true)? "visible":""}`}> */}
+
                 <div className={`SelectBox${(state.SelectMode == true)? " visible":""}`}>
                     <span className="titles" >¿Qué Desea hacer?</span>
                     <div className="div">
@@ -155,6 +127,9 @@ export default class UINOTES extends React.Component {
                         <div className="item" onClick={() => this.SelectMode.setMode(false)}><Mat>close</Mat> Cancelar</div>
                     </div>
                 </div>
+
+                <AuxMenu UI={this} />
+
             </div>
         )
 

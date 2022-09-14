@@ -1,5 +1,8 @@
 import React, { createRef } from "react";
 import Note from "../../interfaces/notes";
+import { AuxList } from "../AuxMenu/item";
+import { CopyToClipboard } from "../AuxMenu/util/CopyToClipboard";
+import { downloadFile } from "../AuxMenu/util/downloadFile";
 import timeAgo from "../timeAgo";
 import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
@@ -26,7 +29,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UI = props.UI;
         this.SelectThis = this.SelectThis.bind(this);
         this.id = props.data.id;
-        // this.AuxEvent = this.AuxEvent.bind(this);
+        this.AuxEvent = this.AuxEvent.bind(this);
+        this.getPreprocesedContent = this.getPreprocesedContent.bind(this);
     }
     UpdateContentPrev() {
         const { current } = this.note;
@@ -48,16 +52,16 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     SelectThis() {
         const { UI, id } = this;
         UI.SelectMode.add(id);
+        UI.SelectMode.setMode(true);
     }
     DeselectThis() {
         const { UI, id } = this;
         UI.SelectMode.delete(id);
+        UI.SelectMode.setMode(true);
     }
 
-    /*
-    AuxEvent(event) {
-        event.preventDefault();
-        let ProcesedContent = this.props.data.content
+    getPreprocesedContent() {
+        return this.props.data.content
         .replace(/<br>/gim,'\n')
         .replace(/<(.*?)>/gim,(e,i) => {
             if(i == "div") return "\n";
@@ -66,82 +70,91 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         .replace(/&lt;/gim,'<')
         .replace(/&gt;/gim,'>')
         .replace(/&nbsp;/gim,' ');
+    }
 
-        const self = this;
 
-        let obj = [
+    AuxEvent(event: React.MouseEvent) {
+
+        event.preventDefault();
+
+        // const self = this;
+
+        let obj: AuxList = [
             {
                 icon:"file_open",
-                Action: self.OpenNote,
+                action: this.OpenNote,
                 name:"Abrir"
             },
             {
                 icon:"content_copy",
-                Action:e => {
-                    let content = ProcesedContent;
+                action: () => {
+                    let content = this.getPreprocesedContent();
                     CopyToClipboard(content);
                 },
                 name:"Copiar Contenido"
             },
             {
                 icon:"check_circle",
-                Action:e => {
-                    self.SelectThis();
-                    Application.setSelectMode(true);
+                action:() => {
+                    this.SelectThis();
+                    //optimizar evitar re-render;
+                    this.UI.setState({});
                 },
                 name:"Seleccionar"
             },
             {
                 icon:"download",
-                Action:e => {
-                    downloadFile(`${self.props.data.title}.txt`,ProcesedContent);
+                action: () => {
+                    downloadFile(`${this.props.data.title}.txt`,this.getPreprocesedContent());
                 },
                 name:"Descargar como TXT"
             },
             {
                 icon:"file_copy",
-                Action:e => {
-                    CopyToClipboard(JSON.stringify(self.props.data))
+                action:() => {
+                    // CopyToClipboard(JSON.stringify(self.props.data))
                 },
                 name:"Copiar como JSON"
             },
             {
                 icon:"insert_drive_file",
-                Action:e => {
-                    ViewJSONNote(self.props.data);
+                action: () => {
+                    // ViewJSONNote(self.props.data);
                 },
                 name:"ver JSON"
             },
             {
                 icon:"drive_file_move_rtl",
-                Action:e => {
-                    if(Application.state.selectes.includes(self.props.data.id) == false){
-                        Application.state.selectes.push(self.props.data.id);
-                    }
-                    OpenMoveFolder();
+                action: () => {
+                    // if(Application.state.selectes.includes(self.props.data.id) == false){
+                    //     Application.state.selectes.push(self.props.data.id);
+                    // }
+                    // OpenMoveFolder();
                 },
                 name:"Mover a..."
             },
             {
                 icon:"delete",
-                Action:e => {
-                    DeleteNote(this.props.data.id);
+                action: () => {
+                    // DeleteNote(this.props.data.id);
                 },
                 danger:true,
                 name:"Eliminar"
             }]
-        if((Application.state.selectes.includes(this.props.data.id))) {
+        if((this.UI.state.selectes.has(this.props.data.id))) {
             obj[2] = {
                 icon:"radio_button_unchecked",
-                Action:e => {
+                name:"Deseleccionar",
+                action: () => {
                     this.DeselectThis();
-                    Application.setState({})
+                    //optimizar evitar re-render;
+                    this.UI.setState({});
                 },
-                name:"Deseleccionar"
             }
         }
-        SetOpenAuxClick(obj,event,"NotesAux")
-    }**/
+        this.UI.AUX?.set(obj,event,"NotesAux")
+        // SetOpenAuxClick(obj,event,"NotesAux")
+    }
 
     Click(event: React.MouseEvent) {
         const { UI } = this;
@@ -190,7 +203,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                                 this.DeselectThis();
                             }
                         }
-                        UI.reloadData();
+                        // UI.reloadData();
+                        UI.setState({});
                     }
                 }
 
@@ -227,7 +241,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 className={`note-preview${(selectes.has(this.props.data.id) ? " selected" : "")}`}
                 // className={`note-preview`}
                 onMouseDown={this.Click}
-                // onAuxClick={this.AuxEvent}
+                onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}
             >
