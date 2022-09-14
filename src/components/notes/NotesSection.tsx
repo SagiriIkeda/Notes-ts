@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import UI from "../UI";
 import { Mat, Btn } from "../prefabs"
 import NoteItem from "./NoteItem";
@@ -12,15 +12,33 @@ interface NoteSectionProps {
 
 export default function NotesSection({ UI }: NoteSectionProps) {
     const { state } = UI;
-    const isSelectMode = state.SelectMode == true
+    const [findText, setFindText] = useState("");
 
-    let Notes = UI.state.Notes;
+    const isSelectMode = state.SelectMode == true;
 
-    let Reg = new RegExp(state.findText.replace(/\W/gim, "\\$&"), 'gim');
+    const Notes = UI.state.Notes;
 
-    let NotesSearched = Notes.filter(note => {
+    const Reg = new RegExp(findText.replace(/\W/gim, "\\$&"), 'gim');
+
+    const NotesSearched = findText ? Notes.filter(note => {
         return Reg.test(note.content) == true || Reg.test(note.title) == true;
-    })
+    }): Notes;
+
+    UI.cachedSearchedNotes = (findText) ? NotesSearched : undefined;
+
+    function changeFindText(e: React.ChangeEvent<HTMLInputElement>) {
+        const { value } = e.target;
+        UI.state.findText = value;
+        setFindText(value);
+    }
+
+    function cancelFind() {
+        const input = UI.SearchInput.current;
+        if(input) input.value = "";
+        UI.state.findText = "";
+        setFindText("");
+    }
+
     function AuxForNotesSection(event: React.MouseEvent) {
         const target = event.target as HTMLDivElement;
         if (target.classList.contains("notes-preview-container")) {
@@ -42,22 +60,22 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                 <div className="item" onClick={() => UI.SelectMode.setMode(false)}><Mat>close</Mat></div>
                 <span className="numsels"><div id="NumSelections">{state.selectes.size}</div>notas Seleccionadas</span>
                 <div
-                    className={`item ${(state.selectes.size == Notes.length) ? "active" : ""}`}
+                    className={`item ${(state.selectes.size == NotesSearched.length) ? "active" : ""}`}
                     onClick={() => UI.SelectMode.toggleAll()}
                     id="ButtonSelectAll"
                 ><Mat>grading</Mat></div>
             </div>
             <div className="search">
-                <div className={`search__container ${(state.findText.length != 0) ? "active" : ""}`}>
+                <div className={`search__container ${(findText.length != 0) ? "active" : ""}`}>
                     <label>
                         <Mat>search</Mat>
                         <input
                             type="text"
                             placeholder="buscar notas..."
-                            onInput={UI.changeFindText}
+                            onInput={changeFindText}
                             ref={UI.SearchInput}
                         />
-                        <Mat onClick={UI.cancelFind}>close</Mat>
+                        <Mat onClick={cancelFind}>close</Mat>
                     </label>
                 </div>
             </div>
@@ -88,7 +106,7 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                     )
                     :
                     // Resultados de Notas
-                    (state.findText.length != 0) ?
+                    (findText.length != 0) ?
                         NotesSearched.map(note =>
                             <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
                         )

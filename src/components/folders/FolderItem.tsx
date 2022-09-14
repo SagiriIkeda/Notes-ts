@@ -34,8 +34,10 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
         classes += " active";
     }
 
-    function SelectThis() {
-        UI.changeSelectedFolder(data.id)
+    function SelectThis(event: React.MouseEvent) {
+        if(event.buttons == 1) {
+            UI.changeSelectedFolder(data.id);
+        }
     }
 
     function AuxEvent(event: React.MouseEvent) {
@@ -83,7 +85,7 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
             onAuxClick={AuxEvent}
             ref={itemfolder}>
             <span className="folder__name">
-                <Mat>arrow_forward_io</Mat>{data.name}
+                <Mat>arrow_forward_ios</Mat>{data.name}
             </span>
             {DB.Notes.Search("folder", data.id).length}
         </div>

@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { createRef, FormEvent, SyntheticEvent } from "react";
 import DB from "../db/database";
 import { Mat } from "./prefabs";
 
@@ -13,6 +13,7 @@ import AuxMenu from "./AuxMenu/Menu";
 import JsonMenu from "./notes/controllers/JsonMenu";
 import { mode } from "./notes/NoteItem";
 import MoveFolder from "./notes/controllers/MoveFolder";
+import Note from "../interfaces/notes";
 
 export default class UINOTES extends React.Component {
 
@@ -25,6 +26,7 @@ export default class UINOTES extends React.Component {
         selectes: new Set<string>(),
         findText: ""
     }
+    cachedSearchedNotes?: Note[];
 
     SelectMode = new SelectMode({ UI: this });
 
@@ -34,22 +36,20 @@ export default class UINOTES extends React.Component {
     JSONMENU?: JsonMenu;
     MOVEFOLDER?: MoveFolder;
 
+
+
     constructor(props: {}) {
         super(props)
 
-        // console.log(this);
+        //AutoSet ActiveFolder
+        const ActiveFolder = DB.ActiveFolder.get();
 
-
-        // this.SearchInput = createRef();
-        // this.version = "v4.2";
-        // this.AuxForFolderSection = this.AuxForFolderSection.bind(this);
-
-        // if(localStorage.getItem('ActiveFolder') != undefined){
-        //     this.state.activeFolder = localStorage.getItem('ActiveFolder');
-        //     if(DB.Folders.Obtain(this.state.activeFolder) == false){
-        //         this.state.activeFolder = 0;
-        //     }
-        // }
+        if(ActiveFolder != "0"){
+            const folderExists = DB.Folders.get(ActiveFolder)
+            if(folderExists){
+                this.state.activeFolder = ActiveFolder
+            }
+        }
 
         // function UpdateInfoBC({data} = e) {
         //     if(data == "UpdateApplication") {
@@ -70,7 +70,7 @@ export default class UINOTES extends React.Component {
     }
 
     changeSelectedFolder(id: Folder["id"]) {
-        // this.reloadData(false,false);
+        DB.ActiveFolder.set(id);
         this.state.activeFolder = id;
         mode.first = true;
         this.reloadData();
@@ -94,12 +94,16 @@ export default class UINOTES extends React.Component {
         config?.update && this.setState({})
     }
 
-    changeFindText() {
-    }
+    // changeFindText(e: FormEvent<HTMLInputElement>) {
+    //     const {value} = e.target as HTMLInputElement;
+    //     this.setState({
+    //         findText: value
+    //     })
+    // }
 
-    cancelFind() {
+    // cancelFind() {
 
-    }
+    // }
 
     render() {
         const { state } = this;
@@ -111,7 +115,7 @@ export default class UINOTES extends React.Component {
                 </div>
                 <div className="sections">
                     <FolderSection UI={this} />
-                    
+
                     <div className="notes-sections">
                         <NotesSection UI={this} />
                     </div>

@@ -36,13 +36,15 @@ export default class SelectMode implements SelectModeConfig {
         const { UI } = this;
         const { state } = UI;
 
-        if (state.selectes.size == state.Notes.length && forceAll == false) {
+        const Notes = UI.cachedSearchedNotes ?? state.Notes;
+
+        if (state.selectes.size == Notes.length && forceAll == false) {
 
             UI.state.selectes.clear();
             UI.setState({})
         } else {
             UI.setState({
-                selectes: new Set<string>(state.Notes.map((note) => note.id))
+                selectes: new Set<string>(Notes.map((note) => note.id))
             })
         }
     }

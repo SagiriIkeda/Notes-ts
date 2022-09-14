@@ -20,7 +20,11 @@ export const AutoUP = new ITEMDATABASE<boolean>({
     storage: "AutoUP",
     default: true
 });
+export const ActiveFolder = new ITEMDATABASE<string>({
+    storage: "ActiveFolder",
+    default: "0"
+});
 
-const DB = { Folders, Notes }
+const DB = { Folders, Notes,AutoUP,ActiveFolder }
 
 export default DB;

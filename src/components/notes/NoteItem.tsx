@@ -73,7 +73,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         Swal.fire({
             confirmButtonText: 'Borrar',
             icon: "warning",
-            title: "¡Cuidado!",
+            // title: "¡Cuidado!",
             html: `¿Quieres Borrar la nota <b>${data.title}</b>?`,
             showCancelButton: true,
             showCloseButton: true,
