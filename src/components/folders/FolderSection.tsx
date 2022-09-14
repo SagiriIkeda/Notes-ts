@@ -6,34 +6,50 @@ import Folder from "../../interfaces/folder";
 import FolderItem from "../../components/folders/FolderItem";
 
 import UI from "../UI";
+import createFolder from "./util/createFolder";
+import { AuxList } from "../AuxMenu/item";
 
 
 interface FolderSectionProps {
     UI: UI
 }
 
-export default function FolderSection({UI} : FolderSectionProps) {
+export default function FolderSection({ UI }: FolderSectionProps) {
 
-    let Folders = DB.Folders.content;
+    const { Folders } = UI.state;
 
-    Folders.sort((a,b) => a.order-b.order);
+    function createFolderAux() {
+        createFolder(UI)
+    }
+    function AuxForFolderSection(event: React.MouseEvent) {
+        if ((event.target as HTMLDivElement).classList.contains("DragableFolders")) {
+            const obj: AuxList = [
+                {
+                    icon: "create_new_folder",
+                    name: "Crear Carpeta",
+                    action: () => {
+                        createFolderAux();
+                    },
+                },
+            ]
+            UI.AUX?.set(obj, event, "NewFolder");
+        }
+    }
 
     return (
-        <React.Fragment>
+        <div className="folders-section" onAuxClick={AuxForFolderSection} >
             <div className="container">
                 <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
-                <FolderItem  UI={UI} key={0} data={DB.Folders.get("0") as Folder}/>
-                {/* <div className="DragableFolders" ref={drgSection}> */}
+                <FolderItem createFolder={createFolderAux} UI={UI} key={0} data={DB.Folders.get("0") as Folder} />
                 <div className="DragableFolders">
                     {Folders.map((fold) => {
-                        if(fold.id != "0"){
-                            return (<FolderItem  UI={UI} key={fold.id} data={fold} />)
+                        if (fold.id != "0") {
+                            return (<FolderItem createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
                         }
                     })}
                 </div>
             </div>
-            {/* <div className="CreateBtn" onClick={CreateFolder}>Nueva Carpeta</div> */}
-            <div className="CreateBtn"> Nueva Carpeta</div>
-        </React.Fragment>
+            <div className="CreateBtn" onClick={createFolderAux}>Nueva Carpeta</div>
+        </div>
     )
 }

@@ -1,4 +1,6 @@
 import React, { createRef } from "react";
+import Swal from "sweetalert2";
+import { Notes } from "../../db/database";
 import Note from "../../interfaces/notes";
 import { AuxList } from "../AuxMenu/item";
 import { CopyToClipboard } from "../AuxMenu/util/CopyToClipboard";
@@ -6,7 +8,10 @@ import { downloadFile } from "../AuxMenu/util/downloadFile";
 import timeAgo from "../timeAgo";
 import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
-// import Note from "../../interfaces/notes";
+
+export const mode = {
+    first: true,
+}
 
 interface NoteItemProps {
     data: Note,
@@ -25,9 +30,11 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         super(props)
 
         this.Click = this.Click.bind(this);
+        this.delete = this.delete.bind(this);
         this.OpenNote = this.OpenNote.bind(this);
         this.UI = props.UI;
-        this.SelectThis = this.SelectThis.bind(this);
+        this.select = this.select.bind(this);
+        this.deselect = this.deselect.bind(this);
         this.id = props.data.id;
         this.AuxEvent = this.AuxEvent.bind(this);
         this.getPreprocesedContent = this.getPreprocesedContent.bind(this);
@@ -46,114 +53,130 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UpdateContentPrev();
     }
     componentDidMount() {
+        mode.first = false;
         this.UpdateContentPrev();
     }
+    //methods
 
-    SelectThis() {
+    select(update = true) {
         const { UI, id } = this;
         UI.SelectMode.add(id);
-        UI.SelectMode.setMode(true);
+        update && UI.SelectMode.setMode(true);
     }
-    DeselectThis() {
+    deselect(update = true) {
         const { UI, id } = this;
         UI.SelectMode.delete(id);
-        UI.SelectMode.setMode(true);
+        update && UI.SelectMode.setMode(true);
+    }
+    delete() {
+        const { data } = this.props;
+        Swal.fire({
+            confirmButtonText: 'Borrar',
+            icon: "warning",
+            title: "¡Cuidado!",
+            html: `¿Quieres Borrar la nota <b>${data.title}</b>?`,
+            showCancelButton: true,
+            showCloseButton: true,
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Notes.Remove(data.id);
+                this.UI.reloadData();
+            }
+        })
     }
 
+    //events and utilities
     getPreprocesedContent() {
         return this.props.data.content
-        .replace(/<br>/gim,'\n')
-        .replace(/<(.*?)>/gim,(e,i) => {
-            if(i == "div") return "\n";
-            return "";
-        })
-        .replace(/&lt;/gim,'<')
-        .replace(/&gt;/gim,'>')
-        .replace(/&nbsp;/gim,' ');
+            .replace(/<br>/gim, '\n')
+            .replace(/<(.*?)>/gim, (e, i) => {
+                if (i == "div") return "\n";
+                return "";
+            })
+            .replace(/&lt;/gim, '<')
+            .replace(/&gt;/gim, '>')
+            .replace(/&nbsp;/gim, ' ');
     }
 
-
     AuxEvent(event: React.MouseEvent) {
-
+        const { data } = this.props;
         event.preventDefault();
 
-        // const self = this;
-
-        let obj: AuxList = [
+        let AUXFORNOTE: AuxList = [
             {
-                icon:"file_open",
+                icon: "file_open",
                 action: this.OpenNote,
-                name:"Abrir"
+                name: "Abrir"
             },
             {
-                icon:"content_copy",
+                icon: "content_copy",
+                name: "Copiar Contenido",
                 action: () => {
                     let content = this.getPreprocesedContent();
                     CopyToClipboard(content);
                 },
-                name:"Copiar Contenido"
             },
             {
-                icon:"check_circle",
-                action:() => {
-                    this.SelectThis();
-                    //optimizar evitar re-render;
+                icon: "check_circle",
+                name: "Seleccionar",
+                action: () => {
+                    this.select(false);
+                    this.UI.state.SelectMode = true;
                     this.UI.setState({});
                 },
-                name:"Seleccionar"
             },
             {
-                icon:"download",
+                icon: "download",
+                name: "Descargar como TXT",
                 action: () => {
-                    downloadFile(`${this.props.data.title}.txt`,this.getPreprocesedContent());
+                    downloadFile(`${data.title}.txt`, this.getPreprocesedContent());
                 },
-                name:"Descargar como TXT"
             },
             {
-                icon:"file_copy",
-                action:() => {
-                    // CopyToClipboard(JSON.stringify(self.props.data))
-                },
-                name:"Copiar como JSON"
-            },
-            {
-                icon:"insert_drive_file",
+                icon: "file_copy",
+                name: "Copiar como JSON",
                 action: () => {
-                    // ViewJSONNote(self.props.data);
+                    CopyToClipboard(JSON.stringify(data))
                 },
-                name:"ver JSON"
             },
             {
-                icon:"drive_file_move_rtl",
+                icon: "insert_drive_file",
+                name: "Ver JSON",
                 action: () => {
+                    this.UI.JSONMENU?.set(data)
+                },
+            },
+            {
+                icon: "drive_file_move_rtl",
+                name: "Mover a...",
+                action: () => {
+                    this.UI.SelectMode.add(data.id)
+                    this.UI.MOVEFOLDER?.open();
                     // if(Application.state.selectes.includes(self.props.data.id) == false){
                     //     Application.state.selectes.push(self.props.data.id);
                     // }
                     // OpenMoveFolder();
                 },
-                name:"Mover a..."
             },
             {
-                icon:"delete",
-                action: () => {
-                    // DeleteNote(this.props.data.id);
-                },
-                danger:true,
-                name:"Eliminar"
+                icon: "delete",
+                action: this.delete,
+                danger: true,
+                name: "Eliminar"
             }]
-        if((this.UI.state.selectes.has(this.props.data.id))) {
-            obj[2] = {
-                icon:"radio_button_unchecked",
-                name:"Deseleccionar",
+        if ((this.UI.state.selectes.has(this.props.data.id))) {
+            AUXFORNOTE[2] = {
+                icon: "radio_button_unchecked",
+                name: "Deseleccionar",
                 action: () => {
-                    this.DeselectThis();
-                    //optimizar evitar re-render;
+                    this.deselect(false);
+                    this.UI.state.SelectMode = true;
                     this.UI.setState({});
                 },
             }
         }
-        this.UI.AUX?.set(obj,event,"NotesAux")
-        // SetOpenAuxClick(obj,event,"NotesAux")
+        this.UI.AUX?.set(AUXFORNOTE, event, "NotesAux")
     }
 
     Click(event: React.MouseEvent) {
@@ -180,7 +203,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 ms += 1;
                 if (ms >= menutime) {
                     clearInterval(clicks);
-                    this.SelectThis();
+                    this.select();
                     UI.SelectMode.setMode(true);
                 }
             }, 3);
@@ -195,12 +218,12 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                         this.OpenNote();
                     } else {
                         if (!UI.state.selectes.has(this.props.data.id)) {
-                            this.SelectThis();
+                            this.select();
                         } else {
                             if (UI.SelectMode.first == true) {
                                 UI.SelectMode.first = false;
                             } else {
-                                this.DeselectThis();
+                                this.deselect();
                             }
                         }
                         // UI.reloadData();
@@ -232,14 +255,16 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             .substr(0, 61)
 
         let more = false;
-        if (content.length >= 61) {
-            more = true;
-        }
+        if (content.length >= 61) more = true;
+
+        let className = "note-preview";
+
+        if (selectes.has(this.props.data.id)) className += " selected";
+        if (mode.first == true) className += " first";
+
         return (
             <div
-                // className={`note-preview${(selectes.has(this.props.data.id)? " selected":"")}${(firstLoad == true)? " first":""}`} 
-                className={`note-preview${(selectes.has(this.props.data.id) ? " selected" : "")}`}
-                // className={`note-preview`}
+                className={className}
                 onMouseDown={this.Click}
                 onAuxClick={this.AuxEvent}
                 ref={this.note}

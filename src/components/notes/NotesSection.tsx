@@ -2,9 +2,9 @@ import React from "react";
 import UI from "../UI";
 import { Mat, Btn } from "../prefabs"
 import NoteItem from "./NoteItem";
-import OpenEditor from "./Editor/OpenEditor";
+import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
 import Tab from "./Editor/Tab";
-
+import { AuxList } from "../AuxMenu/item";
 
 interface NoteSectionProps {
     UI: UI
@@ -12,6 +12,7 @@ interface NoteSectionProps {
 
 export default function NotesSection({ UI }: NoteSectionProps) {
     const { state } = UI;
+    const isSelectMode = state.SelectMode == true
 
     let Notes = UI.state.Notes;
 
@@ -20,23 +21,24 @@ export default function NotesSection({ UI }: NoteSectionProps) {
     let NotesSearched = Notes.filter(note => {
         return Reg.test(note.content) == true || Reg.test(note.title) == true;
     })
-    // function AuxForNotesSection(event : MouseEventHandler ) {
-    //     if(event.target.classList.contains("notes-preview-container")){
-    //         let obj = [
-    //             {
-    //                 icon:"note_add",
-    //                 Action:e => {
-    //                     NewNote();
-    //                 },
-    //                 name:"Crear Nueva Nota"
-    //             },
-    //         ]
-    //         SetOpenAuxClick(obj,event,"NewNoteAux");
-    //     }
-    // }
+    function AuxForNotesSection(event: React.MouseEvent) {
+        const target = event.target as HTMLDivElement;
+        if (target.classList.contains("notes-preview-container")) {
+            let obj: AuxList = [
+                {
+                    icon: "note_add",
+                    action: () => {
+                        OpenLimitedEditor(UI)
+                    },
+                    name: "Crear Nueva Nota"
+                },
+            ]
+            UI.AUX?.set(obj, event, "NewNoteAux");
+        }
+    }
     return (
         <>
-            <div className={`selectedIndicate ${(state.SelectMode == true) ? "visible" : ""}`}>
+            <div className={`selectedIndicate ${(isSelectMode) ? "visible" : ""}`}>
                 <div className="item" onClick={() => UI.SelectMode.setMode(false)}><Mat>close</Mat></div>
                 <span className="numsels"><div id="NumSelections">{state.selectes.size}</div>notas Seleccionadas</span>
                 <div
@@ -55,13 +57,14 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                             onInput={UI.changeFindText}
                             ref={UI.SearchInput}
                         />
-                        <i className="material-icons" onClick={UI.cancelFind}>close</i>
+                        <Mat onClick={UI.cancelFind}>close</Mat>
                     </label>
                 </div>
             </div>
-            <div className={`notes-preview-container ${(UI.state.SelectMode == true) ? "selectmode" : ""}`}
-            // onAuxClick={AuxForNotesSection}
+            <div className={`notes-preview-container ${(isSelectMode) ? "selectmode" : ""}`}
+                onAuxClick={AuxForNotesSection}
             >
+                {/* No hay Notas o no hay resultados por búsqueda */}
                 {(Notes.length == 0 || NotesSearched.length == 0) ?
                     (
                         <div className="NoNotes">
@@ -76,7 +79,7 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                                         <Mat>note_add</Mat>
                                         <span>Aun no hay notas</span>
                                         <Btn
-                                        // onClick={NewNote}
+                                            onClick={() => OpenLimitedEditor(UI)}
                                         >Crea una</Btn>
                                     </>
                                     )}
@@ -84,10 +87,12 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                         </div>
                     )
                     :
+                    // Resultados de Notas
                     (state.findText.length != 0) ?
                         NotesSearched.map(note =>
                             <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
                         )
+                        //No hay búsqueda (todas las notas)
                         : Notes.map(note =>
                             <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
                         )
@@ -96,7 +101,7 @@ export default function NotesSection({ UI }: NoteSectionProps) {
             </div>
             <div className="activeEditorsContainer">
                 <div className="activeEditors">
-                    {([...UI.state.Editors.entries()] as [string, OpenEditor][])
+                    {[...UI.state.Editors.entries()]
                         .sort(([ia, a], [ib, b]) => a.createdAt - b.createdAt)
                         .map(([id, item]) => {
                             return <Tab invoker={item} key={id} />

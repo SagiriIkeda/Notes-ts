@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     $line: #6e6e6e;
-    pointer-events: none;
+    // pointer-events: none;
     &.active{
         pointer-events: initial;
     }
@@ -25,6 +25,7 @@
         grid-template-rows: auto 1fr auto;
         animation: OpenJson cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
         box-shadow: 2px -3px 20px -6px #0000006e;
+        z-index: 51;
         .Nav {
             padding: $pad;
             border-bottom: 1px solid $line;
@@ -76,11 +77,13 @@
             // margin: 5px auto;
             // padding: 5px;
             display: inline-block;
-            padding: 5px;
-            background: #ff00005b;
+            // padding: 5px;
+            color: #f75656;
+            // background: #f756565b;
+            // background: #ec164b1c;
             border-radius: 3px;
-            border: 1px solid red;
-            animation: Swake cubic-bezier(0.190, 1.000, 0.220, 1.000) 1s;
+            // border: 1px solid #f75656;
+            animation: Shake cubic-bezier(0.190, 1.000, 0.220, 1.000) 1s;
         }
         .FoldersSection {
             position: relative;
@@ -176,38 +179,47 @@
         }
 
     }
+    .shadow {
+        position: absolute;
+        inset: 0;
+        background: #1a19192c;
+        z-index: 50;
+        &.noaction {
+            pointer-events: none;
+        }
+    }
 }
 
-@keyframes Swake {
+@keyframes Shake {
     0% {
         transform: translateX(0px);
     }
     10% {
-        transform: translateX(10px);
+        transform: translateX(3px);
     }
     20% {
-        transform: translateX(-10px);
+        transform: translateX(-3px);
     }
     30% {
-        transform: translateX(10px);
+        transform: translateX(3px);
     }
     40% {
-        transform: translateX(10px);
+        transform: translateX(3px);
     }
     50% {
-        transform: translateX(-10px);
+        transform: translateX(-3px);
     }
     60% {
-        transform: translateX(10px);
+        transform: translateX(3px);
     }
     70% {
-        transform: translateX(-10px);
+        transform: translateX(-3px);
     }
     80% {
-        transform: translateX(10px);
+        transform: translateX(3px);
     }
     90% {
-        transform: translateX(-10px);
+        transform: translateX(-3px);
     }
     100% {
         transform: translateX(0px);

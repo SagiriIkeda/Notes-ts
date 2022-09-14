@@ -9,6 +9,7 @@ import UINOTES from "../../UI";
 import EditorMovement from "./Movement";
 import EditorSelection from "./Selection";
 import DB, { AutoUP } from "../../../db/database";
+import { AuxList } from "../../AuxMenu/item";
 
 interface EditorProps {
     invoker: OpenEditor,
@@ -93,6 +94,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.toggleTexturizeCamp = this.toggleTexturizeCamp.bind(this);
         this.MaxCampHeight = this.MaxCampHeight.bind(this);
         this.SavePosition = this.SavePosition.bind(this);
+        this.AuxInput = this.AuxInput.bind(this);
+        this.AuxCamp = this.AuxCamp.bind(this);
 
         // EditInstance = this;
         //functions
@@ -265,12 +268,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         })
     }
-
-    // saveAutoUp(type: boolean) {
-    //     // localStorage.setItem('AutoUp', JSON.stringify(type));
-    //     AutoUP.set(type)
-    // }
-
     setAutoOpen(type = true) {
         if (type != this.state.autoUP) {
             this.setState({
@@ -282,105 +279,123 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         }
     }
 
-    // AuxForInput(event) {
-    //     let input = this.InputName.current;
-    //     // let obj = [
-    //     //     {
-    //     //         icon: "content_copy",
-    //     //         Action: e => {
-    //     //             document.execCommand("copy", false, null);
-    //     //         },
-    //     //         name: "Copiar <min>(Ctrl + C)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "content_cut",
-    //     //         Action: e => {
-    //     //             document.execCommand("cut", false, null);
-    //     //         },
-    //     //         name: "Cortar <min>(Ctrl + X)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "content_paste",
-    //     //         Action: e => {
-    //     //             navigator.clipboard.readText().then(text => {
-    //     //                 document.execCommand("insertHTML", false, text);
-    //     //             })
-    //     //         },
-    //     //         // disabled:true,
-    //     //         name: "Pegar <min>(Ctrl + V)</min>"
-    //     //     },
-    //     // ]
-    //     // if (input.selectionEnd - input.selectionStart == 0) {
-    //     //     obj[0].disabled = true;
-    //     //     obj[1].disabled = true;
-    //     // }
-    //     // SetOpenAuxClick(obj, event, "AuxInput");
-    // }
-    // AuxForCamp(event) {
-    //     let selection = this.getSelectionHtml().replace(/<.*?>/gim, '');
-    //     // let obj = [
-    //     //     {
-    //     //         icon: "content_copy",
-    //     //         Action: e => {
-    //     //             document.execCommand("copy", false, null);
-    //     //         },
-    //     //         name: "Copiar <min>(Ctrl + C)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "content_cut",
-    //     //         Action: e => {
-    //     //             document.execCommand("cut", false, null);
-    //     //         },
-    //     //         name: "Cortar <min>(Ctrl + X)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "content_paste",
-    //     //         Action: e => {
-    //     //             navigator.clipboard.readText().then(text => {
-    //     //                 document.execCommand("insertHTML", false, text);
-    //     //             })
-    //     //         },
-    //     //         hr: true,
-    //     //         // disabled:true,
-    //     //         name: "Pegar <min>(Ctrl + V)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "format_bold",
-    //     //         Action: e => {
-    //     //             obj[3].actived = !this.state.bold;
-    //     //             document.execCommand("bold", false, null);
-    //     //             SetOpenAuxClick(obj, event, "AuxCamp");
-    //     //         },
-    //     //         actived: this.state.bold,
-    //     //         name: "Bold <min>(Ctrl + B)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "format_italic",
-    //     //         Action: e => {
-    //     //             obj[4].actived = !this.state.italic;
-    //     //             document.execCommand("italic", false, null);
-    //     //             SetOpenAuxClick(obj, event, "AuxCamp");
-    //     //         },
-    //     //         actived: this.state.italic,
-    //     //         name: "Italic <min>(Ctrl + I)</min>"
-    //     //     },
-    //     //     {
-    //     //         icon: "format_underlined",
-    //     //         Action: e => {
-    //     //             obj[5].actived = !this.state.underline;
-    //     //             document.execCommand("underline", false, null);
-    //     //             SetOpenAuxClick(obj, event, "AuxCamp");
-    //     //         },
-    //     //         actived: this.state.underline,
-    //     //         name: "Underline <min>(Ctrl + U)</min>"
-    //     //     },
-    //     // ]
-    //     // if (selection.length == 0) {
-    //     //     obj[0].disabled = true;
-    //     //     obj[1].disabled = true;
-    //     // }
-    //     // SetOpenAuxClick(obj, event, "AuxCamp");
-    // }
+    AuxInput(event: React.MouseEvent) {
+        const input = this.InputName.current;
+        if (input) {
+            const obj: AuxList = [
+                {
+                    icon: "content_copy",
+                    name: "Copiar",
+                    desc: "(Ctrl + C)",
+                    action: () => {
+                        document.execCommand("copy", false);
+                    },
+                },
+                {
+                    icon: "content_cut",
+                    name: "Cortar",
+                    desc: "(Ctrl + X)",
+                    action: () => {
+                        document.execCommand("cut", false);
+                    },
+                },
+                {
+                    icon: "content_paste",
+                    name: "Pegar",
+                    desc: "(Ctrl + V)",
+                    action: () => {
+                        navigator.clipboard.readText().then(text => {
+                            document.execCommand("insertHTML", false, text);
+                        })
+                    },
+                    // disabled:true,
+                },
+            ]
+            if (input.selectionEnd == null || input.selectionStart == null || input.selectionEnd - input.selectionStart == 0) {
+                obj[0].disabled = true;
+                obj[1].disabled = true;
+            }
+            this.invoker.UI.AUX?.set(obj, event, "AuxInput");
+        }
+
+    }
+    AuxCamp(event: React.MouseEvent) {
+        const { UI } = this.invoker;
+        const selection = this.Selection.getSelectionHtml().replace(/<.*?>/gim, '');
+        const obj: AuxList = [
+            {
+                icon: "content_copy",
+                name: "Copiar",
+                desc: "(Ctrl + C)",
+                action: () => {
+                    document.execCommand("copy", false);
+                },
+            },
+            {
+                icon: "content_cut",
+                name: "Cortar",
+                desc: "(Ctrl + X)",
+                action: () => {
+                    document.execCommand("cut", false);
+                },
+            },
+            {
+                icon: "content_paste",
+                hr: true,
+                // disabled:true,
+                name: "Pegar",
+                desc: "(Ctrl + V)",
+                action: () => {
+                    navigator.clipboard.readText().then(text => {
+                        document.execCommand("insertHTML", false, text);
+                    })
+                },
+            },
+            {
+                icon: "format_bold",
+                actived: this.state.bold,
+                name: "Bold",
+                desc: "(Ctrl + B)",
+                action: () => {
+                    obj[3].actived = !this.state.bold;
+                    document.execCommand("bold", false);
+                    UI.AUX?.set(obj, event, "AuxCamp");
+                    return false;
+
+                },
+            },
+            {
+                icon: "format_italic",
+                actived: this.state.italic,
+                name: "Italic",
+                desc: "(Ctrl + I)",
+                action: () => {
+                    obj[4].actived = !this.state.italic;
+                    document.execCommand("italic", false);
+                    UI.AUX?.set(obj, event, "AuxCamp");
+                    return false;
+
+                },
+            },
+            {
+                icon: "format_underlined",
+                actived: this.state.underline,
+                name: "Underline",
+                desc: "(Ctrl + U)",
+                action: () => {
+                    obj[5].actived = !this.state.underline;
+                    document.execCommand("underline", false);
+                    UI.AUX?.set(obj, event, "AuxCamp");
+                    return false;
+                },
+            },
+        ]
+        if (selection.length == 0) {
+            obj[0].disabled = true;
+            obj[1].disabled = true;
+        }
+        UI.AUX?.set(obj, event, "AuxCamp");
+    }
 
     render() {
         const { state, Movement, Selection, invoker } = this;
@@ -399,7 +414,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                         </div>
                         <div className="btns">
                             <div className="wbtn" onClick={invoker.Close}><Mat>close</Mat></div>
-                            {/* <div className="wbtn" ><Mat>close</Mat></div> */}
+
                         </div>
                     </div>
                     <div className="usereditor" ref={this.usereditor}>
@@ -414,7 +429,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                             onInput={this.UpdateName}
                                             ref={this.InputName}
                                             onKeyDown={this.SaveKey}
-                                        // onAuxClick={this.AuxForInput}
+                                            onAuxClick={this.AuxInput}
                                         />
                                     </div>
                                 </div>
@@ -446,7 +461,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     onKeyUp={this.UpdateCharact}
                                     onKeyDown={this.SaveKey}
                                     onPaste={Selection.preventPasteHTML}
-                                // onAuxClick={this.AuxForCamp}
+                                    onAuxClick={this.AuxCamp}
                                 ></div>
                                 <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoUP == true) ? state.texturize : false}>
                                     <span className="titles">Seleccione estilo...</span>

@@ -20,7 +20,7 @@ export default class SelectMode implements SelectModeConfig {
     }
 
     add(id: Note["id"]) {
-        this.getSelectes().add(id)
+        this.getSelectes().add(id);
     }
 
     delete(id: Note["id"]) {
@@ -67,37 +67,40 @@ export default class SelectMode implements SelectModeConfig {
     //utilities 
 
     deleteSelectes() {
-        const selectes = this.getSelectes();
+        if (this.getSelectes().size > 0) {
+            const selectes = this.getSelectes();
 
-        Swal.fire({
-            // title: 'Estas Seguro?',
-            showCancelButton: true,
-            cancelButtonText: "Cancelar",
-            reverseButtons: true,
-            html: "<h2>¿Estás seguro?</h2> Una vez borradas no hay forma de recuperarlas!",
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Borrar',
-            icon: 'warning'
-        }).then((result) => {
-            if (result.isConfirmed) {
+            Swal.fire({
+                // title: 'Estas Seguro?',
+                showCancelButton: true,
+                cancelButtonText: "Cancelar",
+                reverseButtons: true,
+                html: "<h2>¿Estás seguro?</h2> Una vez borradas no hay forma de recuperarlas!",
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Borrar',
+                icon: 'warning'
 
-                selectes.forEach((id) => {
-                    const Editor = this.UI.state.Editors.get(id);
-                    if (Editor) {
-                        Editor.forceClose(true);
-                    }
+            }).then((result) => {
+                if (result.isConfirmed) {
 
-                    Notes.Remove(id);
-                })
+                    selectes.forEach((id) => {
+                        const Editor = this.UI.state.Editors.get(id);
+                        if (Editor) {
+                            Editor.forceClose(true);
+                        }
 
-                this.UI.state.SelectMode = false;
-                this.UI.reloadData();
-            }
-        })
+                        Notes.Remove(id);
+                    })
 
-        selectes.forEach((id) => {
-            Notes.Remove(id)
-        })
+                    this.UI.state.SelectMode = false;
+                    this.UI.reloadData();
+                }
+            })
+        }
+
+        // selectes.forEach((id) => {
+        //     Notes.Remove(id)
+        // })
     }
 
 

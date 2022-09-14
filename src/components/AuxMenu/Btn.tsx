@@ -5,14 +5,14 @@ import AuxMenu from "./Menu";
 export default function AuxBtn({ data, AUX }: { data: AuxItem, AUX: AuxMenu }) {
     let className = "aux-option";
 
-    if(data.danger) className += " danger";
-    if(data.actived) className += " actived";
-    if(data.disabled) className += " disabled";
+    if (data.danger) className += " danger";
+    if (data.actived) className += " actived";
+    if (data.disabled) className += " disabled";
 
     function onClick() {
-        data.action && data.action()
+        const give = data.action && data.action();
 
-        AUX.close();
+        give != false && AUX.close();
     }
 
     return (
@@ -22,7 +22,7 @@ export default function AuxBtn({ data, AUX }: { data: AuxItem, AUX: AuxMenu }) {
                 onClick={onClick}
             >
                 <Mat>{data.icon}</Mat> <span>{data.name}</span>
-                {(data.desc) && <div  className="min">{data.desc}</div>}
+                {(data.desc) && <div className="min">{data.desc}</div>}
             </div>
             {(data.hr === true) && <hr />}
         </>

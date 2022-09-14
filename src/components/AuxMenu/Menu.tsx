@@ -18,6 +18,9 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         left: 0
     }
     UI: UINOTES;
+
+    time = 0;
+
     constructor(props: AuxMenuProps) {
         super(props)
         this.UI = props.UI;
@@ -28,7 +31,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         this.set = this.set.bind(this);
         this.comprobateOutsideClick = this.comprobateOutsideClick.bind(this);
 
-        window.removeEventListener('mouseup',this.comprobateOutsideClick);
+        window.removeEventListener('mouseup', this.comprobateOutsideClick);
     }
 
     setOptions(options: AuxList | false) {
@@ -43,7 +46,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
     }
 
     close() {
-        window.removeEventListener('mouseup',this.comprobateOutsideClick);
+        window.removeEventListener('mouseup', this.comprobateOutsideClick);
         this.setState({
             options: [],
             opend: false,
@@ -54,9 +57,10 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
     }
 
     set(options: AuxList, event: React.MouseEvent, type: string) {
+        clearTimeout(this.time);
         event.preventDefault();
 
-        window.removeEventListener('mouseup',this.comprobateOutsideClick);
+        window.removeEventListener('mouseup', this.comprobateOutsideClick);
         let { x, y } = { x: event.clientX, y: event.clientY };
         let width = 210;
         let height = (options.length * 39 - 5) + 27 + 20;
@@ -75,20 +79,21 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         this.state.top = y;
         this.state.type = type;
         this.setOptions(options);
-        window.addEventListener('mouseup',this.comprobateOutsideClick);
+        window.addEventListener('mouseup', this.comprobateOutsideClick);
     }
 
     comprobateOutsideClick(event: MouseEvent) {
-        const target = event.target as HTMLDivElement;
+        this.time = setTimeout(() => {
+            const target = event.target as HTMLDivElement;
 
-        if(!target.classList.contains("aux-option")) {
-            this.close();
-            return true;
-        }
+            if (!target.classList.contains("aux-option")) {
+                this.close();
+                return true;
+            }
 
-        return false;
+            return false;
+        }, 1)
     }
-
 
     render() {
         const { state } = this;
@@ -96,7 +101,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
 
         if (state.opend) {
             return (
-                <div className="AuxContainer" style={{left: state.left, top: state.top}}>
+                <div className="AuxContainer" style={{ left: state.left, top: state.top }}>
 
                     {(state.options.length != 0) ? (
                         <div className="TextAction">Accion...</div>

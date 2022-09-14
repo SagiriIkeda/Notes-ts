@@ -10,6 +10,9 @@ import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import Editor, { Editors } from "./notes/Editor/Editor";
 import SelectMode from "./notes/controllers/SelectMode";
 import AuxMenu from "./AuxMenu/Menu";
+import JsonMenu from "./notes/controllers/JsonMenu";
+import { mode } from "./notes/NoteItem";
+import MoveFolder from "./notes/controllers/MoveFolder";
 
 export default class UINOTES extends React.Component {
 
@@ -17,17 +20,19 @@ export default class UINOTES extends React.Component {
         Notes: DB.Notes.getAll(),
         Folders: DB.Folders.getAll(),
         activeFolder: "0",
-        Editors: new Map<string,OpenEditor>(),
+        Editors: new Map<string, OpenEditor>(),
         SelectMode: false,
         selectes: new Set<string>(),
         findText: ""
     }
 
-    SelectMode = new SelectMode({UI: this});
+    SelectMode = new SelectMode({ UI: this });
 
     SearchInput = createRef<HTMLInputElement>();
 
     AUX?: AuxMenu;
+    JSONMENU?: JsonMenu;
+    MOVEFOLDER?: MoveFolder;
 
     constructor(props: {}) {
         super(props)
@@ -67,7 +72,7 @@ export default class UINOTES extends React.Component {
     changeSelectedFolder(id: Folder["id"]) {
         // this.reloadData(false,false);
         this.state.activeFolder = id;
-
+        mode.first = true;
         this.reloadData();
     }
     // send is sendUpdateToBC
@@ -79,8 +84,12 @@ export default class UINOTES extends React.Component {
             .filter((note) => note.folder == state.activeFolder)
             .sort((a, b) => b.time - a.time);
 
+        const Folders = DB.Folders.getAll()
+            // .filter((folder) => folder.folder == state.activeFolder)
+            .sort((a, b) => a?.order - b?.order);
+
         this.state.Notes = Notes;
-        this.state.Folders = DB.Folders.getAll();
+        this.state.Folders = Folders;
 
         config?.update && this.setState({})
     }
@@ -101,11 +110,8 @@ export default class UINOTES extends React.Component {
                     <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name}</div>
                 </div>
                 <div className="sections">
-                    <div className="folders-section"
-                    // onAuxClick={this.AuxForFolderSection}
-                    >
-                        <FolderSection UI={this} />
-                    </div>
+                    <FolderSection UI={this} />
+                    
                     <div className="notes-sections">
                         <NotesSection UI={this} />
                     </div>
@@ -119,17 +125,18 @@ export default class UINOTES extends React.Component {
                     <Editors UI={this} />
                 </div>
 
-                <div className={`SelectBox${(state.SelectMode == true)? " visible":""}`}>
+                <div className={`SelectBox${(state.SelectMode == true) ? " visible" : ""}`}>
                     <span className="titles" >¿Qué Desea hacer?</span>
                     <div className="div">
-                        <div className="item" onClick={this.SelectMode.deleteSelectes} ><Mat>delete</Mat> Borrar</div>
-                        {/* <div className="item" onClick={OpenMoveFolder}><Mat>drive_file_move_rtl</Mat> Mover a...</div> */}
+                        <div className={`item${state.selectes.size == 0 ? " disabled" : ""}`} onClick={this.SelectMode.deleteSelectes} ><Mat>delete</Mat> Borrar</div>
+                        <div className={`item${state.selectes.size == 0 ? " disabled" : ""}`} onClick={() => this.MOVEFOLDER?.open()}><Mat>drive_file_move_rtl</Mat> Mover a...</div>
                         <div className="item" onClick={() => this.SelectMode.setMode(false)}><Mat>close</Mat> Cancelar</div>
                     </div>
                 </div>
 
                 <AuxMenu UI={this} />
-
+                <JsonMenu UI={this} />
+                <MoveFolder UI={this} />
             </div>
         )
 

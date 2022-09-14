@@ -1,17 +1,25 @@
-.ViewJson {
-    display: none;
+.JSONMENU {
+    display: flex;
     position: fixed;
     left:0;
     top:0;
     right:0;
     bottom: 0;
-    &.view {
-        display: flex;
-    }
+    // &.view {
+    //     display: flex;
+    // }
     justify-content: center;
     align-items: center;
     z-index: 500;
+
+    .shadow {
+        position: absolute;
+        inset: 0;
+        background: #1a19192c;
+        z-index: 50;
+    }
     .container {
+        z-index: 51;
         display: flex;
         flex-wrap: nowrap;
         flex-direction: column;
@@ -20,12 +28,13 @@
         background: #1f1f1f;
         animation: OpenJson cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
         box-shadow: 2px -3px 20px -6px #0000006e;
-        .headerj {
+        .__header {
+            // background: red;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             user-select: none;
-            .titlejson {
+            .__title {
                 color: #e1e1e1;
                 font-size: 24px;
                 display: flex;

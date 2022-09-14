@@ -4,6 +4,9 @@
     margin: 0;
     box-sizing: border-box;
 }
+body {
+    color:#fff;
+}
 $primary:#00bdd6;
 :root {
     --primary: #00BCD4;
@@ -367,6 +370,10 @@ body {
             &:hover,&.active {
                 background: var(--primary);
             }
+            &.disabled {
+                pointer-events: none;
+                opacity: 0.5;
+            }
         }
     }
     &.active {
@@ -394,7 +401,7 @@ body {
     border-radius: 10px;
     transform-origin: center top;
     background: #1f1f1f;
-
+    
     &.none {
         display: none !important;
     }
