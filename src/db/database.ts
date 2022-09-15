@@ -25,6 +25,19 @@ export const ActiveFolder = new ITEMDATABASE<string>({
     default: "0"
 });
 
-const DB = { Folders, Notes,AutoUP,ActiveFolder }
+const DB = {
+    Folders,
+    Notes,
+    AutoUP,
+    ActiveFolder,
+
+    loadAll() {
+        for (const [name,db] of Object.entries(this)) {
+            if(name != "loadAll") {
+                (db as ITEMDATABASE<any>)?.load()
+            }
+        }
+    }
+}
 
 export default DB;

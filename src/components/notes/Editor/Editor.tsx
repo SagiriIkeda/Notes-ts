@@ -10,6 +10,9 @@ import EditorMovement from "./Movement";
 import EditorSelection from "./Selection";
 import DB, { AutoUP } from "../../../db/database";
 import { AuxList } from "../../AuxMenu/item";
+import EditorsBar from "./Bar";
+import Tooltip, { Theme } from "../../../../libraries/Tooltips/Tooltips2";
+
 
 interface EditorProps {
     invoker: OpenEditor,
@@ -32,39 +35,35 @@ interface EditorState {
     updateReceived: boolean,
 }
 
-export default class Editor extends React.Component<EditorProps, EditorState> {
+export default class Editor extends React.Component<EditorProps,EditorState> {
 
     note_name_container = createRef<HTMLDivElement>();
-    InputName = createRef<HTMLInputElement>();
-    InputCamp = createRef<HTMLDivElement>();
-    windowElm = createRef<HTMLDivElement>();
-    data: Note;
-
-    invoker: OpenEditor;
-
-    windowEditor = createRef<HTMLDivElement>();
-
     usereditor = createRef<HTMLDivElement>();
     note__info = createRef<HTMLDivElement>();
     note__header = createRef<HTMLDivElement>();
+    InputName = createRef<HTMLInputElement>();
+    InputCamp = createRef<HTMLDivElement>();
+    windowElm = createRef<HTMLDivElement>();
+    windowEditor = createRef<HTMLDivElement>();
+
+    data: Note;
+    invoker: OpenEditor;
 
     Movement = new EditorMovement({ Editor: this });
     Selection = new EditorSelection({ Editor: this });
 
+    chachedUpdate?: Note;
+
+    public state;
+
     constructor(props: EditorProps) {
         super(props);
 
-        let autoup = true;
-
-        if (localStorage.getItem('AutoUp') != undefined) {
-            autoup = JSON.parse(localStorage.getItem('AutoUp') ?? "false");
-        }
         this.invoker = props.invoker;
 
         this.data = this.invoker.data;
 
         const { data } = this;
-
 
         this.state = {
             title: data.title,
@@ -96,32 +95,28 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.SavePosition = this.SavePosition.bind(this);
         this.AuxInput = this.AuxInput.bind(this);
         this.AuxCamp = this.AuxCamp.bind(this);
-
-        // EditInstance = this;
-        //functions
-        //References 
-
-
-
-        // this.chachedUpdate = null;
+        this.onClickUpdateReceived = this.onClickUpdateReceived.bind(this);
     }
 
+    onClickUpdateReceived() {
+        const {invoker} = this;
+        const {TabInstance} = invoker;
+        const prevData = this.data;
 
-    // ClickUpdateReceived() {
+        invoker.data = { ...this.chachedUpdate } as Note;
+        this.data = invoker.data;
+        this.data.position = prevData.position;
 
-    //     data = { ...this.chachedUpdate }
+        this.state.theme = invoker.data.theme;
+        this.state.updateReceived = false;
+        this.chachedUpdate = undefined;
+        this.state.title = invoker.data.title;
 
-    //     this.state.theme = data.theme;
+        TabInstance?.setState({ title: invoker.data.title })
 
-    //     this.chachedUpdate = null;
-    //     this.state.updateReceived = false;
-
-    //     this.state.title = data.title;
-    //     TabInstance.setState({ title: data.title })
-
-    //     this.componentDidMount();
-    //     SetTheme(data.theme);
-    // }
+        this.componentDidMount();
+        this.data = invoker.data;
+    }
 
     UpdateName(event: SyntheticEvent<HTMLInputElement, InputEvent>) {
         const { invoker } = this.props;
@@ -137,6 +132,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             }
         }
     }
+
+
     UpdateCharact() {
         const InputCamp = this.InputCamp.current;
         if (InputCamp) {
@@ -151,7 +148,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         const { data, id } = invoker;
 
         if (id) {
-            DB.Notes.Update(id, { position: data.position });
+            DB.Notes.update(id, { position: data.position });
         }
     }
 
@@ -199,8 +196,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             windowEditor.style.top = `${data.position.top}px`;
         }
 
-
-        // LastestSave = this.InputCamp.current.innerHTML;
         this.UpdateCharact();
     }
     toggleMenuTheme() {
@@ -243,6 +238,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             const { Selection, invoker } = this;
 
             const windowEditor = this.windowEditor.current;
+            this.invoker.Socket.delete();
 
             const ANIMATION_TIME = 300;
 
@@ -401,6 +397,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         const { state, Movement, Selection, invoker } = this;
         const { data } = this.props.invoker;
 
+        const TooltipTheme: Theme = (state.theme == "dark") ? "light" : "dark";
+
         let time = new Date(data.time);
 
         if (state.closed == false) {
@@ -436,15 +434,15 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                 <div className="lefting-part">
 
                                     {(state.updateReceived == true) && (
-                                        // <div className="OpenSubMenu btnUpdateReceived " onClick={this.ClickUpdateReceived}>
-                                        <div className="OpenSubMenu btnUpdateReceived ">
-                                            <Mat>update</Mat>
-                                            <div className="__update__tooltip">
-                                                Se hicieron cambios en otra instancia de esta nota
-                                                <br />
-                                                Pulse para actualizar el contenido....
-                                            </div>
-                                        </div>
+                                        <Tooltip 
+                                            text="Se hicieron cambios en otra instancia de esta nota" 
+                                            description="Pulse para actualizar el contenido...."
+                                            maxWidth="200px"
+                                            className={["EditorTooltip"]}
+                                            theme={TooltipTheme}
+                                        >
+                                            <div className="OpenSubMenu"  onClick={this.onClickUpdateReceived} ><Mat>update</Mat></div>
+                                        </Tooltip>
                                     )}
 
                                     <div className="OpenSubMenu" onClick={this.toggleTexturizeCamp} data-actived={String(state.force)}> <Mat>title</Mat></div>
@@ -453,7 +451,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                 </div>
                             </div>
                             <div className="note-editor">
-                                <div className="note-data" ref={this.note__info} >{time.getFullYear()} {months[time.getMonth()]} {time.getDate()} {time.getHours()}:{time.getMinutes()}{(time.getHours() >= 12) ? "PM" : "AM"} | {state.charact} characters</div>
+                                <div className="note-data" ref={this.note__info} >
+                                    {time.getFullYear()} {months[time.getMonth()]} {time.getDate()} {time.getHours()}:{time.getMinutes()}{(time.getHours() >= 12) ? "PM" : "AM"} | {state.charact} carácteres</div>
                                 <div
                                     className="note-capm"
                                     contentEditable="true"
@@ -464,7 +463,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     onAuxClick={this.AuxCamp}
                                 ></div>
                                 <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoUP == true) ? state.texturize : false}>
-                                    <span className="titles">Seleccione estilo...</span>
+                                    <span className="titles">Seleccione un estilo...</span>
                                     <div className="div">
                                         <CampBtn bold ad={state.bold}>format_bold</CampBtn>
                                         <CampBtn underline ad={state.underline}>format_underline</CampBtn>
@@ -474,7 +473,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                     <div className="material-icons AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoUP)}>{(state.autoUP) ? "expand_less" : "expand_more"}</div>
                                 </div>
                                 <div className="selected_theme" data-active={String(state.themeMenu)}>
-                                    <span className="titles">Selecciona Temas</span>
+                                    <span className="titles">Selecciona un Tema</span>
                                     <div className="div">
                                         <ThemeBtn Editor={this} theme="dark">Oscuro</ThemeBtn>
                                         <ThemeBtn Editor={this} theme="yellow">Amarillo</ThemeBtn>
@@ -525,10 +524,7 @@ function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?
     )
 }
 
-export function Editors({ UI }: { UI: UINOTES }) {
-    return (<>
-        {[...UI.state.Editors.entries()].map(([id, item]: [string, OpenEditor]) => {
-            return <Editor invoker={item} key={item.temporalId ?? item.data.id} />
-        })}
-    </>)
+
+export function DevEditors({ UI }: { UI: UINOTES }) {
+    return (<EditorsBar UI={UI}/>)
 }

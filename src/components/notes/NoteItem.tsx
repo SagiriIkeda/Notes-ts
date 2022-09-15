@@ -80,7 +80,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             reverseButtons: true,
         }).then((result) => {
             if (result.isConfirmed) {
-                Notes.Remove(data.id);
+                Notes.remove(data.id);
                 this.UI.reloadData();
             }
         })

@@ -117,15 +117,6 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                 }
                 {(state.SelectMode == true) && (<div className="SimulateBox"></div>)}
             </div>
-            <div className="activeEditorsContainer">
-                <div className="activeEditors">
-                    {[...UI.state.Editors.entries()]
-                        .sort(([ia, a], [ib, b]) => a.createdAt - b.createdAt)
-                        .map(([id, item]) => {
-                            return <Tab invoker={item} key={id} />
-                        })}
-                </div>
-            </div>
         </>
     )
 }

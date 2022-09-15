@@ -9,7 +9,6 @@ import UI from "../UI";
 import createFolder from "./util/createFolder";
 import { AuxList } from "../AuxMenu/item";
 
-
 interface FolderSectionProps {
     UI: UI
 }

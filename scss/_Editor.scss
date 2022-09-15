@@ -7,7 +7,7 @@
     background: rgb(0, 0, 0);
     animation: openeditor ease .2s;
     max-width: 98vw;
-    z-index: 40;
+    z-index: 41;
     width: 700px;
     border-radius: 8px;
     height: 600px;
@@ -210,44 +210,10 @@
                     background: transparent;
                 }
             }
-
-            .btnUpdateReceived {
-                position: relative;
-                --bg: var(--menucolor);
-
-                transition: background ease .25s;
-
-                border-radius: 5px 5px 0px 0px;
-                .__update__tooltip {
-                    font-size: 14px;
-                    padding: 5px;
-                    border-radius: 5px;
-                    text-align: center;
-                    width: 20vw;
-                    position: absolute;
-                    user-select: none;
-                    left: 50%;
-                    top: 100%;
-                    transform: translateX(-50%);
-                    opacity: 0;
-                    background: var(--bg);
-                    transition: ease opacity 0.25s;
-                
-                    pointer-events: none !important;
-                }
-                &:hover, .__update__tooltip:hover {
-                    background: var(--bg);
-                    .material-icons {
-                        color: white !important;
-
-                    }
-                    .__update__tooltip {
-                        opacity: 1;
-                    }
-
-                }
+            .EditorTooltip {
+                font-size: 13px;
             }
-            
+
             .material-icons {
                 font-size: 36px;
                 width: 36px;

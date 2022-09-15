@@ -17,9 +17,9 @@ export default class ARRAYDATABASE<Type> implements DATABASECONFIG {
         this.default = config.default;
         this.identifier = config.identifier;
         this.content = [];
-        this.Load();
+        this.load();
     }
-    Load() {
+    load() {
         const gettedItem = localStorage.getItem(this.storage);
         const setDefaultValue = () => {
             if (this.default instanceof Function) {
@@ -43,61 +43,62 @@ export default class ARRAYDATABASE<Type> implements DATABASECONFIG {
             setDefaultValue()
         }
     }
-    Save() {
+    save() {
         localStorage.setItem(this.storage, JSON.stringify(this.content));
     }
-    Add(content: Type): string {
-        this.Load();
+    add(content: Type): string {
+        this.load();
         let uuid = `${Date.now()}-${this.content.length}`;
         (content as any)[this.identifier] = uuid;
         this.content.push(content)
-        this.Save();
+        this.save();
         return uuid;
     }
 
     get(id: string): Type | undefined {
-        this.Load();
+        this.load();
         return this.content.find((e: any) => e[this.identifier] == id);
     }
 
-    Update(id: string, content: Partial<Type> = {}) {
-        this.Load();
+    update(id: string, content: Partial<Type> = {}) {
+        this.load();
         let find = this.content.findIndex((e: any) => e[this.identifier] == id);
         if (find != -1) {
             this.content[find] = { ...this.content[find], ...content }
-            this.Save();
+            this.save();
         }
     }
-    Delete(ok = false) {
+    delete(ok = false) {
         if (ok == true) {
             this.content = [];
             if (this.default != false) {
                 this.content = this.default();
             }
-            this.Save()
+            this.save()
         }
     }
-    Remove(id: string) {
-        this.Load();
+    remove(id: string) {
+        this.load();
         let find = this.content.findIndex((e: any) => e[this.identifier] == id);
         if (find != -1) {
             this.content.splice(find, 1)
-            this.Save();
+            this.save();
         } else {
             return false;
         }
     }
-    Search(key: string, value: string) {
-        this.Load()
+    search(key: string, value: string) {
+        this.load()
         return this.content.filter((e: any) => e[key] == value);
     }
 
     getAll() {
+        // this.Load();
         return this.content;
     }
 
-    Filter(filterFn: (item: Type) => void) {
-        this.Load()
+    filter(filterFn: (item: Type) => void) {
+        this.load()
         return this.content.filter(filterFn);
     }
 }

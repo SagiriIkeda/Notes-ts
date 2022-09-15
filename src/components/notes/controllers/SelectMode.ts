@@ -91,7 +91,7 @@ export default class SelectMode implements SelectModeConfig {
                             Editor.forceClose(true);
                         }
 
-                        Notes.Remove(id);
+                        Notes.remove(id);
                     })
 
                     this.UI.state.SelectMode = false;

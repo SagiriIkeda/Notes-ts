@@ -24,7 +24,6 @@ export default class ITEMDATABASE<Type>{
         const defaultValue= (upsert = true) =>{
             const defaultv = (this.default instanceof Function) ? this.default() : this.default;
 
-
             if (upsert && this.default != undefined) {
                 this.content = defaultv;
             }

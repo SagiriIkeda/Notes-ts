@@ -87,7 +87,7 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
             <span className="folder__name">
                 <Mat>arrow_forward_ios</Mat>{data.name}
             </span>
-            {DB.Notes.Search("folder", data.id).length}
+            {DB.Notes.search("folder", data.id).length}
         </div>
     )
 }

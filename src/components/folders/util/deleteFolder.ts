@@ -17,12 +17,12 @@ export default function deleteFolder(UI: UINOTES, data: Folder) {
         confirmButtonText: "borrar"
     }).then((result) => {
         if (result.isConfirmed) {
-            if (DB.Folders.Remove(folderId) != false) {
+            if (DB.Folders.remove(folderId) != false) {
                 if (UI.state.activeFolder == folderId) {
                     UI.state.activeFolder = "0";
 
                 }
-                const deletableNotes = DB.Notes.Search("folder", folderId);
+                const deletableNotes = DB.Notes.search("folder", folderId);
 
                 UI.state.Editors.forEach(Editor => {//en caso de q se esté creando una nota sin guardar en esa carpeta
                     if (Editor.temporalId && Editor.data.folder == folderId) {
@@ -38,7 +38,7 @@ export default function deleteFolder(UI: UINOTES, data: Folder) {
                         Editor.forceClose();
                     }
 
-                    DB.Notes.Remove(note.id);
+                    DB.Notes.remove(note.id);
                 })
 
                 UI.reloadData();

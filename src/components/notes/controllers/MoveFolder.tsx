@@ -100,7 +100,7 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         const { state, UI } = this;
         if (state.selected.trim()) {
             UI.state.selectes.forEach(note => {
-                DB.Notes.Update(note, {
+                DB.Notes.update(note, {
                     folder: state.selected
                 })
             })
@@ -139,12 +139,12 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         let { Folders } = UI.state;
 
         if (state.search != "") {
-            let Reg = new RegExp(state.search.replace(/\W/gim, "\\$&"), 'gim');
+            const Reg = new RegExp(state.search.replace(/\W/gim, "\\$&"), 'gim');
             Folders = Folders.filter(folder => Reg.test(folder.name))
         }
 
         if (state.opend) {
-            let size = UI.state.selectes.size;
+            const size = UI.state.selectes.size;
             return (
                 <div className="MoveFolderContainer">
                     <div className="shadow" ref={this.shadow} onClick={this.close} ></div>

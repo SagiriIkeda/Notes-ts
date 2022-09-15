@@ -28,7 +28,7 @@ export default function renameFolder(UI: UINOTES, data: Folder) {
                         text: 'Esa Carpeta ya existe!',
                     })
                 } else {
-                    DB.Folders.Update(folderId, {
+                    DB.Folders.update(folderId, {
                         name: result.value,
                     })
                     UI.reloadData();

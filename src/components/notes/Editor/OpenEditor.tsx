@@ -6,6 +6,8 @@ import Editor from "./Editor";
 import Tab from "./Tab";
 import Swal from "sweetalert2";
 import { EDITORCONFIG } from "../../../interfaces/config";
+import EditorSocket from "./Socket";
+import Socket from "../../../socket";
 
 export default class OpenEditor {
 
@@ -17,6 +19,7 @@ export default class OpenEditor {
     temporalId?: string;
 
     createdAt = Date.now();
+    Socket = new EditorSocket(this);
 
 
     constructor(public UI: UI, id?: string) {
@@ -25,7 +28,7 @@ export default class OpenEditor {
         this.id = id;
         if (id) {// se está abriendo una nota existente
             this.data = new NoteBuilder(activeFolder, DB.Notes.get(id))
-
+            this.Socket.start();
             UI.state.Editors.set(id, this);
         } else {//la nota no existe (colocarle una id temporal)
             this.data = new NoteBuilder(activeFolder);
@@ -76,7 +79,7 @@ export default class OpenEditor {
     }
 
     Save() {
-        const { data, id, UI } = this;
+        const { data, id, UI,EditorInstance } = this;
         const { Editors } = UI.state;
 
         this.LastestSave = data.content;
@@ -87,16 +90,22 @@ export default class OpenEditor {
 
         try {
             if (!id) {//la nota no existe, crearla
-                let uuid = DB.Notes.Add(construct);
+                let uuid = DB.Notes.add(construct);
                 this.id = uuid;
                 data.id = uuid;
+                this.Socket.start();
 
                 Editors.delete(this.temporalId as string);//eliminar la instancia temporal
                 Editors.set(this.id, this);// volver a crearla usando la id real
-
-                // this.temporalId = undefined;
             } else {//la nota si existe
-                DB.Notes.Update(construct.id, construct);
+                this.Socket.deferUpdate();
+    
+                if(EditorInstance) {
+                    EditorInstance.state.updateReceived = false;
+                    EditorInstance.chachedUpdate = undefined;
+                };
+            
+                DB.Notes.update(construct.id, construct);
             }
         } catch (error: any) {
             QuotaLimit(error)
@@ -120,16 +129,11 @@ export default class OpenEditor {
             })
         }
 
-        // bc.postMessage(new NoteUpdateData(construct));
-
-        // EditInstance.chachedUpdate = null;
-        // EditInstance.setState({ updateReceived: false })
-
         this.UI.reloadData();
     }
 
     //Close
-    Close(force: React.MouseEvent | boolean = false,update = true) {
+    Close(force: React.MouseEvent | boolean = false, update = true) {
         const { data } = this;
 
         let construct = JSON.parse(JSON.stringify(data));
@@ -156,8 +160,7 @@ export default class OpenEditor {
     }
 
     async forceClose(update = true) {
-        // bc.removeEventListener('message', BcReceivedUpdate)
-
+ 
         const { TabInstance, EditorInstance, UI, data } = this;
         const { Editors } = UI.state;
 

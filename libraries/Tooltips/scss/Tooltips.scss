@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+:root {
+    --toltip-background: #18191c;
+    --toltip-description-color: grey;
+    --toltip-text-color: #dad8d8;
+}
+
+.tooltip {
+    color: white;
+    padding: 5px 5px;
+    background: var(--toltip-background);
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+    user-select: none;
+    // position: fixed;
+    position: absolute;
+    // position: fixed;
+    top: 0;
+    left: 0;
+    max-width: calc(93vw - 10px);
+    z-index: 100;
+    // box-shadow: 1px 6px 11px 2px #00000047;
+    box-shadow: 1px 6px 11px 2px #00000021;
+    opacity: 0;
+    display: flex;
+    flex-wrap: wrap;
+    pointer-events: none;
+
+    span {
+        color: var(--toltip-text-color);
+        display: flex;
+        align-items: center;
+        padding: 0px 15px;
+        padding-bottom: 3px;
+        text-align: center;
+        word-break: break-word;
+        width: 100%;
+
+        &[aling="right"] {
+            padding: 0px 0px 0px 15px;
+            text-align: end;
+        }
+
+        &[aling="left"] {
+            padding: 0px 15px 0px 0px;
+            text-align: start;
+        }
+    }
+
+    .description {
+        color: var(--toltip-description-color);
+        text-align: center;
+        width: 100%;
+        word-break: break-word;
+    }
+
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-top: 5px solid var(--toltip-background);
+        border-right: 5px solid transparent;
+        position: absolute;
+        top: 100%;
+        left: calc(50% - 5px);
+    }
+
+    &[position="bottom"]>.triangle {
+        top: -5px;
+        border-left: 5px solid transparent;
+        border-top: unset;
+        border-bottom: 5px solid var(--toltip-background);
+        border-right: 5px solid transparent;
+    }
+
+    &[position="left"] {
+        .triangle {
+            top: calc(50% - 5px);
+            left: -5px;
+            border-left: unset;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-right: 5px solid var(--toltip-background);
+        }
+
+        .description {
+            text-align: start;
+        }
+    }
+
+    &[position="right"] {
+        .triangle {
+            top: calc(50% - 5px);
+            left: 100%;
+            border-top: 5px solid transparent;
+            border-left: 5px solid var(--toltip-background);
+            border-bottom: 5px solid transparent;
+            border-right: unset;
+            box-shadow: -5px 0px 0px 0px var(--toltip-background);
+        }
+
+        .description {
+            text-align: end;
+        }
+    }
+
+    &.ligth {
+        --toltip-background:rgb(240, 238, 238);
+        --toltip-description-color: #4b4a4a;
+        // --toltip-text-color: #292929;
+        --toltip-text-color: #1a1a1a;
+    }
+
+}
+
+// .tooltip {
+//     --toltip-background:rgb(240, 238, 238);
+//     --toltip-description-color: #4b4a4a;
+//     --toltip-text-color: #292929;
+// }

@@ -23,7 +23,7 @@ export default function createFolder(UI: UINOTES) {
                         text: 'Esa Carpeta ya existe!',
                     })
                 } else {
-                    DB.Folders.Add({
+                    DB.Folders.add({
                         id: "",
                         name: result.value,
                         order: DB.Folders.getAll().length
