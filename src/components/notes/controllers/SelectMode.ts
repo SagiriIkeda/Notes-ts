@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { Notes } from "../../../db/database";
 import Note from "../../../interfaces/notes";
+import Socket from "../../../socket";
 import UINOTES from "../../UI";
 // import { firstSelected } from "../NoteItem";
 
@@ -24,7 +25,7 @@ export default class SelectMode implements SelectModeConfig {
     }
 
     delete(id: Note["id"]) {
-        this.getSelectes().delete(id)
+        this.getSelectes().delete(id);
     }
 
     clear() {
@@ -88,10 +89,15 @@ export default class SelectMode implements SelectModeConfig {
                     selectes.forEach((id) => {
                         const Editor = this.UI.state.Editors.get(id);
                         if (Editor) {
-                            Editor.forceClose(true);
+                            Editor.forceClose(false);
                         }
 
                         Notes.remove(id);
+                    })
+
+                    Socket.send({
+                        data: [...selectes],
+                        event: "note-bulk-delete",
                     })
 
                     this.UI.state.SelectMode = false;
@@ -100,9 +106,6 @@ export default class SelectMode implements SelectModeConfig {
             })
         }
 
-        // selectes.forEach((id) => {
-        //     Notes.Remove(id)
-        // })
     }
 
 

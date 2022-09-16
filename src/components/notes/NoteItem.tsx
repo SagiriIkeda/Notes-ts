@@ -2,10 +2,11 @@ import React, { createRef } from "react";
 import Swal from "sweetalert2";
 import { Notes } from "../../db/database";
 import Note from "../../interfaces/notes";
+import Socket from "../../socket";
 import { AuxList } from "../AuxMenu/item";
 import { CopyToClipboard } from "../AuxMenu/util/CopyToClipboard";
 import { downloadFile } from "../AuxMenu/util/downloadFile";
-import timeAgo from "../timeAgo";
+import timeAgo from "../../../libraries/timeAgo/timeAgo";
 import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
 
@@ -73,7 +74,6 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         Swal.fire({
             confirmButtonText: 'Borrar',
             icon: "warning",
-            // title: "¡Cuidado!",
             html: `¿Quieres Borrar la nota <b>${data.title}</b>?`,
             showCancelButton: true,
             showCloseButton: true,
@@ -81,6 +81,13 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         }).then((result) => {
             if (result.isConfirmed) {
                 Notes.remove(data.id);
+
+                Socket.send({
+                    data:null,
+                    event:"note-delete",
+                    id: data.id,
+                })
+
                 this.UI.reloadData();
             }
         })

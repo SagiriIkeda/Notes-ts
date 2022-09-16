@@ -21,7 +21,7 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         createFolder(UI)
     }
     function AuxForFolderSection(event: React.MouseEvent) {
-        if ((event.target as HTMLDivElement).classList.contains("DragableFolders")) {
+        if ((event.target as HTMLDivElement).classList.contains("container")) {
             const obj: AuxList = [
                 {
                     icon: "create_new_folder",
@@ -36,9 +36,9 @@ export default function FolderSection({ UI }: FolderSectionProps) {
     }
 
     return (
-        <div className="folders-section" onAuxClick={AuxForFolderSection} >
-            <div className="container">
-                <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
+        <div className="folders-section">
+            <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
+            <div className="container" onAuxClick={AuxForFolderSection}>
                 <FolderItem createFolder={createFolderAux} UI={UI} key={0} data={DB.Folders.get("0") as Folder} />
                 <div className="DragableFolders">
                     {Folders.map((fold) => {

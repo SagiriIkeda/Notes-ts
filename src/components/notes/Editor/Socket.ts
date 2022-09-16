@@ -6,31 +6,18 @@ import OpenEditor from "./OpenEditor";
 export default class EditorSocket {
     invoker: OpenEditor;
 
-    CACHEDOnUpdateReceived?: (data: MessageEvent) => void;
-
     constructor(Invoker: OpenEditor) {
         this.invoker = Invoker;
 
         this.onUpdateReceived = this.onUpdateReceived.bind(this);
+        this.onDeleteReceived = this.onDeleteReceived.bind(this);
     }
     /**
      * Empezar a recibir las Actualizaciones externas
      */
     start() {
-        this.CACHEDOnUpdateReceived = Socket.on("note-update", this.onUpdateReceived, this.invoker.id);
-    }
-
-    onUpdateReceived(message: SendData<Note>) {
-        const { invoker } = this;
-        const { EditorInstance } = invoker;
-        const { data } = message;
-        if (EditorInstance) {
-
-            EditorInstance.chachedUpdate = data;
-            EditorInstance.setState({
-                updateReceived: true,
-            })
-        }
+        Socket.on("note-update", this.onUpdateReceived, this.invoker.id);
+        Socket.on("note-delete", this.onDeleteReceived, this.invoker.id);
     }
     /**
      * Send Update to the Socket
@@ -45,13 +32,33 @@ export default class EditorSocket {
         })
     }
 
+    onUpdateReceived(message: SendData<Note>) {
+        const { invoker } = this;
+        const { EditorInstance } = invoker;
+        const { data } = message;
+        if (EditorInstance) {
+            EditorInstance.chachedUpdate = data;
+            EditorInstance.setState({
+                updateReceived: true,
+            })
+        }
+    }
+    
+    onDeleteReceived(message: SendData) {
+        const { invoker } = this;
+
+        this.delete();
+
+        invoker.forceClose(true);
+    }
+
     /**
      * Destruir Todos Los eventos en el Socket
      */
     delete() {
-        // console.log("deleting");
+        Socket.remove(this.onUpdateReceived);
+        Socket.remove(this.onDeleteReceived);
 
-        this.CACHEDOnUpdateReceived && Socket.remove(this.CACHEDOnUpdateReceived)
     }
 
 }

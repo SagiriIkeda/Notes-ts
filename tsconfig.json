@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "libraries/timeAgo/timeAgo.ts","libraries/Tooltips/Tooltips2.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

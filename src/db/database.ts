@@ -2,12 +2,13 @@ import Note from "../interfaces/notes";
 import Folder from "../interfaces/folder";
 import ARRAYDATABASE from "./array";
 import ITEMDATABASE from "./item";
+import { FOLDERSCONFIG } from "../interfaces/config";
 
 export const Folders = new ARRAYDATABASE<Folder>({
     storage: "Folders",
     identifier: "id",
     default: () => {
-        return [{ name: "Notas", id: "0" }]
+        return [{ name: FOLDERSCONFIG.DEFAULT_NAME, id: FOLDERSCONFIG.DEFAULT_ID }]
     }
 });
 export const Notes = new ARRAYDATABASE<Note>({
@@ -22,7 +23,7 @@ export const AutoUP = new ITEMDATABASE<boolean>({
 });
 export const ActiveFolder = new ITEMDATABASE<string>({
     storage: "ActiveFolder",
-    default: "0"
+    default: FOLDERSCONFIG.DEFAULT_ID
 });
 
 const DB = {

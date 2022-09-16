@@ -11,6 +11,7 @@ import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import SelectMode from "./notes/controllers/SelectMode";
 import AuxMenu from "./AuxMenu/Menu";
 import JsonMenu from "./notes/controllers/JsonMenu";
+
 import { mode } from "./notes/NoteItem";
 import MoveFolder from "./notes/controllers/MoveFolder";
 import Note from "../interfaces/notes";
@@ -54,28 +55,69 @@ export default class UINOTES extends React.Component {
 
         this.reloadData({
             update: false,
-            send:false,
+            send: false,
         });
 
     }
+
     componentDidMount() {
-        Socket.on("update-app", (data) => {
+        //Socket Events
+        Socket.on("update-app", (response) => {
             DB.loadAll();
             this.reloadData({
                 send: false,
             })
         })
-        
+
+        Socket.on("note-bulk-delete", (response) => {
+            const NoteIds = response.data;
+            // Cerrar los editores de esas Notas
+            NoteIds.forEach((id) => {
+                const Editor = this.state.Editors.get(id);
+                if (Editor) {
+                    Editor.forceClose(false);
+                }
+            })
+        })
+
+        Socket.on("folder-delete", (response) => {
+            const { state } = this;
+            const folderId = response.data;
+            DB.ActiveFolder.load();
+
+            if (state.activeFolder == folderId) {
+                state.activeFolder = "0";
+                mode.first = true;
+            }
+
+            state.Editors.forEach((Invoker, id) => {
+                const { data } = Invoker;
+
+                if (data.folder == folderId) {//El editor está en la misma carpeta
+                    if (Invoker.temporalId) {//es una nota sin guardar (Aún temporal) añadirle una nota
+                        Invoker.data.folder = "0";
+                        const { EditorInstance } = Invoker;
+                        if (EditorInstance) EditorInstance.state.folderDeleted = true;
+                    } else {//es una nota previamente guardada (cerrarla)
+                        Invoker.forceClose(false);
+
+                    }
+
+                }
+            })
+        })
+
+
     }
 
     changeSelectedFolder(id: Folder["id"]) {
         DB.ActiveFolder.set(id);
         this.state.activeFolder = id;
         mode.first = true;
-        this.reloadData({send:false});
+        this.reloadData({ send: false });
     }
     // send is sendUpdateToBC
-    reloadData({update = true, send = true}: { send?: boolean, update?: boolean } = {}) {
+    reloadData({ update = true, send = true }: { send?: boolean, update?: boolean } = {}) {
         const { state } = this;
 
         const Notes = DB.Notes.getAll()

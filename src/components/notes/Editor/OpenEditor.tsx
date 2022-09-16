@@ -95,24 +95,31 @@ export default class OpenEditor {
                 data.id = uuid;
                 this.Socket.start();
 
+                if(EditorInstance) {//Quitar el folderdDeleted Warn
+                    EditorInstance.state.folderDeleted = false;
+                };
+
                 Editors.delete(this.temporalId as string);//eliminar la instancia temporal
                 Editors.set(this.id, this);// volver a crearla usando la id real
+
             } else {//la nota si existe
                 this.Socket.deferUpdate();
-    
+                
                 if(EditorInstance) {
+                    EditorInstance.state.folderDeleted = false;
                     EditorInstance.state.updateReceived = false;
                     EditorInstance.chachedUpdate = undefined;
                 };
             
                 DB.Notes.update(construct.id, construct);
             }
+            if(EditorInstance) EditorInstance.state.saved = true;
         } catch (error: any) {
+            if(EditorInstance) EditorInstance.state.saved = false;
             QuotaLimit(error)
         }
 
         function QuotaLimit(error: { name: string }) {
-            // c
             let message = "";
 
             if (error.name == "QuotaExceededError") {
@@ -147,7 +154,7 @@ export default class OpenEditor {
                     cancelButtonText: "Cancelar",
                     reverseButtons: true,
                     html: 'Aún no haz guardado<br> <b>¿estas seguro que deseas cerrar?</b>',
-                    confirmButtonText: 'cerrar'
+                    confirmButtonText: 'Cerrar Editor'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.forceClose(update);

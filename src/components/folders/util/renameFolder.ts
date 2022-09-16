@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import DB from "../../../db/database";
+import { FOLDERSCONFIG } from "../../../interfaces/config";
 import Folder from "../../../interfaces/folder";
 import UINOTES from "../../UI";
 
@@ -8,8 +9,9 @@ export default function renameFolder(UI: UINOTES, data: Folder) {
     if (folderId === "0") return false;
 
     Swal.fire({
-        confirmButtonText: 'Crear',
-        title: "Renombar Carpeta",
+        confirmButtonText: 'Renombrar',
+        cancelButtonText:"Cancelar",
+        title: "Renombrar Carpeta",
         input: 'text',
         showCancelButton: true,
         showCloseButton: true,
@@ -22,7 +24,7 @@ export default function renameFolder(UI: UINOTES, data: Folder) {
             const alreadyExist = (DB.Folders.getAll().findIndex(folder => folder.name == value) != -1)
 
             if (result.value.trim()) {
-                if (alreadyExist || result.value === "Notes") {
+                if (alreadyExist || result.value === FOLDERSCONFIG.DEFAULT_NAME) {
                     Swal.fire({
                         icon: 'error',
                         text: 'Esa Carpeta ya existe!',

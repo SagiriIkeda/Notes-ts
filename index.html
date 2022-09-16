@@ -2,13 +2,21 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notes TS</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="shortcut icon" href="src/assets/icon-react.jpg" type="image/x-icon">
+    <link href="css/Preloader.css" rel="stylesheet"/>
   </head>
-  <body oncontextmenu="return false" class="loaded">
+  <body oncontextmenu="return false">
+    <div class="LoadingPage" id="LD">
+      <div class="centered">
+          <div class="center">
+              <img src="src/assets/icon-react.jpg" alt="react">
+          </div>
+          <h2>React TS Notes</h2>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -4,5 +4,10 @@ export enum EDITORCONFIG  {
     MAX_EDITORS_OPENDS = 6,
 }
 
+export enum FOLDERSCONFIG {
+    DEFAULT_NAME = "Notes",
+    DEFAULT_ID = "0"
+}
+
 
 export const version = "6";

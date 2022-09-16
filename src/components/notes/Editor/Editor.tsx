@@ -1,7 +1,7 @@
 import React, { createRef, FormEventHandler, KeyboardEvent, ReactNode, SyntheticEvent } from "react";
 import Note, { Themes } from "../../../interfaces/notes";
 import { Mat } from "../../prefabs";
-import { months } from "../../timeAgo";
+import { months } from "../../../../libraries/timeAgo/timeAgo";
 import OpenEditor from "./OpenEditor";
 
 import iconReact from "../../../assets/icon-react.jpg";
@@ -22,20 +22,24 @@ interface EditorState {
     title: Note["title"],
     theme: Note["theme"],
 
+    force: boolean,
+    themeMenu: boolean,
+
+    updateReceived: boolean,
+    folderDeleted: boolean,
+    autoUP: boolean,
+
+    saved: boolean,
+
     charact: number,
     texturize: boolean,
-    force: boolean,
     closed: boolean,
     bold: boolean,
     underline: boolean,
     italic: boolean,
-    themeMenu: boolean,
-    autoUP: boolean,
-
-    updateReceived: boolean,
 }
 
-export default class Editor extends React.Component<EditorProps,EditorState> {
+export default class Editor extends React.Component<EditorProps, EditorState> {
 
     note_name_container = createRef<HTMLDivElement>();
     usereditor = createRef<HTMLDivElement>();
@@ -69,15 +73,19 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
             title: data.title,
             theme: data.theme,
             charact: 0,
+            autoUP: AutoUP.get(),
+            updateReceived: false,
+            folderDeleted: false,
+            saved: true,
+
             texturize: false,
-            force: false,
             closed: false,
             bold: false,
             underline: false,
             italic: false,
+
+            force: false,
             themeMenu: false,
-            autoUP: AutoUP.get(),
-            updateReceived: false,
         }
 
         this.props.invoker.EditorInstance = this;
@@ -96,11 +104,12 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
         this.AuxInput = this.AuxInput.bind(this);
         this.AuxCamp = this.AuxCamp.bind(this);
         this.onClickUpdateReceived = this.onClickUpdateReceived.bind(this);
+        this.ctrlKeyEvents = this.ctrlKeyEvents.bind(this);
     }
 
     onClickUpdateReceived() {
-        const {invoker} = this;
-        const {TabInstance} = invoker;
+        const { invoker } = this;
+        const { TabInstance } = invoker;
         const prevData = this.data;
 
         invoker.data = { ...this.chachedUpdate } as Note;
@@ -112,7 +121,7 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
         this.chachedUpdate = undefined;
         this.state.title = invoker.data.title;
 
-        TabInstance?.setState({ title: invoker.data.title })
+        TabInstance?.setState({ title: invoker.data.title, theme: invoker.data.theme })
 
         this.componentDidMount();
         this.data = invoker.data;
@@ -133,13 +142,17 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
         }
     }
 
-
     UpdateCharact() {
         const InputCamp = this.InputCamp.current;
+        const {invoker} = this.props;
         if (InputCamp) {
-            this.props.invoker.data.content = InputCamp.innerHTML;
-            let value = InputCamp.innerText;
-            this.setState({ charact: value.length })
+        
+            invoker.data.content = InputCamp.innerHTML;
+
+            this.state.saved = invoker.data.content == invoker.LastestSave;
+          
+            const value = InputCamp.innerText;
+            this.setState({ charact: value.length})
         }
     }
 
@@ -167,13 +180,25 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
         }
     }
 
-    SaveKey(e: KeyboardEvent) {
+    SaveKey(e: React.KeyboardEvent) {
         const keyCode = e.keyCode;
 
-        if (keyCode === 116) {
-            // e.returnValue = false;
+        if (keyCode === 116) {//key "F5"
             e?.preventDefault();
             this.Save();
+        }
+    }
+
+    ctrlKeyEvents(e: React.KeyboardEvent) {
+        const KeyCode = e.keyCode;
+
+        if (e.ctrlKey) {
+
+            if (KeyCode === 83) {//key "S"
+                e.preventDefault();
+                e.stopPropagation();
+                this.Save();
+            };
         }
     }
 
@@ -399,7 +424,7 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
 
         const TooltipTheme: Theme = (state.theme == "dark") ? "light" : "dark";
 
-        let time = new Date(data.time);
+        const time = new Date(data.time);
 
         if (state.closed == false) {
             return (
@@ -409,16 +434,38 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
                         <div className="title">
                             <img src={iconReact} alt="editor" />
                             <span>{state.title}</span>
+
+                            {(state.saved == false) && (<Tooltip
+                                text="Hay cambios sin guardar"
+                                maxWidth="200px"
+                                className={["EditorTooltip dontSavedTooltip "]}
+                                theme={TooltipTheme}
+                            >
+                                <div className="dontSavedIndicator" ></div>
+                            </Tooltip>)}
                         </div>
                         <div className="btns">
                             <div className="wbtn" onClick={invoker.Close}><Mat>close</Mat></div>
-
                         </div>
                     </div>
                     <div className="usereditor" ref={this.usereditor}>
                         <div className="note-editor-capm">
                             <div className="editor-header" ref={this.note__header}>
-                                <div className="atras" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
+                                <div className="left-part">
+                                    {(state.folderDeleted == true) && (
+                                        <Tooltip
+                                            text="La carpeta en la que se iba a crear esta nota fue borrada"
+                                            description="Se cambió la carpeta a la principal"
+                                            maxWidth="200px"
+                                            className={["EditorTooltip"]}
+                                            theme={TooltipTheme}
+                                        >
+                                            <div className="OpenSubMenu WarnButton"><Mat>folder_delete</Mat></div>
+                                        </Tooltip>
+                                    )}
+                                    <div className="atras" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
+                                </div>
+
                                 <div className="note_name">
                                     <div className="container" ref={this.note_name_container}>
                                         <div className="saved">Guardando...</div>
@@ -431,17 +478,17 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
                                         />
                                     </div>
                                 </div>
-                                <div className="lefting-part">
+                                <div className="right-part">
 
                                     {(state.updateReceived == true) && (
-                                        <Tooltip 
-                                            text="Se hicieron cambios en otra instancia de esta nota" 
+                                        <Tooltip
+                                            text="Se hicieron cambios en otra instancia de esta nota"
                                             description="Pulse para actualizar el contenido...."
                                             maxWidth="200px"
                                             className={["EditorTooltip"]}
                                             theme={TooltipTheme}
                                         >
-                                            <div className="OpenSubMenu"  onClick={this.onClickUpdateReceived} ><Mat>update</Mat></div>
+                                            <div className="OpenSubMenu" onClick={this.onClickUpdateReceived} ><Mat>update</Mat></div>
                                         </Tooltip>
                                     )}
 
@@ -458,6 +505,7 @@ export default class Editor extends React.Component<EditorProps,EditorState> {
                                     contentEditable="true"
                                     ref={this.InputCamp}
                                     onKeyUp={this.UpdateCharact}
+                                    onKeyDownCapture={this.ctrlKeyEvents}
                                     onKeyDown={this.SaveKey}
                                     onPaste={Selection.preventPasteHTML}
                                     onAuxClick={this.AuxCamp}
@@ -526,5 +574,5 @@ function CampBtn(props: { ad: boolean, children: string, bold?: boolean, italic?
 
 
 export function DevEditors({ UI }: { UI: UINOTES }) {
-    return (<EditorsBar UI={UI}/>)
+    return (<EditorsBar UI={UI} />)
 }

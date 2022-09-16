@@ -1,15 +1,27 @@
+import Note from "./interfaces/notes";
+
 const bc = new BroadcastChannel("Notes");
 
-/**
- * Por agregar "note-delete" "folder-delete"
- */
-type Events = "update-app" | "note-update" | "note-delete" | "folder-delete" ;
+interface EventType {
+    "update-app"?: null,//cuando algo sea actualizado
 
-export interface SendData<Type = any> {
+    "note-update": Note,// cuando una nota sea actualizada, para actualizar otras instancias del editor
+    "note-delete": null,// cuando una nota sea borrada, para cerrar otras instancias del editor
+    "note-bulk-delete": string[],//ids: cuando varias notas sean borradas (con el SelectMenu) para cerrar otras instancias del Editor
+
+    "folder-delete"?: string,//id:  cuando una carpeta sea borrada, para cerrar instancias de editores de notas en esa carpeta
+}
+
+
+export interface SendData<Type = any, E extends keyof EventType = any> {
     data: Type,
-    event: Events,
+    event: E,
     id?: string,
     by?: string,
+}
+
+interface SocketEventFunction extends Function {
+    SocketIdentifier?: string;
 }
 
 const clientId = crypto.randomUUID();
@@ -17,33 +29,46 @@ const clientId = crypto.randomUUID();
 class Socket {
     static clientId = clientId;
 
-    static send<Type>(data: SendData<Type>) {
+    static EventFunctions = new Map<string, (data: SendData) => void>()
+
+    static send<T extends keyof EventType>(data: SendData<EventType[T], T>) {
         data.by = clientId;
         bc.postMessage(data)
     }
 
-    static on(event: Events, fn: (data: SendData) => void, id?: string) {
+    static on<E extends keyof EventType>(event: E, fn: (data: SendData<EventType[E],E>) => void, id?: string) {
+        const identifier = event + (id ? `+${id}` : "");
+        const reference = fn as SocketEventFunction;
 
-        function socketFn(message: MessageEvent<SendData<any>>) {
-            if (message.data.by != clientId) {
-                if (message.data.event == event) {
-                    if (id === message.data.id) {
-                        return fn(message.data);
-                    }
-                    fn(message.data);
-                }
-            }
-        }
+        reference.SocketIdentifier = identifier;
 
-        bc.addEventListener("message", socketFn)
-
-        return socketFn;
+        this.EventFunctions.set(identifier, fn);
     }
 
-    static remove(ref: (data: MessageEvent) => void) {
-        bc.removeEventListener("message", ref);
+    static remove(ref: Function) {
+        const reference = ref as SocketEventFunction;
+        const { SocketIdentifier } = reference;
+
+        if (SocketIdentifier) {
+            this.EventFunctions.delete(SocketIdentifier);
+
+            delete reference.SocketIdentifier;
+        }
     }
 }
+
+bc.onmessage = (message: MessageEvent<SendData>) => {
+    const { data } = message;
+    if (data.by != clientId) {
+        const id = data.event + (data.id ? `+${data.id}` : "");
+        const getFunction = Socket.EventFunctions.get(id);
+        if (getFunction) {
+            getFunction(message.data);
+        }
+
+    }
+}
+
 
 
 
