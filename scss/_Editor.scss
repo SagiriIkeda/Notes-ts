@@ -88,19 +88,36 @@
         z-index: 40;
         .note-editor-capm {
             position: relative;
-            width: 100%;
+            width: calc(100% - 5px);
             height: 100%;
             top:0px;
             left: 0px;
+        
             .note-capm  {
+                margin-right:5px ;
+                margin-bottom:5px ;
                 // background: red;
                 overflow-y: auto;
+                &::-webkit-scrollbar {
+                    width: 8px;
+                    background: var(--menucolor);
+                    border-radius: 5px;
+                }
+
+
+                &::-webkit-scrollbar-thumb {
+                    width: 8px;
+                    cursor: pointer;
+                    background: var(--primary);
+                    border-radius: 5px;
+                }
             }
             .selected_capm {
                 bottom: -150px;
                 &.active {
                     bottom: 5px;
                 }
+
             }
         }
     }
@@ -437,6 +454,9 @@
     &[data-theme="green"] {
         --primary:#738d4a;
         --menucolor:#454e2b;
+        .usereditor {
+            background: #e2fac3;
+        }
         .note-editor-capm {
             background: #e2fac3;
         }
@@ -477,7 +497,7 @@
     &[data-theme="red"] {
         --primary:#6e3a3a;
         --menucolor:#4e2f2b;
-        .note-editor-capm {
+        .note-editor-capm,.usereditor {
             background: #fac7c7;
         }
         .OpenSubMenu[data-actived="true"] i{
@@ -517,7 +537,7 @@
     &[data-theme="blue"] {
         --primary:#3d555e;
         --menucolor:#273d44;
-        .note-editor-capm {
+        .note-editor-capm,.usereditor {
             background: #c3edfd;
         }
         .OpenSubMenu[data-actived="true"] i{
@@ -557,7 +577,7 @@
     &[data-theme="yellow"] {
         --primary:#6e693a;
         --menucolor:#5a562f;
-        .note-editor-capm {
+        .note-editor-capm,.usereditor {
             background: #faf9b2;
         }
         .OpenSubMenu[data-actived="true"] i{

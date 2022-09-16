@@ -28,7 +28,7 @@ export class NoteBuilder implements Note {
     position: { width: number; height: number; left: number; top: number; };
     v: string;
 
-    constructor(folder: string, from?: Note) {
+    constructor(folder: string, from?: Partial<Note>) {
 
         const windowHeight = document.documentElement.scrollHeight;
         const windowWidth = document.documentElement.scrollWidth;
@@ -40,10 +40,10 @@ export class NoteBuilder implements Note {
         this.time = from?.time || Date.now();
         this.title = from?.title || "Note title";
         this.position = {
-            width: from?.position.width || 700,
-            height: from?.position.height || 600,
-            left: from?.position.left || (windowWidth / 2) - (700 / 2),
-            top: from?.position.top || (windowHeight / 2.3) - (600 / 2)
+            width: from?.position?.width || 700,
+            height: from?.position?.height || 600,
+            left: from?.position?.left || (windowWidth / 2) - (700 / 2),
+            top: from?.position?.top || (windowHeight / 2.3) - (600 / 2)
         };
 
         this.v = version;

@@ -18,6 +18,7 @@ import Note from "../interfaces/notes";
 import EditorsBar from "./notes/Editor/Bar";
 import { DevEditors } from "./notes/Editor/Editor";
 import Socket from "../socket";
+import DropZone from "./notes/controllers/droopzone";
 
 export default class UINOTES extends React.Component {
 
@@ -176,6 +177,7 @@ export default class UINOTES extends React.Component {
                 <AuxMenu UI={this} />
                 <JsonMenu UI={this} />
                 <MoveFolder UI={this} />
+                <DropZone UI={this} />
             </div>
         )
 

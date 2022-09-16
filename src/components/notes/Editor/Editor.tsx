@@ -212,7 +212,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             InputCamp.current.innerHTML = data.content;
         }
         document.addEventListener('selectionchange', Selection.SelectionChange);
-        this.MaxCampHeight();
+        this.MaxCampHeight(true);
 
         if (windowEditor) {
             windowEditor.style.height = `${data.position.height}px`;
@@ -240,8 +240,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     MaxCampHeight(s?: boolean) {
         const usereditor = this.usereditor.current;
         const note__info = this.note__info.current as HTMLDivElement;
-        const note__header = this.note__info.current as HTMLDivElement;
-        const InputCamp = this.note__info.current as HTMLInputElement;
+        const note__header = this.note__header.current as HTMLDivElement;
+        const InputCamp = this.InputCamp.current as HTMLInputElement;
+
         if (usereditor) {
             let usereditorheight = usereditor.getBoundingClientRect().height;
 
@@ -251,10 +252,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
             avaibleHeight -= 1;
             if (s === true) {
-                avaibleHeight = avaibleHeight * 1.2;
+                avaibleHeight = avaibleHeight * 1.25;
             }
-            InputCamp.style.maxHeight = `${avaibleHeight}px`;
-
+            InputCamp.style.maxHeight = `${avaibleHeight - 5}px`;
         }
     }
 
@@ -499,7 +499,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             </div>
                             <div className="note-editor">
                                 <div className="note-data" ref={this.note__info} >
-                                    {time.getFullYear()} {months[time.getMonth()]} {time.getDate()} {time.getHours()}:{time.getMinutes()}{(time.getHours() >= 12) ? "PM" : "AM"} | {state.charact} carácteres</div>
+                                    {time.getFullYear()} {months[time.getMonth()]} {time.getDate()} {time.getHours()}:{time.getMinutes()}{(time.getHours() >= 12) ? "PM" : "AM"} | {state.charact} carácteres
+                                </div>
                                 <div
                                     className="note-capm"
                                     contentEditable="true"
