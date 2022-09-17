@@ -84,6 +84,7 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
                         })
 
                         function Sortable(e: Event) {
+                            itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             const target = e.target as HTMLDivElement;
                             let sibling = target;
                             const targetRect = target.getBoundingClientRect().top + height;
@@ -108,6 +109,7 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
                             ItemReact = targetRect;
                         }
                         function EndDrag() {
+                            itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             // clearInterval(ainterval);
                             father.classList.add("OUTDRAGER");
                             father.classList.remove("dragger");
@@ -141,22 +143,22 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
                         }
                     }
                 }
-
                 mss += 1;
             }, 15);
-            itemfolder.current?.addEventListener('mouseup', cancelAction)
-            document.addEventListener('mousemove', mousemoved)
+            itemfolder.current?.addEventListener('mouseup', cancelAction);
+            setTimeout(() => {
+                document.addEventListener('mousemove', mousemoved);
+            }, 0);
             function mousemoved(e: MouseEvent) {
                 if (mss < timers) {
                     clearInterval(intervals);
                 }
-                document.removeEventListener('mousemove', mousemoved)
+                document.removeEventListener('mousemove', mousemoved);
             }
             function cancelAction() {
                 clearInterval(intervals);
-                if (itemfolder.current != null) {
-                    itemfolder.current.removeEventListener('mouseup', cancelAction);
-                }
+                itemfolder.current?.removeEventListener('mouseup', cancelAction);
+            
                 if (mss < timers) {
                     UI.changeSelectedFolder(data.id);
                 }

@@ -101,7 +101,6 @@ export default class UINOTES extends React.Component {
                         if (EditorInstance) EditorInstance.state.folderDeleted = true;
                     } else {//es una nota previamente guardada (cerrarla)
                         Invoker.forceClose(false);
-
                     }
 
                 }

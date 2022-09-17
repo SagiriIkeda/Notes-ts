@@ -15,6 +15,14 @@ $primary:#00bdd6;
     color: var(--primary);
 }
 .material-icons {
+    font-family: 'Material Icons';
+    display: inline-flex;
+    align-items: center;
+    font-size: 24px;
+    font-style: normal;
+    // text-decoration: none;
+    font-weight: 400;
+    height: 24px;
     width: 24px;
     overflow: hidden;
     user-select: none;
@@ -114,11 +122,13 @@ $primary:#00bdd6;
             width: 100%;
             user-select: none;
             height: auto;
-            padding: 15px 30px;
+            padding: 13px 30px;
             justify-content: space-between;
             color: grey;
             cursor: pointer;
             .folder__name {
+                display: flex;
+                align-items: center;
                 pointer-events: none;
             }
             span {

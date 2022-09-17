@@ -1,6 +1,7 @@
 .Editor {
     --primary: var(var(--primary));
     --menucolor: #333333;
+    --scrollbar-bg: #292929;
     display: grid;
     grid-template-rows: 36px 1fr;
     position: absolute;
@@ -96,14 +97,12 @@
             .note-capm  {
                 margin-right:5px ;
                 margin-bottom:5px ;
-                // background: red;
                 overflow-y: auto;
                 &::-webkit-scrollbar {
                     width: 8px;
-                    background: var(--menucolor);
+                    background: var(--scrollbar-bg);
                     border-radius: 5px;
                 }
-
 
                 &::-webkit-scrollbar-thumb {
                     width: 8px;
@@ -454,10 +453,9 @@
     &[data-theme="green"] {
         --primary:#738d4a;
         --menucolor:#454e2b;
-        .usereditor {
-            background: #e2fac3;
-        }
-        .note-editor-capm {
+        --scrollbar-bg: #91a86d;
+       
+        .note-editor-capm,.usereditor {
             background: #e2fac3;
         }
         .OpenSubMenu[data-actived="true"] i{
@@ -497,6 +495,8 @@
     &[data-theme="red"] {
         --primary:#6e3a3a;
         --menucolor:#4e2f2b;
+        --scrollbar-bg: #a86d6d;
+
         .note-editor-capm,.usereditor {
             background: #fac7c7;
         }
@@ -537,6 +537,7 @@
     &[data-theme="blue"] {
         --primary:#3d555e;
         --menucolor:#273d44;
+        --scrollbar-bg: #6da1a8;
         .note-editor-capm,.usereditor {
             background: #c3edfd;
         }
@@ -577,6 +578,8 @@
     &[data-theme="yellow"] {
         --primary:#6e693a;
         --menucolor:#5a562f;
+        --scrollbar-bg: #a8a76d;
+
         .note-editor-capm,.usereditor {
             background: #faf9b2;
         }
