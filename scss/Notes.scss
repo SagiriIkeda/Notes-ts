@@ -65,13 +65,12 @@ $primary:#00bdd6;
         display: grid;
         overflow: hidden;
         
-    
         grid-template-rows: auto 1fr auto;
         
         background: #272727;
-        // background: red;
         padding: 10px 0px 0px 0px;
-        .AnimationIndicator {
+        .VoidPlaceHolderIndicator {
+            position: absolute;
             display: block;
         }
         .text {
@@ -99,7 +98,10 @@ $primary:#00bdd6;
             }
         }
         .folder {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
             width: 100%;
             user-select: none;
             height: auto;
@@ -107,28 +109,24 @@ $primary:#00bdd6;
             justify-content: space-between;
             color: grey;
             cursor: pointer;
-            .folder__name {
-                display: flex;
-                align-items: center;
+
+            .__icon,.material-icons,.__name {
                 pointer-events: none;
             }
-            span {
-                display: flex;
-                align-items: center;
-                i {
-                    font-size: 15px;
-                    width: 15px;
-                    margin-right: 10px;
-                }
+            .material-icons {
+                width: 15px;
+                height: 15px;
+                font-size: 15px;
             }
+            .__name {
+                word-break: break-all;
+            }
+
             &:hover {
                 background: #434343;
             }
-            // i {
-            //     opacity: 0;
-            // }
             &.active {
-                span {
+                span,.material-icons {
                     color: var(--primary);
                 }
                 i {
@@ -164,12 +162,12 @@ $primary:#00bdd6;
             
             &.__dragStateIn {
                 cursor: move;
+                .VoidPlaceHolderIndicator {
+                    cursor: move;
+                }
                 .folder {
                     cursor: move;
-                    background: #272727 !important;
-                    .AnimationIndicator {
-                        cursor: move;
-                    }
+                    background: none !important;
                     &.__dragStateIn {
                         background: #434343 !important;
                     }

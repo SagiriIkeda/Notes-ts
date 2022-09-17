@@ -38,33 +38,34 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
     }
 
     function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-        if(e.buttons == 1) {
-            const folderItem = e.target as HTMLDivElement;
+        if (e.buttons == 1) {
+            const folderItem = itemfolder.current as HTMLDivElement ;
             const father = folderItem.parentElement as HTMLElement;
             const offsetYdiff = e.nativeEvent.offsetY;
-    
+
             let isDragInitialized = false;
-    
+
             function startDrag() {
                 isDragInitialized = true;
                 if (grid) {
                     const vGrid = grid.current;
                     if (vGrid) {
                         const folderRect = folderItem.getBoundingClientRect();
-        
+
                         //crear el elemento invisible que ocupará el espació del folder
                         const voidElm = document.createElement("div");
-                        voidElm.className = "AnimationIndicator";
+                        voidElm.className = "VoidPlaceHolderIndicator";
                         voidElm.style.height = folderRect.height + "px";
+                        
                         folderItem.parentNode?.insertBefore(voidElm, folderItem);
                         //alinear la posición actual para q sea fixed y no absoluta
                         AlignFolderTargetPositionToMouse(e.nativeEvent)
-    
+
                         //añadirle clases a los elementos
                         folderItem.classList.add("__dragStateIn");
                         folderItem.classList.add(GridConfig.IGNORED_CLASSNAME)//ignorar el elemento en la grid
                         father.classList.add("__dragStateIn");
-    
+
                         //agregar eventos
                         document.addEventListener('mousemove', AlignFolderTargetPositionToMouse);
                         document.addEventListener('mouseup', EndDrag);
@@ -72,14 +73,14 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                             //agregarle el evento "Sortable"a todos los folders para que se detecte
                             sitem.addEventListener('mouseover', Sortable)
                         })
-        
+
                         function AlignFolderTargetPositionToMouse(e: MouseEvent) {
                             //prohibir que el elemento se pase a menos de 0
                             if (e.clientY - offsetYdiff < 0) return;
                             const actual = e.clientY - offsetYdiff;
                             //prohibir que el elemento se desborde a más del alto de la pantalla
                             if (actual > window.innerHeight) return;
-        
+
                             folderItem.animate({
                                 top: `${actual}px`
                             }, {
@@ -87,72 +88,74 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                                 fill: "forwards",
                             })
                         }
-        
-                        let ItemReact = folderRect.top + folderRect.height;
-                        
+
+                        let LastVoidPositionY = folderRect.top + folderRect.height;
+
                         function Sortable(e: Event) {
                             const target = e.target as HTMLDivElement;
                             let sibling = target;
-                            const targetRect = target.getBoundingClientRect().top + folderRect.height;
+                            const folderRect = target.getBoundingClientRect()
+                            // const targetRect = target.getBoundingClientRect().top + folderRect.height;
+                            const folderY = folderRect.top + folderRect.height;
                             //detectar si se está moviendo para arriba o para abajo
-                            if (targetRect > ItemReact) {
+                            if (folderY > LastVoidPositionY) {
                                 sibling = target.nextElementSibling as HTMLDivElement;
                             }
-        
+
                             father.insertBefore(voidElm, sibling);
-                            ItemReact = targetRect;
+                            LastVoidPositionY = folderY;
                             //Actualizar la grid
                             vGrid?.UpdateElementPositions();
                         }
-        
+
                         function EndDrag() {
                             itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             //Ajustar la posición para que pase de "fixed" a "absolute" sin que sea un cambio brusco
                             const fatherRect = father.getBoundingClientRect();
                             const targetRect = folderItem.getBoundingClientRect();
                             const actual = targetRect.top - fatherRect.top
-        
+
                             folderItem.animate({
                                 top: `${actual}px`
                             }, {
                                 duration: 0,
                                 fill: "forwards",
                             })
-        
+
                             //Quitar clases a los elementos
                             father.classList.add("__dragStateOut");
                             father.classList.remove("__dragStateIn");
-        
+
                             folderItem.classList.add("__dragStateOut");
                             folderItem.classList.remove("__dragStateIn");
                             folderItem.classList.remove(GridConfig.IGNORED_CLASSNAME);//Hacer que la grid vuelva a contarlo
-    
+
                             //colocar el folder donde el "void element" para que éste sea su nueva posición
                             father.insertBefore(folderItem, voidElm);
                             father.removeChild(voidElm);
-        
-        
+
+
                             setTimeout(() => {
                                 //Quitar las clases de animación
                                 father.classList.remove("__dragStateOut");
                                 folderItem.classList.remove("__dragStateOut");
                             }, GridConfig.ANIMATION_DURATION);
-        
+
                             //Guardar la nueva Posición en la DB de cada folder
                             father.querySelectorAll('.folder').forEach((sitem, order) => {
                                 const item = sitem as HTMLFolderElement;
-                                let id = item.identifier;
-                                DB.Folders.update(id as string, { order: order + 1 });
+                                let id = item.identifier as string;
+                                DB.Folders.update(id, { order: order + 1 });
                                 sitem.removeEventListener('mouseover', Sortable);
                             })
                             //Actualizar la grid
                             vGrid?.UpdateElementPositions();
-        
+
                             Socket.send({
                                 data: null,
                                 event: "update-app"
                             })
-                            
+
                             document.removeEventListener('mousemove', AlignFolderTargetPositionToMouse);
                             document.removeEventListener('mouseup', EndDrag);
                         }
@@ -162,17 +165,17 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                 }
             }
             itemfolder.current?.addEventListener('mouseup', cancelAction);
-    
+
             const timeout = setTimeout(() => {
                 itemfolder.current?.removeEventListener('mouseup', cancelAction);
                 startDrag();
             }, 225);
-    
-    
+
+
             function cancelAction() {
                 clearTimeout(timeout);
                 itemfolder.current?.removeEventListener('mouseup', cancelAction);
-    
+
                 if (!isDragInitialized) {
                     UI.changeSelectedFolder(data.id);
                 }
@@ -224,11 +227,15 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
             className={classes}
             onMouseDown={onMouseDown}
             onAuxClick={AuxEvent}
-            ref={itemfolder}>
-            <span className="folder__name">
-                <Mat>arrow_forward_ios</Mat>{data.name}
+            ref={itemfolder}
+        >
+            <Mat>arrow_forward_ios</Mat>
+            <span className="__name">
+                {data.name}
             </span>
-            {DB.Notes.search("folder", data.id).length}
+            <div className="__icon">
+                {DB.Notes.search("folder", data.id).length}
+            </div>
         </div>
     )
 }
