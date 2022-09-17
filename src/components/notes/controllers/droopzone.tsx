@@ -25,6 +25,9 @@ export default class DropZone extends React.Component<DropZoneProps> {
     }
     componentDidMount() {
         window.onfocus = () => {
+            if(this.isAnimated) {
+                this.dropOutAnimation();
+            }
             this.Enabled = false;
         }
         window.onblur = () => {
@@ -116,7 +119,6 @@ export default class DropZone extends React.Component<DropZoneProps> {
             window.removeEventListener('dragleave', this.leaveDrag);
         }
     }
-
 
     render() {
         return (

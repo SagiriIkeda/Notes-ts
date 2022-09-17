@@ -49,13 +49,6 @@ export default function FolderSection({ UI }: FolderSectionProps) {
                         }
                     })}
                 </VerticalGrid>
-                {/* <div className="DragableFolders">
-                    {Folders.map((fold) => {
-                        if (fold.id != "0") {
-                            return (<FolderItem createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
-                        }
-                    })}
-                </div> */}
             </div>
             <div className="CreateBtn" onClick={createFolderAux}>Nueva Carpeta</div>
         </div>
