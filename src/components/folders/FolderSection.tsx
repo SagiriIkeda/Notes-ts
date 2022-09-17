@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import DB from "../../db/database";
 import { Mat } from "../prefabs";
 
@@ -8,6 +8,7 @@ import FolderItem from "../../components/folders/FolderItem";
 import UI from "../UI";
 import createFolder from "./util/createFolder";
 import { AuxList } from "../AuxMenu/item";
+import VerticalGrid from "./Grid";
 
 interface FolderSectionProps {
     UI: UI
@@ -16,6 +17,7 @@ interface FolderSectionProps {
 export default function FolderSection({ UI }: FolderSectionProps) {
 
     const { Folders } = UI.state;
+    const grid = createRef<VerticalGrid>()
 
     function createFolderAux() {
         createFolder(UI)
@@ -40,13 +42,20 @@ export default function FolderSection({ UI }: FolderSectionProps) {
             <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
             <div className="container" onAuxClick={AuxForFolderSection}>
                 <FolderItem createFolder={createFolderAux} UI={UI} key={0} data={DB.Folders.get("0") as Folder} />
-                <div className="DragableFolders">
+                <VerticalGrid ref={grid}>
+                    {Folders.map((fold) => {
+                        if (fold.id != "0") {
+                            return (<FolderItem  grid={grid} createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
+                        }
+                    })}
+                </VerticalGrid>
+                {/* <div className="DragableFolders">
                     {Folders.map((fold) => {
                         if (fold.id != "0") {
                             return (<FolderItem createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
                         }
                     })}
-                </div>
+                </div> */}
             </div>
             <div className="CreateBtn" onClick={createFolderAux}>Nueva Carpeta</div>
         </div>

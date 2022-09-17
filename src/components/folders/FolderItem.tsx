@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from "react";
+import React, { createRef, RefObject, useEffect } from "react";
 import Folder from "../../interfaces/folder";
 import { Mat } from "../prefabs"
 import DB from "../../db/database";
@@ -8,18 +8,20 @@ import { AuxList } from "../AuxMenu/item";
 import deleteFolder from "./util/deleteFolder";
 import renameFolder from "./util/renameFolder";
 import Socket from "../../socket";
+import VerticalGrid, { GridConfig } from "./Grid";
 
 interface FolderProp {
     data: Folder,
     UI: UI,
-    createFolder: () => void
+    grid?: RefObject<VerticalGrid>,
+    createFolder: () => void,
 }
 
 interface HTMLFolderElement extends HTMLDivElement {
     identifier?: string
 }
 
-export default function FolderItem({ UI, data, createFolder }: FolderProp) {
+export default function FolderItem({ UI, data, createFolder, grid }: FolderProp) {
 
     let itemfolder = createRef<HTMLFolderElement>();
 
@@ -36,137 +38,148 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
     }
 
     function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-        if (e.buttons == 1) {
-            let mss = 0;
-            let timers = 15;
-            let intervals = setInterval(() => {
-                if (mss >= timers && data.id != "0") {
-                    clearInterval(intervals);
-                    document.removeEventListener('mousemove', mousemoved)
-                    if (data.id != "0") {
-                        // EXPERIMENT
-                        // let TimeToDelete = 0;
-                        // const TimeToExecuteDelete = 60;
-                        // const ainterval = setInterval(() => {
-                        //     if (TimeToDelete >= TimeToExecuteDelete) {
-                        //         clearInterval(ainterval);
-                        //         EndDrag();
-                        //         deleteFolder(UI, data);
-                        //     }
-                        //     TimeToDelete += 1;
-                        // }, 10);
-                        //sortable
-                        const item = e.target as HTMLDivElement;
-                        const father = item.parentNode as HTMLDivElement;
-                        const height = item.getBoundingClientRect().height;
-
-                        item.classList.add("dragin");
-                        document.addEventListener('mousemove', AlignPosition);
+        if(e.buttons == 1) {
+            const folderItem = e.target as HTMLDivElement;
+            const father = folderItem.parentElement as HTMLElement;
+            const offsetYdiff = e.nativeEvent.offsetY;
+    
+            let isDragInitialized = false;
+    
+            function startDrag() {
+                isDragInitialized = true;
+                if (grid) {
+                    const vGrid = grid.current;
+                    if (vGrid) {
+                        const folderRect = folderItem.getBoundingClientRect();
+        
+                        //crear el elemento invisible que ocupará el espació del folder
+                        const voidElm = document.createElement("div");
+                        voidElm.className = "AnimationIndicator";
+                        voidElm.style.height = folderRect.height + "px";
+                        folderItem.parentNode?.insertBefore(voidElm, folderItem);
+                        //alinear la posición actual para q sea fixed y no absoluta
+                        AlignFolderTargetPositionToMouse(e.nativeEvent)
+    
+                        //añadirle clases a los elementos
+                        folderItem.classList.add("__dragStateIn");
+                        folderItem.classList.add(GridConfig.IGNORED_CLASSNAME)//ignorar el elemento en la grid
+                        father.classList.add("__dragStateIn");
+    
+                        //agregar eventos
+                        document.addEventListener('mousemove', AlignFolderTargetPositionToMouse);
                         document.addEventListener('mouseup', EndDrag);
-                        father.classList.add("dragger");
-
-                        const AnimationElm = document.createElement('div');
-                        AnimationElm.className = "AnimationIndicator";
-                        AnimationElm.style.height = `${height}px`;
-
-                        let ItemReact = item.getBoundingClientRect().top + height;
-
-                        const InitialHeight = e.nativeEvent.offsetY;
-                        item.style.top = `${e.clientY - InitialHeight - 5}px`;
-                        father.insertBefore(AnimationElm, item);
-
-                        function AlignPosition(e: MouseEvent) {
-                            // clearInterval(ainterval);
-                            item.style.top = `${e.clientY - InitialHeight}px`;
-                        }
                         father.querySelectorAll('.folder').forEach(sitem => {
+                            //agregarle el evento "Sortable"a todos los folders para que se detecte
                             sitem.addEventListener('mouseover', Sortable)
                         })
-
+        
+                        function AlignFolderTargetPositionToMouse(e: MouseEvent) {
+                            //prohibir que el elemento se pase a menos de 0
+                            if (e.clientY - offsetYdiff < 0) return;
+                            const actual = e.clientY - offsetYdiff;
+                            //prohibir que el elemento se desborde a más del alto de la pantalla
+                            if (actual > window.innerHeight) return;
+        
+                            folderItem.animate({
+                                top: `${actual}px`
+                            }, {
+                                duration: 0,
+                                fill: "forwards",
+                            })
+                        }
+        
+                        let ItemReact = folderRect.top + folderRect.height;
+                        
                         function Sortable(e: Event) {
-                            itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             const target = e.target as HTMLDivElement;
                             let sibling = target;
-                            const targetRect = target.getBoundingClientRect().top + height;
+                            const targetRect = target.getBoundingClientRect().top + folderRect.height;
+                            //detectar si se está moviendo para arriba o para abajo
                             if (targetRect > ItemReact) {
                                 sibling = target.nextElementSibling as HTMLDivElement;
                             }
-                            const ContracAnimation = document.createElement('div');
-                            ContracAnimation.className = "ContractAnimation";
-                            father.insertBefore(ContracAnimation, AnimationElm);
-
-                            const animation: KeyframeAnimationOptions = {
-                                easing: "ease",
-                                fill: "forwards",
-                                duration: 250
-                            }
-
-                            ContracAnimation.animate([{ height: `${AnimationElm.getBoundingClientRect().height}px` }, { height: "0px" }], animation)
-                            AnimationElm.animate([{ height: "0px" }, { height: `${height}px` }], animation);
-
-                            setTimeout(() => { father.removeChild(ContracAnimation); }, 250);
-                            father.insertBefore(AnimationElm, sibling);
+        
+                            father.insertBefore(voidElm, sibling);
                             ItemReact = targetRect;
+                            //Actualizar la grid
+                            vGrid?.UpdateElementPositions();
                         }
+        
                         function EndDrag() {
                             itemfolder.current?.removeEventListener('mouseup', cancelAction);
-                            // clearInterval(ainterval);
-                            father.classList.add("OUTDRAGER");
-                            father.classList.remove("dragger");
-                            item.classList.add("ofDragin");
-                            const y = AnimationElm.getBoundingClientRect().top;
+                            //Ajustar la posición para que pase de "fixed" a "absolute" sin que sea un cambio brusco
+                            const fatherRect = father.getBoundingClientRect();
+                            const targetRect = folderItem.getBoundingClientRect();
+                            const actual = targetRect.top - fatherRect.top
+        
+                            folderItem.animate({
+                                top: `${actual}px`
+                            }, {
+                                duration: 0,
+                                fill: "forwards",
+                            })
+        
+                            //Quitar clases a los elementos
+                            father.classList.add("__dragStateOut");
+                            father.classList.remove("__dragStateIn");
+        
+                            folderItem.classList.add("__dragStateOut");
+                            folderItem.classList.remove("__dragStateIn");
+                            folderItem.classList.remove(GridConfig.IGNORED_CLASSNAME);//Hacer que la grid vuelva a contarlo
+    
+                            //colocar el folder donde el "void element" para que éste sea su nueva posición
+                            father.insertBefore(folderItem, voidElm);
+                            father.removeChild(voidElm);
+        
+        
                             setTimeout(() => {
-                                item.style.top = `${y - 2}px`;
-                            }, 1);
-                            father.insertBefore(item, AnimationElm);
-                            setTimeout(() => {
-                                father.classList.remove("OUTDRAGER");
-                                item.classList.remove("dragin");
-                                item.classList.remove("ofDragin");
-                                item.style.top = "";
-                                father.removeChild(AnimationElm);
-                            }, 250);
+                                //Quitar las clases de animación
+                                father.classList.remove("__dragStateOut");
+                                folderItem.classList.remove("__dragStateOut");
+                            }, GridConfig.ANIMATION_DURATION);
+        
+                            //Guardar la nueva Posición en la DB de cada folder
                             father.querySelectorAll('.folder').forEach((sitem, order) => {
                                 const item = sitem as HTMLFolderElement;
                                 let id = item.identifier;
                                 DB.Folders.update(id as string, { order: order + 1 });
                                 sitem.removeEventListener('mouseover', Sortable);
                             })
-
+                            //Actualizar la grid
+                            vGrid?.UpdateElementPositions();
+        
                             Socket.send({
                                 data: null,
                                 event: "update-app"
                             })
-
-                            document.removeEventListener('mousemove', AlignPosition);
+                            
+                            document.removeEventListener('mousemove', AlignFolderTargetPositionToMouse);
                             document.removeEventListener('mouseup', EndDrag);
                         }
+                        //Actualizar la grid
+                        vGrid.UpdateElementPositions();
                     }
                 }
-                mss += 1;
-            }, 15);
-            itemfolder.current?.addEventListener('mouseup', cancelAction);
-            setTimeout(() => {
-                document.addEventListener('mousemove', mousemoved);
-            }, 0);
-            function mousemoved(e: MouseEvent) {
-                if (mss < timers) {
-                    clearInterval(intervals);
-                }
-                document.removeEventListener('mousemove', mousemoved);
             }
-            function cancelAction() {
-                clearInterval(intervals);
+            itemfolder.current?.addEventListener('mouseup', cancelAction);
+    
+            const timeout = setTimeout(() => {
                 itemfolder.current?.removeEventListener('mouseup', cancelAction);
-            
-                if (mss < timers) {
+                startDrag();
+            }, 225);
+    
+    
+            function cancelAction() {
+                clearTimeout(timeout);
+                itemfolder.current?.removeEventListener('mouseup', cancelAction);
+    
+                if (!isDragInitialized) {
                     UI.changeSelectedFolder(data.id);
                 }
             }
         }
+
     }
-
-
 
     function AuxEvent(event: React.MouseEvent) {
         const AuxActions: AuxList = [
@@ -209,7 +222,6 @@ export default function FolderItem({ UI, data, createFolder }: FolderProp) {
     return (
         <div
             className={classes}
-            // onMouseDown={SelectThis}
             onMouseDown={onMouseDown}
             onAuxClick={AuxEvent}
             ref={itemfolder}>

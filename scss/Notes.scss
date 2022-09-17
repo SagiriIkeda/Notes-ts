@@ -64,13 +64,14 @@ $primary:#00bdd6;
     .folders-section {
         display: grid;
         overflow: hidden;
+        
     
         grid-template-rows: auto 1fr auto;
         
         background: #272727;
         // background: red;
         padding: 10px 0px 0px 0px;
-        .AnimationIndicator,.ContractAnimation {
+        .AnimationIndicator {
             display: block;
         }
         .text {
@@ -95,26 +96,6 @@ $primary:#00bdd6;
             &::-webkit-scrollbar-thumb {
                 border-radius: 5px;
                 background: #008fa1;
-            }
-        }
-        .DragableFolders {
-            &.dragger {
-                cursor: move;
-                .folder {
-                    cursor: move;
-                    background: #272727 !important;
-                    .AnimationIndicator,.ContractAnimation {
-                        cursor: move;
-                    }
-                    &.dragin {
-                        background: #434343 !important;
-                    }
-                }
-            }
-            &.OUTDRAGER {
-                .folder {
-                    pointer-events: none !important;
-                }
             }
         }
         .folder {
@@ -155,21 +136,53 @@ $primary:#00bdd6;
                 }
             }
             transition: transform ease 250ms;
-            &.dragin {
+            &.__dragStateIn {
                 user-select: none;
                 z-index: 100;
                 width: 250px;
-                position: fixed;
+                position: fixed !important;
                 pointer-events: none;
                 background: #434343 !important;
                 transform: scale(1.05);
-                // background: white;
             }
-            &.ofDragin {
+            &.__dragStateOut {
+                background: #434343 !important;
                 transform: scale(1);
                 transition: top ease 200ms, transform ease 200ms;
             }
         }
+        .VerticalGrid {
+            position: relative;
+            overflow: visible;
+            .folder {
+                position: absolute;
+                opacity: 0 !important;
+                &.visible {
+                    opacity: 1 !important;
+                }
+            }
+            
+            &.__dragStateIn {
+                cursor: move;
+                .folder {
+                    cursor: move;
+                    background: #272727 !important;
+                    .AnimationIndicator {
+                        cursor: move;
+                    }
+                    &.__dragStateIn {
+                        background: #434343 !important;
+                    }
+                }
+            }
+            &.__dragStateOut {
+                .folder {
+                    pointer-events: none !important;
+                }
+            }
+
+        }
+
     }
     .notes-sections {
         overflow: hidden;
@@ -769,6 +782,7 @@ $primary:#00bdd6;
         color: #ffffff52;
         font-size: 100px;
         width: 100px;
+        height: 100px;
     }
     span {
         padding: 10px 0;
