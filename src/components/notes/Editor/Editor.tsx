@@ -120,11 +120,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.state.updateReceived = false;
         this.chached_update_received = undefined;
         this.state.title = invoker.data.title;
+        invoker.lastest_save = invoker.data.content;
 
         TabInstance?.setState({ title: invoker.data.title, theme: invoker.data.theme })
 
         this.componentDidMount();
-        this.data = invoker.data;
     }
 
     UpdateName(event: SyntheticEvent<HTMLInputElement, InputEvent>) {
@@ -458,7 +458,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                             className={["EditorTooltip"]}
                                             theme={TooltipTheme}
                                         >
-                                            <div className="OpenSubMenu WarnButton"><Mat>folder_delete</Mat></div>
+                                            <div className="menu-btn warn-btn"><Mat>folder_delete</Mat></div>
                                         </Tooltip>
                                     )}
                                     <div className="back-btn" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
@@ -486,7 +486,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                             className={["EditorTooltip"]}
                                             theme={TooltipTheme}
                                         >
-                                            <div className="OpenSubMenu" onClick={this.onClickUpdateReceived} ><Mat>update</Mat></div>
+                                            <div className="menu-btn" onClick={this.onClickUpdateReceived} ><Mat>update</Mat></div>
                                         </Tooltip>
                                     )}
 

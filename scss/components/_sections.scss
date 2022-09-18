@@ -26,7 +26,9 @@
         }
         .container {
             overflow: auto;
-            margin-right: 5px;
+            &.have-scroll {
+                margin-right: 5px;
+            }
 
             &::-webkit-scrollbar {
                 width: 8px;
@@ -87,8 +89,6 @@
             }
             &.__dragStateOut {
                 background: #434343 !important;
-                transform: scale(1);
-                transition: top ease 200ms, transform ease 200ms;
             }
         }
         .VerticalGrid {
@@ -96,10 +96,6 @@
             overflow: visible;
             .folder {
                 position: absolute;
-                opacity: 0 !important;
-                &.visible {
-                    opacity: 1 !important;
-                }
             }
             
             &.__dragStateIn {

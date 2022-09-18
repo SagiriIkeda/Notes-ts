@@ -1,7 +1,8 @@
-import React, { Children, createRef, ReactNode } from "react";
+import React, { Children, createRef, ReactNode, RefObject } from "react";
 
 interface GridProps {
     children: ReactNode,
+    afterUpdate?: (container: RefObject<HTMLDivElement> ) => void;
 }
 
 interface VerticalPosition {
@@ -13,7 +14,7 @@ export enum GridConfig {
     ANIMATION_DURATION = 250,
 }
 
-interface GridElement extends HTMLDivElement{
+interface GridElement extends HTMLDivElement {
     vgridFirstAnimation?: boolean;
 }
 
@@ -27,40 +28,41 @@ export default class VerticalGrid extends React.Component<GridProps> {
     }
 
     UpdateElementPositions() {
+        const { afterUpdate } = this.props;
         const container = this.container.current;
-        if(container) {
-            const childrens = container.childNodes as NodeListOf<GridElement> ;
+        if (container) {
+            const childrens = container.childNodes as NodeListOf<GridElement>;
             const positions: VerticalPosition[] = [];
 
-            childrens.forEach((child,indx) => {
-                if(!child.classList.contains(GridConfig.IGNORED_CLASSNAME)) {
-                    const {height} = child.getBoundingClientRect();
+            childrens.forEach((child, indx) => {
+                if (!child.classList.contains(GridConfig.IGNORED_CLASSNAME)) {
+                    const { height } = child.getBoundingClientRect();
                     const lastPosition = positions.at(-1);
                     const positionY = lastPosition?.y ?? 0;
-    
+
                     positions.push({
                         y: positionY + height,
                     })
-                    child.classList.add("visible");
 
-                    if(child.vgridFirstAnimation != true) {
+                    if (child.vgridFirstAnimation != true) {
                         child.style.top = `${positionY}px`;
                         child.vgridFirstAnimation = true;
-                    }else {
-                        child.animate({top: `${positionY}px`}, {
-                            easing:"ease",
-                            fill:"forwards",
-                            duration:GridConfig.ANIMATION_DURATION
+                    } else {
+                        child.animate({ top: `${positionY}px` }, {
+                            easing: "ease",
+                            fill: "forwards",
+                            duration: GridConfig.ANIMATION_DURATION
                         })
                     }
 
                 }
             })
             const lastPosition = positions.at(-1);
-            if(lastPosition) {
+            if (lastPosition) {
                 const container = this.container.current;
-                if(container) container.style.height = `${lastPosition.y}px`;
+                if (container) container.style.height = `${lastPosition.y}px`;
             }
+            afterUpdate && afterUpdate(this.container)
         }
     }
 
@@ -74,11 +76,11 @@ export default class VerticalGrid extends React.Component<GridProps> {
 
 
     render() {
-        const {props} = this;
+        const { props } = this;
 
         return (
             <div className="VerticalGrid" ref={this.container} >
-            {props.children}
+                {props.children}
             </div>
         );
     }

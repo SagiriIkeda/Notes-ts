@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { createRef, RefObject } from "react";
 import DB from "../../db/database";
 import { Mat } from "../prefabs";
 
@@ -17,7 +17,7 @@ interface FolderSectionProps {
 export default function FolderSection({ UI }: FolderSectionProps) {
 
     const { Folders } = UI.state;
-    const grid = createRef<VerticalGrid>()
+    const grid = createRef<VerticalGrid>();
 
     function createFolderAux() {
         createFolder(UI)
@@ -37,15 +37,28 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         }
     }
 
+    function afterUpdate(vgrid: RefObject<HTMLDivElement>) {
+        const container = vgrid.current?.parentElement;
+        if (container) {
+            const { scrollHeight, offsetHeight } = container;
+            if (scrollHeight != offsetHeight) {
+                container.classList.add("have-scroll");
+                return;
+            }
+            container.classList.remove("have-scroll");
+        }
+
+    }
+
     return (
         <div className="folders-section">
             <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
             <div className="container" onAuxClick={AuxForFolderSection}>
                 <FolderItem createFolder={createFolderAux} UI={UI} key={0} data={DB.Folders.get("0") as Folder} />
-                <VerticalGrid ref={grid}>
+                <VerticalGrid ref={grid} afterUpdate={afterUpdate} >
                     {Folders.map((fold) => {
                         if (fold.id != "0") {
-                            return (<FolderItem  grid={grid} createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
+                            return (<FolderItem grid={grid} createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
                         }
                     })}
                 </VerticalGrid>
