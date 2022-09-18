@@ -22,7 +22,7 @@ export default class EditorSelection {
 
     SelectionChange(e: any) {
         const { Editor } = this;
-        const InputCamp = Editor.InputCamp.current;
+        const InputCamp = Editor.content_editable_input.current;
         // console.log(this.getSelectionHtml());
         let self = this;
         if (InputCamp) {

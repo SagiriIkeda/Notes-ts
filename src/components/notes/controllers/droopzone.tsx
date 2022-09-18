@@ -1,6 +1,5 @@
 import React, { createRef } from "react";
 import UINOTES from "../../UI";
-import "../../../../css/dropzone.css"
 import { NoteBuilder } from "../../../interfaces/notes";
 import DB from "../../../db/database";
 

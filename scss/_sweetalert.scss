@@ -1,0 +1,80 @@
+//SWEET ALERT 
+.swal2-modal {
+    background: #333333 !important;
+    padding: 0 !important;
+    padding-top: 1.25em !important;
+    overflow: hidden !important;
+    .swal2-title {
+        color: white  !important;
+    }
+    .swal2-actions {
+        display: flex;
+        width:100%;
+        justify-content: flex-end;
+        padding-right: 10px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        background: #2a2a2a;
+    }
+    .swal2-header {
+       display: flex !important;
+       align-items: flex-start !important;
+    }
+    .swal2-title {
+        padding: 0 1.8em;
+        // padding-top: 0px;
+        display: flex !important;
+        align-content: flex-start;
+        font-size: 24px !important ;
+        user-select: none;
+        // background: red;
+    }
+    .swal2-html-container {
+        color: #aeaeae;
+    }
+    .swal2-cancel {
+        color: #aeaeae !important;
+        background: transparent !important;
+        transition: color ease .25s, background ease .25s !important;
+        &:hover {
+            background: #464646 !important;
+            color: white !important;
+        }
+    }
+    .swal2-close {
+        font-family: serif;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        // color: red;
+    }
+    .swal2-content {
+        // color: #aeaeae !important;
+        color: white !important;
+    }
+    .swal2-confirm {
+        padding: 10px !important;
+        border-radius: 3px !important;
+        text-transform: capitalize !important;
+        outline: 0px !important;
+        box-shadow: none !important;
+        transition: color ease .25s, background ease .25s !important;
+        background: transparentize($primary,0.9)  !important;
+        color: $primary !important;
+        &:hover {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+    }
+    .swal2-input {
+        height: 2.625em;
+        background: #606060 !important;
+        border: 2px solid transparent !important;
+        outline: none !important;
+        color: #abaeae;
+        &:focus {
+            border: 2px solid $primary !important;
+            box-shadow: none !important;
+        }
+    }
+}

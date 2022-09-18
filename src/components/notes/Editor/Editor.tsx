@@ -41,14 +41,14 @@ interface EditorState {
 
 export default class Editor extends React.Component<EditorProps, EditorState> {
 
-    note_name_container = createRef<HTMLDivElement>();
-    usereditor = createRef<HTMLDivElement>();
-    note__info = createRef<HTMLDivElement>();
-    note__header = createRef<HTMLDivElement>();
-    InputName = createRef<HTMLInputElement>();
-    InputCamp = createRef<HTMLDivElement>();
-    windowElm = createRef<HTMLDivElement>();
-    windowEditor = createRef<HTMLDivElement>();
+    editor_note_name_container = createRef<HTMLDivElement>();
+    editor_ui_container = createRef<HTMLDivElement>();
+    editor_date = createRef<HTMLDivElement>();
+    editor_ui_header = createRef<HTMLDivElement>();
+    editor_input_name = createRef<HTMLInputElement>();
+    editor_window = createRef<HTMLDivElement>();
+    content_editable_input = createRef<HTMLDivElement>();
+    // windowElm = createRef<HTMLDivElement>();
 
     data: Note;
     invoker: OpenEditor;
@@ -56,7 +56,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     Movement = new EditorMovement({ Editor: this });
     Selection = new EditorSelection({ Editor: this });
 
-    chachedUpdate?: Note;
+    chached_update_received?: Note;
 
     public state;
 
@@ -112,13 +112,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         const { TabInstance } = invoker;
         const prevData = this.data;
 
-        invoker.data = { ...this.chachedUpdate } as Note;
+        invoker.data = { ...this.chached_update_received } as Note;
         this.data = invoker.data;
         this.data.position = prevData.position;
 
         this.state.theme = invoker.data.theme;
         this.state.updateReceived = false;
-        this.chachedUpdate = undefined;
+        this.chached_update_received = undefined;
         this.state.title = invoker.data.title;
 
         TabInstance?.setState({ title: invoker.data.title, theme: invoker.data.theme })
@@ -143,16 +143,16 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     UpdateCharact() {
-        const InputCamp = this.InputCamp.current;
-        const {invoker} = this.props;
-        if (InputCamp) {
-        
-            invoker.data.content = InputCamp.innerHTML;
+        const content_editable_input = this.content_editable_input.current;
+        const { invoker } = this.props;
+        if (content_editable_input) {
 
-            this.state.saved = invoker.data.content == invoker.LastestSave;
-          
-            const value = InputCamp.innerText;
-            this.setState({ charact: value.length})
+            invoker.data.content = content_editable_input.innerHTML;
+
+            this.state.saved = invoker.data.content == invoker.lastest_save;
+
+            const value = content_editable_input.innerText;
+            this.setState({ charact: value.length })
         }
     }
 
@@ -171,7 +171,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     SaveAnimation() {
-        const note_name_container = this.note_name_container.current;
+        const note_name_container = this.editor_note_name_container.current;
         if (note_name_container) {
             note_name_container.classList.add('saving');
             setTimeout(() => {
@@ -203,13 +203,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     componentDidMount() {
-        const { InputName, InputCamp, data, Selection } = this;
-        const windowEditor = this.windowEditor.current;
-        if (InputName.current) {
-            InputName.current.value = data.title;
+        const { editor_input_name, content_editable_input, data, Selection } = this;
+        const windowEditor = this.editor_window.current;
+        if (editor_input_name.current) {
+            editor_input_name.current.value = data.title;
         }
-        if (InputCamp.current) {
-            InputCamp.current.innerHTML = data.content;
+        if (content_editable_input.current) {
+            content_editable_input.current.innerHTML = data.content;
         }
         document.addEventListener('selectionchange', Selection.SelectionChange);
         this.MaxCampHeight(true);
@@ -237,24 +237,24 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         })
     }
 
-    MaxCampHeight(s?: boolean) {
-        const usereditor = this.usereditor.current;
-        const note__info = this.note__info.current as HTMLDivElement;
-        const note__header = this.note__header.current as HTMLDivElement;
-        const InputCamp = this.InputCamp.current as HTMLInputElement;
+    MaxCampHeight(isWindowAnimating?: boolean) {
+        const editor_ui_container = this.editor_ui_container.current;
+        const editor_date = this.editor_date.current as HTMLDivElement;
+        const editor_ui_header = this.editor_ui_header.current as HTMLDivElement;
+        const content_editable_input = this.content_editable_input.current as HTMLInputElement;
 
-        if (usereditor) {
-            let usereditorheight = usereditor.getBoundingClientRect().height;
+        if (editor_ui_container) {
+            const ui_container_height = editor_ui_container.getBoundingClientRect().height;
+            const date_height = editor_date.getBoundingClientRect().height;
+            const header_height = editor_ui_header.getBoundingClientRect().height;
 
-            let characterheight = note__info.getBoundingClientRect().height;
-            let editorheaderHeight = note__header.getBoundingClientRect().height;
-            let avaibleHeight = usereditorheight - characterheight - editorheaderHeight;
+            let avaibleHeight = ui_container_height - date_height - header_height;
 
             avaibleHeight -= 1;
-            if (s === true) {
+            if (isWindowAnimating === true) {
                 avaibleHeight = avaibleHeight * 1.25;
             }
-            InputCamp.style.maxHeight = `${avaibleHeight - 5}px`;
+            content_editable_input.style.maxHeight = `${avaibleHeight - 5}px`;
         }
     }
 
@@ -262,7 +262,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         return new Promise((resolve, reject) => {
             const { Selection, invoker } = this;
 
-            const windowEditor = this.windowEditor.current;
+            const windowEditor = this.editor_window.current;
             this.invoker.Socket.delete();
 
             const ANIMATION_TIME = 300;
@@ -295,13 +295,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                 autoUP: type
             })
             AutoUP.set(type)
-
-            // this.saveAutoUp(type);
         }
     }
 
     AuxInput(event: React.MouseEvent) {
-        const input = this.InputName.current;
+        const input = this.editor_input_name.current;
         if (input) {
             const obj: AuxList = [
                 {
@@ -428,10 +426,10 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         if (state.closed == false) {
             return (
-                <div className="Editor" ref={this.windowEditor} data-theme={state.theme} >
+                <div className="Editor-window" ref={this.editor_window} data-theme={state.theme} >
 
-                    <div className="window" ref={this.windowElm} onMouseDown={Movement.DragWindow} >
-                        <div className="title">
+                    <div className="window-header" onMouseDown={Movement.DragWindow} >
+                        <div className="window-title">
                             <img src={iconReact} alt="editor" />
                             <span>{state.title}</span>
 
@@ -444,13 +442,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                 <div className="dontSavedIndicator" ></div>
                             </Tooltip>)}
                         </div>
-                        <div className="btns">
+                        <div className="window-buttons">
                             <div className="wbtn" onClick={invoker.Close}><Mat>close</Mat></div>
                         </div>
                     </div>
-                    <div className="usereditor" ref={this.usereditor}>
-                        <div className="note-editor-capm">
-                            <div className="editor-header" ref={this.note__header}>
+                    <div className="editor-ui-container" ref={this.editor_ui_container}>
+                        <div className="editor-ui">
+                            <div className="editor-ui-header" ref={this.editor_ui_header}>
                                 <div className="left-part">
                                     {(state.folderDeleted == true) && (
                                         <Tooltip
@@ -463,16 +461,16 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                             <div className="OpenSubMenu WarnButton"><Mat>folder_delete</Mat></div>
                                         </Tooltip>
                                     )}
-                                    <div className="atras" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
+                                    <div className="back-btn" onClick={invoker.Close}><Mat>keyboard_arrow_left</Mat></div>
                                 </div>
 
-                                <div className="note_name">
-                                    <div className="container" ref={this.note_name_container}>
-                                        <div className="saved">Guardando...</div>
-                                        <input className="name" type="text"
+                                <div className="editor-ui-note-name">
+                                    <div className="editor-ui-note-name-container" ref={this.editor_note_name_container}>
+                                        <div className="save-placeholder">Guardando...</div>
+                                        <input className="name-input" type="text"
                                             maxLength={23}
                                             onInput={this.UpdateName}
-                                            ref={this.InputName}
+                                            ref={this.editor_input_name}
                                             onKeyDown={this.SaveKey}
                                             onAuxClick={this.AuxInput}
                                         />
@@ -492,38 +490,36 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                         </Tooltip>
                                     )}
 
-                                    <div className="OpenSubMenu" onClick={this.toggleTexturizeCamp} data-actived={String(state.force)}> <Mat>title</Mat></div>
-                                    <div className="OpenSubMenu" onClick={this.toggleMenuTheme} data-actived={String(state.themeMenu)}> <Mat>format_paint</Mat></div>
-                                    <div className="save" onClick={this.Save}><Mat>done</Mat></div>
+                                    <div className="menu-btn" onClick={this.toggleTexturizeCamp} data-actived={String(state.force)}> <Mat>title</Mat></div>
+                                    <div className="menu-btn" onClick={this.toggleMenuTheme} data-actived={String(state.themeMenu)}> <Mat>format_paint</Mat></div>
+                                    <div className="save-btn" onClick={this.Save}><Mat>done</Mat></div>
                                 </div>
                             </div>
-                            <div className="note-editor">
-                                <div className="note-data" ref={this.note__info} >
+                            <div className="editor-ui-content-container">
+                                <div className="editor-date" ref={this.editor_date} >
                                     {time.getFullYear()} {months[time.getMonth()]} {time.getDate()} {time.getHours()}:{time.getMinutes()}{(time.getHours() >= 12) ? "PM" : "AM"} | {state.charact} carácteres
                                 </div>
-                                <div
-                                    className="note-capm"
+                                <div className="content-editable-input"
                                     contentEditable="true"
-                                    ref={this.InputCamp}
+                                    ref={this.content_editable_input}
                                     onKeyUp={this.UpdateCharact}
                                     onKeyDownCapture={this.ctrlKeyEvents}
                                     onKeyDown={this.SaveKey}
                                     onPaste={Selection.preventPasteHTML}
                                     onAuxClick={this.AuxCamp}
                                 ></div>
-                                <div className="selected_capm" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoUP == true) ? state.texturize : false}>
-                                    <span className="titles">Seleccione un estilo...</span>
-                                    <div className="div">
+                                <div className="texture-menu-container" data-active={(state.force == true) ? true : (state.themeMenu == true) ? false : (state.autoUP == true) ? state.texturize : false}>
+                                    <span className="menu-title">Seleccione un estilo...</span>
+                                    <div className="menu-items-container">
                                         <CampBtn bold ad={state.bold}>format_bold</CampBtn>
                                         <CampBtn underline ad={state.underline}>format_underline</CampBtn>
                                         <CampBtn italic ad={state.italic}>format_italic</CampBtn>
                                     </div>
-
-                                    <div className="material-icons AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoUP)}>{(state.autoUP) ? "expand_less" : "expand_more"}</div>
+                                    <Mat className="AutoOpenBtn" onClick={() => this.setAutoOpen(!state.autoUP)}>{(state.autoUP) ? "expand_less" : "expand_more"}</Mat>
                                 </div>
-                                <div className="selected_theme" data-active={String(state.themeMenu)}>
-                                    <span className="titles">Selecciona un Tema</span>
-                                    <div className="div">
+                                <div className="theme-menu-container" data-active={String(state.themeMenu)}>
+                                    <span className="menu-title">Selecciona un Tema</span>
+                                    <div className="menu-items-container">
                                         <ThemeBtn Editor={this} theme="dark">Oscuro</ThemeBtn>
                                         <ThemeBtn Editor={this} theme="yellow">Amarillo</ThemeBtn>
                                         <ThemeBtn Editor={this} theme="blue">Azul</ThemeBtn>
@@ -534,7 +530,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             </div>
                         </div>
                     </div>
-                    <div className="expandiblewindow" onMouseDown={Movement.ResizeWindow} ></div>
+                    <div className="window-resize-btn" onMouseDown={Movement.ResizeWindow} ></div>
 
                 </div>
             )

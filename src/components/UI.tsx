@@ -143,9 +143,10 @@ export default class UINOTES extends React.Component {
 
     render() {
         const { state } = this;
+        const SelectMenuButtonsDisabled = state.selectes.size == 0 ? " disabled" : "";
 
         return (
-            <div className="UI-manager" >
+            <div className="UI-notes-manager" >
                 <div className="header">
                     <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name}</div>
                 </div>
@@ -167,8 +168,8 @@ export default class UINOTES extends React.Component {
                 <div className={`SelectBox${(state.SelectMode == true) ? " visible" : ""}`}>
                     <span className="titles" >¿Qué Desea hacer?</span>
                     <div className="div">
-                        <div className={`item${state.selectes.size == 0 ? " disabled" : ""}`} onClick={this.SelectMode.deleteSelectes} ><Mat>delete</Mat> Borrar</div>
-                        <div className={`item${state.selectes.size == 0 ? " disabled" : ""}`} onClick={() => this.MOVEFOLDER?.open()}><Mat>drive_file_move_rtl</Mat> Mover a...</div>
+                        <div className={`item${SelectMenuButtonsDisabled}`} onClick={this.SelectMode.deleteSelectes} ><Mat>delete</Mat> Borrar</div>
+                        <div className={`item${SelectMenuButtonsDisabled}`} onClick={() => this.MOVEFOLDER?.open()}><Mat>drive_file_move_rtl</Mat> Mover a...</div>
                         <div className="item" onClick={() => this.SelectMode.setMode(false)}><Mat>close</Mat> Cancelar</div>
                     </div>
                 </div>

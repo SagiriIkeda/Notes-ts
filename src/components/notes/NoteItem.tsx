@@ -30,7 +30,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     constructor(props: NoteItemProps) {
         super(props)
 
-        this.Click = this.Click.bind(this);
+        this.onClick = this.onClick.bind(this);
         this.delete = this.delete.bind(this);
         this.OpenNote = this.OpenNote.bind(this);
         this.UI = props.UI;
@@ -186,7 +186,7 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UI.AUX?.set(AUXFORNOTE, event, "NotesAux")
     }
 
-    Click(event: React.MouseEvent) {
+    onClick(event: React.MouseEvent) {
         const { UI } = this;
 
         if (event.buttons == 1) {
@@ -264,15 +264,15 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         let more = false;
         if (content.length >= 61) more = true;
 
-        let className = "note-preview";
+        let className = "note-item";
 
         if (selectes.has(this.props.data.id)) className += " selected";
-        if (mode.first == true) className += " first";
+        if (mode.first == true) className += " firstAnimation";
 
         return (
             <div
                 className={className}
-                onMouseDown={this.Click}
+                onMouseDown={this.onClick}
                 onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}

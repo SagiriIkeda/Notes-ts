@@ -31,7 +31,7 @@
         align-items: center;
         margin-bottom: 5px !important;
         user-select: none;
-        animation: InitOption ease .5s;
+        animation: InitializeOptionAnimation ease .5s;
         .material-icons {
             pointer-events: none;
         }
@@ -83,7 +83,7 @@
         border-bottom: 1px solid #ffffff3d;
     }
 }
-@keyframes InitOption {
+@keyframes InitializeOptionAnimation {
     0% {
         transform: translateX(10px);
         opacity: 0;

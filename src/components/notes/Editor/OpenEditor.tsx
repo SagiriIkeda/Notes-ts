@@ -13,7 +13,7 @@ export default class OpenEditor {
 
     id?: string;
     data: Note;
-    LastestSave: string;
+    lastest_save: string;
     TabInstance?: Tab;
     EditorInstance?: Editor;
     temporalId?: string;
@@ -41,7 +41,7 @@ export default class OpenEditor {
 
         const { data } = this;
 
-        this.LastestSave = data.content;
+        this.lastest_save = data.content;
 
         this.Close = this.Close.bind(this);
         this.forceClose = this.forceClose.bind(this);
@@ -63,7 +63,7 @@ export default class OpenEditor {
         Editors.delete((this.id ?? this.temporalId) as string);
         Editors.set((this.id ?? this.temporalId) as string, this);
 
-        EditorInstance?.windowEditor.current?.classList.add("noanimation");
+        EditorInstance?.editor_window.current?.classList.add("noanimation");
 
         UI.setState({});
     }
@@ -82,7 +82,7 @@ export default class OpenEditor {
         const { data, id, UI,EditorInstance } = this;
         const { Editors } = UI.state;
 
-        this.LastestSave = data.content;
+        this.lastest_save = data.content;
 
         // Crear copia de los Datos de la nota
         let construct = JSON.parse(JSON.stringify(data));
@@ -108,7 +108,7 @@ export default class OpenEditor {
                 if(EditorInstance) {
                     EditorInstance.state.folderDeleted = false;
                     EditorInstance.state.updateReceived = false;
-                    EditorInstance.chachedUpdate = undefined;
+                    EditorInstance.chached_update_received = undefined;
                 };
             
                 DB.Notes.update(construct.id, construct);
@@ -147,7 +147,7 @@ export default class OpenEditor {
         if (force == true) {
             this.forceClose(update);
         } else {
-            if (construct.content != this.LastestSave) {
+            if (construct.content != this.lastest_save) {
                 Swal.fire({
                     icon: 'warning',
                     showCancelButton: true,

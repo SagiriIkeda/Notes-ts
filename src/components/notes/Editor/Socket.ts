@@ -37,7 +37,7 @@ export default class EditorSocket {
         const { EditorInstance } = invoker;
         const { data } = message;
         if (EditorInstance) {
-            EditorInstance.chachedUpdate = data;
+            EditorInstance.chached_update_received = data;
             EditorInstance.setState({
                 updateReceived: true,
             })

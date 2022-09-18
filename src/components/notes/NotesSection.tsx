@@ -16,13 +16,13 @@ export default function NotesSection({ UI }: NoteSectionProps) {
 
     const isSelectMode = state.SelectMode == true;
 
-    const Notes = UI.state.Notes;
+    const { Notes } = UI.state;
 
     const Reg = new RegExp(findText.replace(/\W/gim, "\\$&"), 'gim');
 
     const NotesSearched = findText ? Notes.filter(note => {
         return Reg.test(note.content) == true || Reg.test(note.title) == true;
-    }): Notes;
+    }) : Notes;
 
     UI.cachedSearchedNotes = (findText) ? NotesSearched : undefined;
 
@@ -34,14 +34,14 @@ export default function NotesSection({ UI }: NoteSectionProps) {
 
     function cancelFind() {
         const input = UI.SearchInput.current;
-        if(input) input.value = "";
+        if (input) input.value = "";
         UI.state.findText = "";
         setFindText("");
     }
 
     function AuxForNotesSection(event: React.MouseEvent) {
         const target = event.target as HTMLDivElement;
-        if (target.classList.contains("notes-preview-container")) {
+        if (target.classList.contains("notes-items-container")) {
             let obj: AuxList = [
                 {
                     icon: "note_add",
@@ -79,7 +79,7 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                     </label>
                 </div>
             </div>
-            <div className={`notes-preview-container ${(isSelectMode) ? "selectmode" : ""}`}
+            <div className={`notes-items-container ${(isSelectMode) ? "selectmode" : ""}`}
                 onAuxClick={AuxForNotesSection}
             >
                 {/* No hay Notas o no hay resultados por búsqueda */}
@@ -105,15 +105,10 @@ export default function NotesSection({ UI }: NoteSectionProps) {
                         </div>
                     )
                     :
-                    // Resultados de Notas
-                    (findText.length != 0) ?
-                        NotesSearched.map(note =>
-                            <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
-                        )
-                        //No hay búsqueda (todas las notas)
-                        : Notes.map(note =>
-                            <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
-                        )
+                    //mostrar notas 
+                    NotesSearched.map(note =>
+                        <NoteItem data={note} UI={UI} key={note.id}></NoteItem>
+                    )
                 }
                 {(state.SelectMode == true) && (<div className="SimulateBox"></div>)}
             </div>

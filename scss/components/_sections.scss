@@ -1,0 +1,217 @@
+.sections {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    overflow: hidden;
+    .folders-section {
+        display: grid;
+        overflow: hidden;
+        
+        grid-template-rows: auto 1fr auto;
+        
+        background: #272727;
+        padding: 10px 0px 0px 0px;
+        .VoidPlaceHolderIndicator {
+            position: absolute;
+            display: block;
+        }
+        .text {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-left: 10px;
+            user-select: none;
+            i {
+                margin-right: 10px;
+            }
+        }
+        .container {
+            overflow: auto;
+            margin-right: 5px;
+
+            &::-webkit-scrollbar {
+                width: 8px;
+                background: #181818;
+                border-radius: 5px;
+            }
+            &::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background: #008fa1;
+            }
+        }
+        .folder {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            user-select: none;
+            height: auto;
+            padding: 13px 30px;
+            justify-content: space-between;
+            color: grey;
+            cursor: pointer;
+
+
+            .__icon,.material-icons,.__name {
+                pointer-events: none;
+            }
+            .material-icons {
+                width: 15px;
+                height: 15px;
+                font-size: 15px;
+            }
+            .__name {
+                word-break: break-all;
+            }
+
+            &:hover {
+                background: #434343;
+            }
+            &.active {
+                span,.material-icons {
+                    color: var(--primary);
+                }
+                i {
+                    opacity: 1;
+                }
+            }
+            transition: transform ease 250ms;
+            &.__dragStateIn {
+                user-select: none;
+                z-index: 100;
+                width: 250px;
+                position: fixed !important;
+                pointer-events: none;
+                background: #434343 !important;
+                transform: scale(1.05);
+            }
+            &.__dragStateOut {
+                background: #434343 !important;
+                transform: scale(1);
+                transition: top ease 200ms, transform ease 200ms;
+            }
+        }
+        .VerticalGrid {
+            position: relative;
+            overflow: visible;
+            .folder {
+                position: absolute;
+                opacity: 0 !important;
+                &.visible {
+                    opacity: 1 !important;
+                }
+            }
+            
+            &.__dragStateIn {
+                cursor: move;
+                .VoidPlaceHolderIndicator {
+                    cursor: move;
+                }
+                .folder {
+                    cursor: move;
+                    background: none !important;
+                    &.__dragStateIn {
+                        background: #434343 !important;
+                    }
+                }
+            }
+            &.__dragStateOut {
+                .folder {
+                    pointer-events: none !important;
+                }
+            }
+
+        }
+
+    }
+    .notes-sections {
+        overflow: hidden;
+        display: grid;
+        overflow: auto;
+        grid-template-rows: auto 1fr 36px;
+        position: relative;
+        .search {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            i {
+                user-select: none;
+                cursor: pointer;
+                color: white;
+                &:hover {
+                    color: var(--primary);
+                }
+                &:nth-child(1) {
+                    margin-right: 10px;
+                }
+                &:nth-child(3) {
+                    display: none;
+                }
+            }
+            &__container {
+                border-radius: 25px;
+                background: #80808093;
+                width: 80%;
+                padding: 8px 12px;
+                input {
+                    color: white;
+                    background: none;
+                    outline: none;
+                    border: none;
+                    &::placeholder {
+                        color: #ffffff96;
+                    }
+                    &::selection{
+                        background: transparentize($primary,0.55);
+                    }
+                }
+                label {
+                    display: grid;
+                    grid-template-columns: auto 1fr;
+                }
+                &.active {
+                    label {
+                        grid-template-columns: auto 1fr auto;
+                    }
+                    i {
+                        &:nth-child(3) {
+                            display: initial;
+                        }
+                    }
+                }
+            }
+        }
+        .selectedIndicate {
+            position: absolute;
+            color: white;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background: #444444;
+            top: -70px;
+            &.visible {
+                top: 0px;
+            }
+            .numsels {
+                display: flex;
+                #NumSelections {
+                    margin-right: 12px;
+                    user-select: none;
+                }
+            }
+            transition: top ease .2s;
+            .item {
+                cursor: pointer;
+                display: flex;
+                &:hover,&.active{
+                    color: $primary;
+                }
+            }
+        }
+       
+    }
+}

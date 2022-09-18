@@ -9,7 +9,7 @@ export default function EditorsBar({ UI }: { UI: UINOTES }) {
 
     return (
         <>
-            <div className="activeEditorsContainer">
+            <div className="active-editors-tab-container">
                 <div className="activeEditors">
                     {EditorsEntries.sort(([ia, a], [ib, b]) => a.createdAt - b.createdAt)
                         .map(([id, item]) => {
@@ -17,7 +17,7 @@ export default function EditorsBar({ UI }: { UI: UINOTES }) {
                         })}
                 </div>
             </div>
-            <div className="Editors">
+            <div className="active-editors-container">
                 {EditorsEntries.map(([id, item]: [string, OpenEditor]) => {
                     return <Editor invoker={item} key={item.temporalId ?? item.data.id} />
                 })}

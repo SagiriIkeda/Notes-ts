@@ -1,0 +1,235 @@
+.note-item {
+    cursor: pointer;
+    display: inline-block;
+    flex-wrap: wrap;
+    padding: 13px;
+    height: fit-content;
+    width: 240px;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+    border-radius: 10px;
+    transform-origin: center top;
+    background: #1f1f1f;
+    
+
+    &.none {
+        display: none !important;
+    }
+    &.firstAnimation {
+        // background: red;
+        animation: InitialNoteItemAnimation forwards .4s;
+    }
+
+    .note__content,
+    .note__date,
+    .more {
+        color: #848484;
+        display: block;
+        width: 100%;
+    }
+
+    .note__date {
+        font-size: 13px;
+        margin-top: 14px;
+    }
+
+    .note__content {
+        font-size: 16px;
+
+        &:first-line {
+            color: white;
+            font-weight: 600;
+        }
+
+        word-break:break-word;
+    }
+
+    .select {
+        display: none;
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 100%;
+        border: 2px solid #3c3c3c;
+        background: #2c2c2c;
+    }
+
+    &.selected {
+        .select {
+            border: 2px solid var(--primary);
+            background: var(--primary);
+
+            .line {
+
+                width: 12px;
+                display: block;
+                height: 3px;
+                position: absolute;
+                background: white;
+                transform: rotate(-45deg);
+                left: 3px;
+                bottom: 6px;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    display: block;
+                    bottom: 0px;
+                    width: 3px;
+                    height: 7px;
+                    background: white;
+                }
+            }
+        }
+    }
+
+    &[data-theme="green"] {
+        background: #e2fac3;
+
+        .note__content,
+        .more {
+            color: #738d4a;
+        }
+
+        .note__content::first-line {
+            color: #738d4a;
+        }
+
+        .note__date {
+            color: #454e2b;
+        }
+
+        .select {
+            background: #e2fac3;
+            border-color: #738d4a;
+        }
+
+        &.selected .select {
+            background: #738d4a;
+        }
+    }
+
+    &[data-theme="red"] {
+        background: #fac7c7;
+
+        .note__content,
+        .more {
+            color: #6e3a3a;
+        }
+
+        .note__content::first-line {
+            color: #6e3a3a;
+        }
+
+        .note__date {
+            color: #4e2f2b;
+        }
+
+        .select {
+            background: #fac7c7;
+            border-color: #6e3a3a;
+        }
+
+        &.selected .select {
+            background: #6e3a3a;
+        }
+    }
+
+    &[data-theme="blue"] {
+        background: #c3edfd;
+
+        .note__content,
+        .more {
+            color: #517280;
+        }
+
+        .note__content::first-line {
+            color: #517280;
+        }
+
+        .note__date {
+            color: #2f434b;
+        }
+
+        .select {
+            background: #c3edfd;
+            border-color: #517280;
+        }
+
+        &.selected .select {
+            background: #517280;
+        }
+    }
+
+    &[data-theme="yellow"] {
+        background: #faf9b2;
+
+        .note__content,
+        .more {
+            color: #8d864a;
+        }
+
+        .note__content::first-line {
+            color: #8d864a;
+        }
+
+        .note__date {
+            color: #5a562f;
+        }
+
+        .select {
+            background: #faf9b2;
+            border-color: #8d864a;
+        }
+
+        &.selected .select {
+            background: #8d864a;
+        }
+    }
+
+}
+
+@keyframes InitialNoteItemAnimation {
+    0% {
+        transform: translateY(25px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.notes-items-container {
+    overflow: auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,var(--notes-width));
+    grid-auto-rows: var(--row-increment);
+    justify-content: center;
+    gap:10px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    position: relative;
+    &.selectmode {
+        .noteItem {
+            .select {
+                display: block;
+            }
+        }
+    }
+    &::-webkit-scrollbar {
+        width: 8px;
+        background: #363636;
+        border-radius: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background: #08c7e0;
+    }
+}

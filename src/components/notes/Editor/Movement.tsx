@@ -11,7 +11,7 @@ interface EditorMovementProperties {
 
 export default class EditorMovement {
     Editor: Editor;
-    windowEditor: Editor["windowEditor"];
+    windowEditor: Editor["editor_window"];
 
     left = 0;
     top = 0;
@@ -20,7 +20,7 @@ export default class EditorMovement {
     
     constructor({ Editor }: EditorMovementProperties) {
         this.Editor = Editor;
-        this.windowEditor = Editor.windowEditor;
+        this.windowEditor = Editor.editor_window;
         this.DragWindow = this.DragWindow.bind(this);
         this.ResizeWindow = this.ResizeWindow.bind(this);
     }

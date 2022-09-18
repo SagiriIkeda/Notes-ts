@@ -5,9 +5,6 @@
     top:0;
     right:0;
     bottom: 0;
-    // &.view {
-    //     display: flex;
-    // }
     justify-content: center;
     align-items: center;
     z-index: 500;
@@ -26,7 +23,7 @@
         width: 80%;
         border-radius: 10px;
         background: #1f1f1f;
-        animation: OpenJson cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
+        animation: OpenJSONMENUAnimation cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
         box-shadow: 2px -3px 20px -6px #0000006e;
         .__header {
             // background: red;
@@ -60,6 +57,25 @@
             margin: 0px 20px 20px 20px;
             // box-shadow: 2px -3px 20px -6px #0000006e;
             box-shadow: 2px 2px 20px -6px #00000021;
+            overflow: auto;
+            max-height: 60vh;
+
+            &::-webkit-scrollbar {
+                padding: 2px;
+                height: 8px;
+                width: 8px;
+                background: #5c5b5b;
+                border-radius: 5px;
+                &-thumb {
+                    background: var(--primary);
+                    border-radius: 5px;
+                }
+            }
+
+            div {
+                word-break: break-all;
+            }
+
             .nsbp {
                 display: inline-block;
                 width: 4px;
@@ -92,53 +108,12 @@
 
         }
         &[data-closing="true"] {
-            animation: CloseJson cubic-bezier(0.190, 1.000, 0.220, 1.000) forwards .5s;
+            animation: CloseJSONMENUAnimation cubic-bezier(0.190, 1.000, 0.220, 1.000) forwards .5s;
         }
     }
 }
 
-.ContentJSON {
-    height: 100%;
-    text-align: initial;
-    border-radius: 5px;
-    background: #3a3a3a;
-    // background-color: rebeccapurple !important;
-    padding: 20px;
-    margin: 0px 20px 20px 20px;
-    // box-shadow: 2px -3px 20px -6px #0000006e;
-    // box-shadow: 2px 2px 20px -6px #00000021;
-    display: inline-block !important;
-    .nsbp {
-        display: inline-block;
-        width: 4px;
-    }
-    .s,.n,.r,.v,&,br {
-        display: inline;
-        font-family: 'Consolas';
-        &::selection {
-            background: #9f3af162;
-        }
-    }
-    .v {
-        color: #7ec9c5;
-        margin-left: 10px;
-    }
-    .n {
-        color: #f08870;
-        padding-left: 5px;
-    }
-    .s{
-        color: #bbe987;
-        padding-left: 5px;
-    }
-    .t {
-        margin-left: 16px;
-    }
-    .t2 {
-        margin-left: 32px;
-    }
-}
-@keyframes CloseJson {
+@keyframes CloseJSONMENUAnimation {
     0% {
         opacity: 1;
         transform: scale(1);
@@ -148,7 +123,7 @@
         transform: scale(0.9);
     }
 }
-@keyframes OpenJson {
+@keyframes OpenJSONMENUAnimation {
     0% {
         opacity: 0.3;
         transform: scale(0.75);
