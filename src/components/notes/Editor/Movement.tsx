@@ -71,10 +71,10 @@ export default class EditorMovement {
                 windowEditor.style.top = `${dy}px`;
                 windowEditor.style.left = `${dx}px`;
 
-                Editor.SavePosition()
             }
 
             function closeDragElement(e: MouseEvent) {
+                Editor.SavePosition()
                 document.removeEventListener('mouseup', closeDragElement)
                 document.removeEventListener('mousemove', elementDrag)
             }
