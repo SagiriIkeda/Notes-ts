@@ -1,6 +1,6 @@
 import { version } from "./config"
 
-export type Themes = "dark" | "red" | "blue" | "yellow" | "green";
+export type Themes = "dark" | "red" | "blue" | "yellow" | "green" | "purple";
 
 export default interface Note {
     id: string,

@@ -61,6 +61,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         event.preventDefault();
 
         window.removeEventListener('mouseup', this.comprobateOutsideClick);
+        window.removeEventListener('mousedown', this.comprobateOutsideClick);
         let { x, y } = { x: event.clientX, y: event.clientY };
         let width = 210;
         let height = (options.length * 39 - 5) + 27 + 20;
@@ -80,6 +81,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         this.state.type = type;
         this.setOptions(options);
         window.addEventListener('mouseup', this.comprobateOutsideClick);
+        window.addEventListener('mousedown', this.comprobateOutsideClick);
     }
 
     comprobateOutsideClick(event: MouseEvent) {
@@ -87,7 +89,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
             const target = event.target as HTMLDivElement;
 
             if (!target.classList.contains("aux-option")) {
-                this.close();
+                event.buttons == 1 && this.close();
                 return true;
             }
 

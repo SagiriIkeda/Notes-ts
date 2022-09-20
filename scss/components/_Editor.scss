@@ -443,6 +443,13 @@
                     color: #517280;
                 }
             }
+            &[data-theme="purple"] {
+                .icon-theme {
+                    border-color: #3c2f4b;
+                    background: #e6c3fd;
+                    color: #6b5180;
+                }
+            }
         }
     }
 
@@ -617,6 +624,47 @@
             }
         }
     }
+    &[data-theme="purple"] {
+        --primary:#523d5e;
+        --menucolor:#382744;
+        --scrollbar-bg: #906da8;
+        .editor-ui,.editor-ui-container {
+            background: #e8c3fd;
+        }
+        .menu-btn[data-actived="true"] i{
+            color: #715180 !important;
+        }
+        .texture-menu-container {
+            .menu-items-container .item {
+                background: #ffffff3b !important;
+                &:hover,&[data-active="true"] {
+                    background: #613380 !important;
+                }
+            }
+        }
+        .content-editable-input {
+            background: #e6c3fd;
+            color: #775180 !important;
+            caret-color: #755180 !important;
+            &,div,br,b,u,i,span {
+                color: #755180 !important;
+                &::selection {
+                    background: #715180b4 !important;
+                }
+            }
+        }
+        .editor-date {
+            color: #402f4b !important;
+        }
+        .editor-ui-note-name {
+            .name-input,.save-placeholder {
+                color:var(--primary) !important;
+                &::selection {
+                    background: #735180b4 !important;
+                }
+            }
+        }
+    }
 }
 @keyframes OpenEditorAnimation {
     0% {
@@ -641,7 +689,10 @@
         height: 100%;
         background: #4b4b4b;
         .icon {
+            display: inline-flex;
+            align-items: center;
             padding-right: 10px;
+
             img{
                 border-radius: 3px;
                 width: 16px;
@@ -698,13 +749,23 @@
             }
         }
         &[data-theme="blue"] {
-            border-color: #8d864a;
+            border-color: #3d555e;
             background: #c3edfd;
             span,i {
                 color: #3d555e;
             }
             i:hover {
                 background: #336e806e;
+            }
+        }
+        &[data-theme="purple"] {
+            border-color: #553d5e;
+            background: #e8c3fd;
+            span,i {
+                color: #553d5e;
+            }
+            i:hover {
+                background: #6433806e;
             }
         }
     }

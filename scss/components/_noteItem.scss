@@ -181,6 +181,27 @@
             background: #517280;
         }
     }
+    &[data-theme="purple"] {
+        background: #e8c3fd;
+
+        .note__content,
+        .more,.__aux-icon,.note__content::first-line {
+            color: #715180;
+        }
+
+        .note__date {
+            color: #402f4b;
+        }
+
+        .select {
+            background: #e8c3fd;
+            border-color: #715180;
+        }
+
+        &.selected .select {
+            background: #715180;
+        }
+    }
 
     &[data-theme="yellow"] {
         background: #faf9b2;

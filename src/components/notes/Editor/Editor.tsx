@@ -12,6 +12,7 @@ import DB, { AutoUP } from "../../../db/database";
 import { AuxList } from "../../AuxMenu/item";
 import EditorsBar from "./Bar";
 import Tooltip, { Theme } from "../../../../libraries/Tooltips/Tooltips2";
+import { EDITORCONFIG } from "../../../interfaces/config";
 
 
 interface EditorProps {
@@ -211,10 +212,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (content_editable_input.current) {
             content_editable_input.current.innerHTML = data.content;
         }
+        
         document.addEventListener('selectionchange', Selection.SelectionChange);
         this.MaxCampHeight(true);
 
         if (windowEditor) {
+
+            windowEditor.style.minWidth = `${EDITORCONFIG.MIN_WIDTH}px`;
             windowEditor.style.height = `${data.position.height}px`;
             windowEditor.style.width = `${data.position.width}px`;
             windowEditor.style.left = `${data.position.left}px`;
@@ -525,6 +529,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                         <ThemeBtn Editor={this} theme="blue">Azul</ThemeBtn>
                                         <ThemeBtn Editor={this} theme="green">Verde</ThemeBtn>
                                         <ThemeBtn Editor={this} theme="red">Rojo</ThemeBtn>
+                                        <ThemeBtn Editor={this} theme="purple">Morado</ThemeBtn>
                                     </div>
                                 </div>
                             </div>
