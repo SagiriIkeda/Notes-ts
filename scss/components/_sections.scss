@@ -11,7 +11,6 @@
         background: #272727;
         padding: 10px 0px 0px 0px;
         .VoidPlaceHolderIndicator {
-            position: absolute;
             display: block;
         }
         .text {
@@ -40,7 +39,7 @@
                 background: #008fa1;
             }
         }
-        .folder {
+        .folder-item {
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
@@ -48,6 +47,7 @@
             width: 100%;
             user-select: none;
             height: auto;
+            
             padding: 13px 30px;
             justify-content: space-between;
             color: grey;
@@ -66,8 +66,16 @@
                 word-break: break-all;
             }
 
-            &:hover {
+            &:hover,&.__dragStateIn,&.__dragStateOut {
                 background: #434343;
+                .__action-icon {
+                    span {
+                        display: none;
+                    }
+                    .material-icons {
+                        display: flex;
+                    }
+                }
             }
             &.active {
                 span,.material-icons {
@@ -84,18 +92,44 @@
                 width: 250px;
                 position: fixed !important;
                 pointer-events: none;
-                background: #434343 !important;
                 transform: scale(1.05);
             }
-            &.__dragStateOut {
-                background: #434343 !important;
+
+            .__action-icon {
+                pointer-events: initial;
+                height: 20px;
+                width: 20px;
+                display: flex;
+                text-align: center;
+                span {
+                    width: 100%;
+                    text-align: center;
+                    pointer-events: none;
+                    background: none;
+                }
+                .material-icons {
+                    width: 100%;
+                    display: none;
+                    background: none;
+                    pointer-events: none;
+                    border-radius: 3px;
+                    width: auto;
+                    height: auto;
+                    padding: 2px;
+                    background: #292929;
+                }
+                &:hover {
+                    color: var(--primary);
+                }
             }
+
         }
         .VerticalGrid {
             position: relative;
             overflow: visible;
-            .folder {
+            .folder-item {
                 position: absolute;
+              
             }
             
             &.__dragStateIn {
@@ -103,16 +137,19 @@
                 .VoidPlaceHolderIndicator {
                     cursor: move;
                 }
-                .folder {
+                .folder-item {
                     cursor: move;
                     background: none !important;
+                    .__action-icon {
+                        pointer-events: none;
+                    }
                     &.__dragStateIn {
                         background: #434343 !important;
                     }
                 }
             }
             &.__dragStateOut {
-                .folder {
+                .folder-item {
                     pointer-events: none !important;
                 }
             }

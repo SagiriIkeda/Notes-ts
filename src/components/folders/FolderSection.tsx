@@ -9,6 +9,7 @@ import UI from "../UI";
 import createFolder from "./util/createFolder";
 import { AuxList } from "../AuxMenu/item";
 import VerticalGrid from "./Grid";
+import { FOLDERSCONFIG } from "../../interfaces/config";
 
 interface FolderSectionProps {
     UI: UI
@@ -54,10 +55,10 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         <div className="folders-section">
             <h2 className="text"><Mat>folder</Mat> Carpetas</h2>
             <div className="container" onAuxClick={AuxForFolderSection}>
-                <FolderItem createFolder={createFolderAux} UI={UI} key={0} data={DB.Folders.get("0") as Folder} />
+                <FolderItem createFolder={createFolderAux} UI={UI} key={FOLDERSCONFIG.DEFAULT_ID} data={DB.Folders.get(FOLDERSCONFIG.DEFAULT_ID) as Folder} />
                 <VerticalGrid ref={grid} afterUpdate={afterUpdate} >
                     {Folders.map((fold) => {
-                        if (fold.id != "0") {
+                        if (fold.id != FOLDERSCONFIG.DEFAULT_ID) {
                             return (<FolderItem grid={grid} createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
                         }
                     })}

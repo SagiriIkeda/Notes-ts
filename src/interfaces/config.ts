@@ -6,7 +6,7 @@ export enum EDITORCONFIG  {
 
 export enum FOLDERSCONFIG {
     DEFAULT_NAME = "Notes",
-    DEFAULT_ID = "0"
+    DEFAULT_ID = "0",
 }
 
 

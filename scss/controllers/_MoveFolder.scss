@@ -23,7 +23,7 @@
         display: grid;
         max-width: 522px;
         grid-template-rows: auto 1fr auto;
-        animation: OpenJson cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
+        animation: OpenJSONMENUAnimation cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
         box-shadow: 2px -3px 20px -6px #0000006e;
         z-index: 51;
         .Nav {
@@ -36,9 +36,40 @@
                 justify-content: space-between;
                 margin-bottom: 20px;
                 user-select: none;
+                // align-content: center;
+                h2 {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    .material-icons {
+                        margin-right: 10px;
+                    }
+                    // background: red;
+                }
                 i:hover {
                     cursor: pointer;
                     color: var(--primary);
+                }
+                span {
+                    // display: flex;
+                    margin-top: 5px;
+                    max-width: 50%;
+                    overflow: hidden;
+                    // align-items: flex-end;
+                    // height: 100%;
+                    // text-justify:;
+                    padding-left: 10px;
+                    font-weight: 100;
+                    font-family: 'Lato';
+                    white-space:nowrap;
+                    text-overflow: ellipsis;
+                    // over
+                    word-break: break-all;
+                    font-size: 14px;
+                    strong {
+                        font-weight: 100;
+                        color: var(--primary);
+                    }
                 }
             }
             .searchFolderBar {

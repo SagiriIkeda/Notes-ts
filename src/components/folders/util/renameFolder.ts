@@ -6,7 +6,7 @@ import UINOTES from "../../UI";
 
 export default function renameFolder(UI: UINOTES, data: Folder) {
     const folderId = data.id;
-    if (folderId === "0") return false;
+    if (folderId === FOLDERSCONFIG.DEFAULT_ID) return false;
 
     Swal.fire({
         confirmButtonText: 'Renombrar',

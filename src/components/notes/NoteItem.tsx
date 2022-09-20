@@ -9,6 +9,7 @@ import { downloadFile } from "../AuxMenu/util/downloadFile";
 import timeAgo from "../../../libraries/timeAgo/timeAgo";
 import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
+import { Mat } from "../prefabs";
 
 export const mode = {
     first: true,
@@ -187,6 +188,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     }
 
     onClick(event: React.MouseEvent) {
+        const eventTarget = event.target as HTMLDivElement;
+        if(eventTarget.classList.contains("__aux-icon")) return;
         const { UI } = this;
 
         if (event.buttons == 1) {
@@ -233,7 +236,6 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                                 this.deselect();
                             }
                         }
-                        // UI.reloadData();
                         UI.setState({});
                     }
                 }
@@ -257,12 +259,11 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
 
         const { data } = this.props
 
-        let content = data.content
+        const content = data.content
             .replace(/<.+?>/gim, "")
             .substr(0, 61)
 
-        let more = false;
-        if (content.length >= 61) more = true;
+        const more = content.length >= 61;
 
         let className = "note-item";
 
@@ -277,8 +278,10 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 ref={this.note}
                 data-theme={data.theme}
             >
+                
+                <Mat className={"__aux-icon"+(this.UI.state.SelectMode ? " __select-mode":"")} onClick={this.AuxEvent} >more_vert</Mat>
                 <div className="note__content" dangerouslySetInnerHTML={{ __html: content }}></div>
-                {(more == true) && (<div className="more">...</div>)}
+                {(more) && (<div className="more">...</div>)}
                 <div className="note__date">{timeAgo(data.time)}</div>
                 <div className="select"><div className="line"></div></div>
             </div>

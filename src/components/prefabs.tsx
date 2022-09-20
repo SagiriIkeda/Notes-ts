@@ -1,6 +1,9 @@
+import React from "react"
+
 type PrefapProp = {
     children: string,
-    onClick?: () => void,
+    // onClick?: (event?: React.MouseEvent) => void,
+    onClick?: (event: React.MouseEvent) => void,
     className?: string,
 }
 

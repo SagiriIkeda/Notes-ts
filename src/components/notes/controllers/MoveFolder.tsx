@@ -45,6 +45,8 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         this.setFolder = this.setFolder.bind(this);
         this.moveNotes = this.moveNotes.bind(this);
         this.close = this.close.bind(this);
+        // console.log("ea");
+
     }
 
     close() {
@@ -126,7 +128,7 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         })
     }
     search(e: SyntheticEvent<HTMLInputElement, InputEvent>) {
-        let value = (e.target as HTMLInputElement).value;
+        const value = (e.target as HTMLInputElement).value;
 
         this.setState({
             search: value
@@ -135,6 +137,8 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
 
     render() {
         const { UI, state } = this;
+
+        const getFolderName = (id: string) => DB.Folders.get(id)?.name;
 
         let { Folders } = UI.state;
 
@@ -151,7 +155,11 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
                     <div className="MoveFolder" ref={this.container} >
                         <div className="Nav">
                             <div className="MoveTitle">
-                                <h2>Mover a la carpeta </h2>
+                                <h2><Mat>drive_file_move_rtl</Mat>  Mover
+                                    <span>de <strong>{getFolderName(UI.state.activeFolder)}</strong>
+                                        {state.selected && (<> a <strong>{getFolderName(state.selected)}</strong></>)}
+                                    </span>
+                                </h2>
                                 <Mat onClick={this.close}>close</Mat>
                             </div>
                             <label className="searchFolderBar">

@@ -9,6 +9,7 @@ import deleteFolder from "./util/deleteFolder";
 import renameFolder from "./util/renameFolder";
 import Socket from "../../socket";
 import VerticalGrid, { GridConfig } from "./Grid";
+import { FOLDERSCONFIG } from "../../interfaces/config";
 
 interface FolderProp {
     data: Folder,
@@ -31,14 +32,16 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
         }
     })
 
-    let classes = "folder";
+    let classes = "folder-item";
 
     if (UI.state.activeFolder == data.id) {
         classes += " active";
     }
 
     function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-        if (e.buttons == 1) {
+        const eventTarget = e.target as HTMLDivElement ; 
+        
+        if (e.buttons == 1 && !eventTarget.classList.contains("__action-icon")) {
             const folderItem = itemfolder.current as HTMLDivElement ;
             const father = folderItem.parentElement as HTMLElement;
             const offsetYdiff = e.nativeEvent.offsetY;
@@ -69,7 +72,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         //agregar eventos
                         document.addEventListener('mousemove', AlignFolderTargetPositionToMouse);
                         document.addEventListener('mouseup', EndDrag);
-                        father.querySelectorAll('.folder').forEach(sitem => {
+                        father.querySelectorAll('.folder-item').forEach(sitem => {
                             //agregarle el evento "Sortable"a todos los folders para que se detecte
                             sitem.addEventListener('mouseover', Sortable)
                         })
@@ -142,7 +145,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                             }, GridConfig.ANIMATION_DURATION);
 
                             //Guardar la nueva Posición en la DB de cada folder
-                            father.querySelectorAll('.folder').forEach((sitem, order) => {
+                            father.querySelectorAll('.folder-item').forEach((sitem, order) => {
                                 const item = sitem as HTMLFolderElement;
                                 let id = item.identifier as string;
                                 DB.Folders.update(id, { order: order + 1 });
@@ -185,6 +188,8 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
     }
 
     function AuxEvent(event: React.MouseEvent) {
+        event.clientX += 5;
+        event.clientY += 5;
         const AuxActions: AuxList = [
             {
                 icon: "folder_open",
@@ -216,7 +221,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                 danger: true,
             },
         ]
-        if (data.id == "0") {
+        if (data.id == FOLDERSCONFIG.DEFAULT_ID) {
             AuxActions.splice(2, 2);
         }
         UI.AUX?.set(AuxActions, event, "FolderAux");
@@ -229,12 +234,15 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
             onAuxClick={AuxEvent}
             ref={itemfolder}
         >
-            <Mat>arrow_forward_ios</Mat>
+            <Mat>arrow_forward_io</Mat>
             <span className="__name">
                 {data.name}
             </span>
-            <div className="__icon">
-                {DB.Notes.search("folder", data.id).length}
+            <div className="__action-icon" onClick={AuxEvent} >
+                <span>
+                    {DB.Notes.search("folder", data.id).length}
+                </span>
+                <Mat>more_vert</Mat>
             </div>
         </div>
     )

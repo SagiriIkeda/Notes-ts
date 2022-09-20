@@ -1,4 +1,4 @@
-import React, { createRef, FormEvent, SyntheticEvent } from "react";
+import React, { createRef } from "react";
 import DB from "../db/database";
 import { Mat } from "./prefabs";
 
@@ -7,7 +7,7 @@ import Folder from "../interfaces/folder";
 
 import NotesSection from "./notes/NotesSection";
 import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
-// import Editor, { Editors } from "./notes/Editor/Editor";
+
 import SelectMode from "./notes/controllers/SelectMode";
 import AuxMenu from "./AuxMenu/Menu";
 import JsonMenu from "./notes/controllers/JsonMenu";
@@ -19,13 +19,14 @@ import EditorsBar from "./notes/Editor/Bar";
 import { DevEditors } from "./notes/Editor/Editor";
 import Socket from "../socket";
 import DropZone from "./notes/controllers/droopzone";
+import { FOLDERSCONFIG } from "../interfaces/config";
 
 export default class UINOTES extends React.Component {
 
     state = {
         Notes: DB.Notes.getAll(),
         Folders: DB.Folders.getAll(),
-        activeFolder: "0",
+        activeFolder: FOLDERSCONFIG.DEFAULT_ID as string ,
         Editors: new Map<string, OpenEditor>(),
         SelectMode: false,
         selectes: new Set<string>(),
@@ -47,7 +48,7 @@ export default class UINOTES extends React.Component {
         //AutoSet ActiveFolder
         const ActiveFolder = DB.ActiveFolder.get();
 
-        if (ActiveFolder != "0") {
+        if (ActiveFolder != FOLDERSCONFIG.DEFAULT_ID) {
             const folderExists = DB.Folders.get(ActiveFolder)
             if (folderExists) {
                 this.state.activeFolder = ActiveFolder
@@ -87,7 +88,7 @@ export default class UINOTES extends React.Component {
             DB.ActiveFolder.load();
 
             if (state.activeFolder == folderId) {
-                state.activeFolder = "0";
+                state.activeFolder = FOLDERSCONFIG.DEFAULT_ID;
                 mode.first = true;
             }
 
@@ -96,7 +97,7 @@ export default class UINOTES extends React.Component {
 
                 if (data.folder == folderId) {//El editor está en la misma carpeta
                     if (Invoker.temporalId) {//es una nota sin guardar (Aún temporal) añadirle una nota
-                        Invoker.data.folder = "0";
+                        Invoker.data.folder = FOLDERSCONFIG.DEFAULT_ID;
                         const { EditorInstance } = Invoker;
                         if (EditorInstance) EditorInstance.state.folderDeleted = true;
                     } else {//es una nota previamente guardada (cerrarla)

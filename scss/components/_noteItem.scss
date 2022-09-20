@@ -12,6 +12,23 @@
     transform-origin: center top;
     background: #1f1f1f;
     
+    .__aux-icon {
+        top: 8px;
+        right: 3px;
+        color: #c0bdbd;
+        position: absolute;
+        opacity: 0;
+        transition: ease .25s opacity;
+        &.__select-mode {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+    }
+    &:hover {
+        .__aux-icon {
+            opacity: 1;
+        }
+    }
 
     &.none {
         display: none !important;
@@ -36,7 +53,7 @@
 
     .note__content {
         font-size: 16px;
-
+        padding-right: 10px;
         &:first-line {
             color: white;
             font-weight: 600;
@@ -87,10 +104,11 @@
     }
 
     &[data-theme="green"] {
+        
         background: #e2fac3;
 
         .note__content,
-        .more {
+        .more,.__aux-icon {
             color: #738d4a;
         }
 
@@ -116,7 +134,7 @@
         background: #fac7c7;
 
         .note__content,
-        .more {
+        .more,.__aux-icon {
             color: #6e3a3a;
         }
 
@@ -142,7 +160,7 @@
         background: #c3edfd;
 
         .note__content,
-        .more {
+        .more,.__aux-icon {
             color: #517280;
         }
 
@@ -168,7 +186,7 @@
         background: #faf9b2;
 
         .note__content,
-        .more {
+        .more,.__aux-icon {
             color: #8d864a;
         }
 
@@ -217,7 +235,7 @@
     margin-bottom: 5px;
     position: relative;
     &.selectmode {
-        .noteItem {
+        .note-item {
             .select {
                 display: block;
             }

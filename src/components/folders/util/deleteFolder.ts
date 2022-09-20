@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import DB from "../../../db/database";
+import { FOLDERSCONFIG } from "../../../interfaces/config";
 import Folder from "../../../interfaces/folder";
 import Socket from "../../../socket";
 import UINOTES from "../../UI";
@@ -7,7 +8,7 @@ import UINOTES from "../../UI";
 export default function deleteFolder(UI: UINOTES, data: Folder) {
     const folderId = data.id;
 
-    if (folderId === "0") return false;
+    if (folderId === FOLDERSCONFIG.DEFAULT_ID) return false;
 
     const deletableNotes = DB.Notes.search("folder", folderId);
     const length = deletableNotes.length;
@@ -24,14 +25,14 @@ export default function deleteFolder(UI: UINOTES, data: Folder) {
         if (result.isConfirmed) {
             if (DB.Folders.remove(folderId) != false) {
                 if (UI.state.activeFolder == folderId) {
-                    UI.state.activeFolder = "0";
+                    UI.state.activeFolder = FOLDERSCONFIG.DEFAULT_ID;
                 }
 
                 UI.state.Editors.forEach(invoker => {//en caso de q se esté creando una nota sin guardar en esa carpeta
                     if (invoker.temporalId && invoker.data.folder == folderId) {
                         const { EditorInstance } = invoker;
                         if (EditorInstance) EditorInstance.state.folderDeleted = true;
-                        invoker.data.folder = "0";
+                        invoker.data.folder = FOLDERSCONFIG.DEFAULT_ID;
                     }
                 })
 
