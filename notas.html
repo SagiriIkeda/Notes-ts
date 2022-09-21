@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Notes</title>
+    <link rel="stylesheet" href="css/Notas.css">
+    <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+    <link rel="shortcut icon" href="icon.jpg" type="image/x-icon">
+    <script src="libraries/sweetalert2.js"></script>
+
+	<style>
+		.material-icons {
+            font-family: 'Material Icons';
+			font-weight:400;
+            font-size: 24px;
+            font-style:initial;
+        } 
+	</style>
+</head>
+<body>
+    <div class="header">
+        <div class="tab active NoteTab"><span></span> <i class="material-icons">expand_more</i></div>
+        <div class="selectedIndicate">
+            <div class="item texted" onclick="SelectMode.DisableMode()"><i class="material-icons">close</i></div>
+            <span class="numsels">0 notas Seleccionadas</span>
+            <div class="item texted selbtn" onclick="SelectMode.SelectAll()"><i class="material-icons">grading</i></div>
+        </div>
+        <div class="folderSection">
+        </div>
+    </div>
+    <div class="NotasMenu">
+        <div class="foldersMenu">
+            <div class="container">
+                <h2>Carpetas</h2>
+            </div>
+        </div>
+        <div class="NotasInteract">
+            <div class="search">
+                <div class="searchcontainer">
+                    <label>
+                        <i class="material-icons">search</i>
+                        <input id="searchnotes" type="text" placeholder="buscar notas..." >
+                        <i class="material-icons closebtnsearch">close</i>
+                    </label>
+                </div>
+            </div>
+            <div class="notes-preview-container">
+            </div>
+            <div class="activeEditors">
+                <template>
+                    <div class="editortab">
+                        <div class="icon">  <img src="icon.jpg" alt="editor"> </div>
+                        <span>Notas</span>
+                        <i class="material-icons">close</i>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div class="editors"></div>
+    <template>
+        <div class="Editor">
+            <div class="window">
+                <div class="title">
+                    <img src="icon.jpg" alt="editor">
+                    <span>[note__name]</span>
+                </div>
+                <div class="btns">
+                    <div class="wbtn"><i class="material-icons">close</i></div>
+                </div>
+            </div>
+            <div class="usereditor">
+                <div class="note-editor-capm">
+                    <div class="editor-header">
+                        <div class="atras">  <i class="material-icons"> keyboard_arrow_left</i></div>
+                        <div class="note_name">
+                            <div class="container">
+                                <div class="saved">Guardando...</div>
+                                <div class="name" contenteditable="true">[note__name]</div>
+                            </div>
+                        </div>
+                        <div class="lefting-part">
+                            <div class="OpenSubMenu" onclick="document.querySelector('.selected_capm').classList.toggle('active')">  <i class="material-icons">mode_edit</i></div>
+                            <div class="save">  <i class="material-icons">done</i></div>
+                        </div>
+                    </div>
+                    <div class="note-editor">
+                        <div class="note-data">1970 Abr 20 7:00PM | 0 characters</div>
+                        <div class="note-capm" contenteditable="true"> [text__content]</div>
+                        <div class="selected_capm">
+                            <span class="titles" >Seleccione estilo...</span>
+                            <div class="div">
+                                <button class="item" property="bold"><span class="material-icons">format_bold</span></button>
+                                <button class="item" property="underline"><span class="material-icons">format_underlined</span></button>
+                                <button class="item" property="italic"><span class="material-icons">format_italic</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="expandiblewindow"></div>
+        </div>
+    </template>
+
+    <div class="addButton">
+          <i class="material-icons">add</i>
+    </div>
+
+    <div class="SelectBox">
+        <span class="titles" >¿Desea Borrar Estas Notas?</span>
+        <div class="div">
+            <div class="item texted" onclick="SelectMode.RemoveSelectes()"><i class="material-icons">delete</i> <span>Borrar</span></div>
+            <div class="item texted" onclick="SelectMode.DisableMode()"><i class="material-icons">close</i> <span>Cancelar</span></div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/Folders.js"></script>
+    <script src="js/notas.js"></script>
+</body>
+</html>
