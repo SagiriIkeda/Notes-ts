@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes React</title>
+    <style>
+        body {
+            background: black;
+            color: white;
+        }
+        .material-icons {
+            font-family: 'Material Icons';
+            font-size: 24px;
+            font-style:initial;
+            font-weight: 400;
+        }
+    </style>
+    <!-- <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script> -->
+    <script src="libraries/babel.js"></script>
+    <script src="libraries/react.js" crossorigin></script>
+    <script src="libraries/react-dom.js" crossorigin></script>
+	<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"> -->
+    <link rel="stylesheet" href="css/Preloader.css">
+    <link rel="stylesheet" href="css/Notas.css">
+    <link rel="stylesheet" href="css/dropzone.css">
+    <link rel="shortcut icon" href="source/icon-react.jpg" type="image/x-icon">
+    
+    <script src="libraries/sweetalert2.js"></script>
+    <script src="libraries/timeAgo.js"></script>
+    <script src="js/Database.js"></script>
+    <!-- <script src="js/Socket.js"></script> -->
+    <script type="text/babel" src="js/functions.jsx"></script>
+    <script type="text/babel" src="js/Prefabs.jsx"></script>
+    <script type="text/babel" src="js/Editor.jsx"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <div class="LoadingPage" id="LD">
+        <div class="centered">
+            <div class="center">
+                <img src="source/icon-react.jpg" alt="react">
+            </div>
+            <h2>React Notes</h2>
+        </div>
+    </div>
+    <div class="ViewJson" id="ViewJson"></div>
+    <div class="AuxContainer" style="display: none;"></div>
+    <div class="dropzone__full" id="DropZone">
+        <div class="dropzone">
+            <div class="container_">
+                <div class="item">TXT
+                    <div class="shadow"></div>
+                </div>
+                <div class="item">TXT
+                    <div class="shadow"></div>
+                </div>
+                <div class="item">TXT</div>
+            </div>
+            <div class="text">¡Suelta tus <strong>.TXT</strong> para convertirlos en Notas!</div>
+        </div>
+    </div>
+
+    <div class="MoveFolderContainer" id="MoveFolderContainer"></div>
+    <!-- <script>
+        let timeI = Date.now();
+    </script> -->
+    <script>
+        document.body.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            return false;
+        })
+    </script>
+	<script type="text/babel" src="js/ViewJson.jsx"></script>
+	<script type="text/babel" src="js/AuxMenu.jsx"></script>
+	<script type="text/babel" src="js/MoveToFolder.jsx"></script>
+    <script src="js/droopzone.js"></script>
+	<script type="text/babel" src="js/app.jsx"></script>
+    <!-- <script src="js/beta.js"></script> -->
+</body>
+</html>
