@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from "react";
+import React from "react";
 import Editor from "./Editor";
 
 interface EditorSelectionProperties {
@@ -23,17 +23,19 @@ export default class EditorSelection {
     SelectionChange(e: any) {
         const { Editor } = this;
         const InputCamp = Editor.content_editable_input.current;
-        // console.log(this.getSelectionHtml());
-        let self = this;
+
+        const self = this;
+
         if (InputCamp) {
             if (e.path[0].activeElement == InputCamp) {
                 clearInterval(this.timetorange);
-                let range = document.getSelection()?.toString() as string;
+            
+                const range = document.getSelection()?.toString() as string;
                 //estilizar los botones
                 function IdentifyProperties() {
-                    let html = self.getSelectionHtml();
+                    const html = self.getSelectionHtml();
                     const selection = document.getSelection();
-                    let parenttag = selection?.anchorNode?.parentElement?.tagName;
+                    const parenttag = selection?.anchorNode?.parentElement?.tagName;
 
                     const cachedTextures = {
                         italic: false,
@@ -116,9 +118,6 @@ export default class EditorSelection {
                 } else {
                     Editor.setState({
                         texturize: false,
-                        // bold: false,
-                        // underline: false,
-                        // italic: false,
                     })
                 }
                 IdentifyProperties();

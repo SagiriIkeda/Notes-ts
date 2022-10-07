@@ -6,9 +6,6 @@ interface EditorMovementProperties {
     Editor: Editor;
 }
 
-// const MIN_WIDTH = 360;
-// const MIN_HEIGHT = 272;
-
 export default class EditorMovement {
     Editor: Editor;
     windowEditor: Editor["editor_window"];
@@ -39,47 +36,47 @@ export default class EditorMovement {
         if (target.classList[0] != "wbtn") {
 
             e.preventDefault();
-            // setIndex();
+
             this.clientX = e.clientX;
             this.clientY = e.clientY;
 
             Editor.invoker.setTopZIndex();
 
-            const elementDrag = (e: MouseEvent) => {
+            const pagewidth = document.documentElement.offsetWidth;
+            const pageheight = document.documentElement.offsetHeight;
+
+            const StartDrag = (e: MouseEvent) => {
                 e.preventDefault();
                 this.left = this.clientX - e.clientX;
                 this.top = this.clientY - e.clientY;
                 this.clientX = e.clientX;
                 this.clientY = e.clientY;
 
-                let dy = windowEditor.offsetTop - this.top;
-                let dx = windowEditor.offsetLeft - this.left;
-
-                let pagewidth = document.documentElement.scrollWidth;
-                let pageheight = document.documentElement.scrollHeight - 123;
+                let PositionY = windowEditor.offsetTop - this.top;
+                let PositionX = windowEditor.offsetLeft - this.left;
 
                 let width = windowEditor.getBoundingClientRect().width;
                 let height = windowEditor.getBoundingClientRect().height;
-                if (dy + height > pageheight) dy = pageheight - height;
-                if (dy < 0) dy = 0;
-                if (dx + width > pagewidth) dx = pagewidth - width;
-                if (dx < 0) dx = 0;
+                if (PositionY + height > pageheight) PositionY = pageheight - height;
+                if (PositionY < 0) PositionY = 0;
+                if (PositionX + width > pagewidth) PositionX = pagewidth - width;
+                if (PositionX < 0) PositionX = 0;
 
-                position.left = dx;
-                position.top = dy;
+                position.left = PositionX;
+                position.top = PositionY;
 
-                windowEditor.style.top = `${dy}px`;
-                windowEditor.style.left = `${dx}px`;
+                windowEditor.style.top = `${PositionY}px`;
+                windowEditor.style.left = `${PositionX}px`;
 
             }
 
             function closeDragElement(e: MouseEvent) {
                 Editor.SavePosition()
                 document.removeEventListener('mouseup', closeDragElement)
-                document.removeEventListener('mousemove', elementDrag)
+                document.removeEventListener('mousemove', StartDrag)
             }
             document.addEventListener('mouseup', closeDragElement)
-            document.addEventListener('mousemove', elementDrag)
+            document.addEventListener('mousemove', StartDrag)
         }
     }
 
@@ -93,19 +90,20 @@ export default class EditorMovement {
 
         e.preventDefault();
 
-        let maxscreenw = document.documentElement.scrollWidth;
-        let maxscreenh = document.documentElement.scrollHeight;
+        const maxscreenw = document.documentElement.offsetWidth;
+        const maxscreenh = document.documentElement.offsetHeight;
 
-        const changet = (e: MouseEvent) => {
-            let ny = e.clientY;
-            let nx = e.clientX;
-            let rect = windowEditor.getBoundingClientRect();
-            let wetop = rect.top;
-            let weleft = rect.left;
+        const ResizeWindow = (e: MouseEvent) => {
+            const ny = e.clientY;
+            const nx = e.clientX;
+            const rect = windowEditor.getBoundingClientRect();
+            const wetop = rect.top;
+            const weleft = rect.left;
+            const top = rect.top;
+            const left = rect.left;
+
             let width = nx - weleft;
             let height = ny - wetop;
-            let top = rect.top;
-            let left = rect.left;
 
             if (height < EDITORCONFIG.MIN_HEIGHT) height = EDITORCONFIG.MIN_HEIGHT;
             if (width < EDITORCONFIG.MIN_WIDTH) width = EDITORCONFIG.MIN_WIDTH;
@@ -117,17 +115,17 @@ export default class EditorMovement {
             windowEditor.style.maxWidth = `${maxscreenw - left}px`;
             windowEditor.style.height = `${height}px`;
             windowEditor.style.width = `${width}px`;
+            Editor.MaxCampHeight();
+        }
+        
+        document.addEventListener('mouseup', CancelResize)
+        document.addEventListener('mousemove', ResizeWindow)
+        
+        function CancelResize() {
             Editor.SavePosition();
             Editor.MaxCampHeight();
-
-        }
-
-        document.addEventListener('mouseup', up)
-        document.addEventListener('mousemove', changet)
-        function up() {
-            Editor.MaxCampHeight();
-            document.removeEventListener('mousemove', up)
-            document.removeEventListener('mousemove', changet)
+            document.removeEventListener('mousemove', CancelResize)
+            document.removeEventListener('mousemove', ResizeWindow)
         }
     }
 }
