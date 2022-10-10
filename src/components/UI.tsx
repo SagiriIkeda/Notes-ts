@@ -20,6 +20,7 @@ import { DevEditors } from "./notes/Editor/Editor";
 import Socket from "../socket";
 import DropZone from "./notes/controllers/droopzone";
 import { FOLDERSCONFIG } from "../interfaces/config";
+import { Header } from "./Header";
 
 export default class UINOTES extends React.Component {
 
@@ -41,6 +42,7 @@ export default class UINOTES extends React.Component {
     AUX?: AuxMenu;
     JSONMENU?: JsonMenu;
     MOVEFOLDER?: MoveFolder;
+    HEADER?: Header;
 
     constructor(props: {}) {
         super(props)
@@ -112,9 +114,11 @@ export default class UINOTES extends React.Component {
     }
 
     changeSelectedFolder(id: Folder["id"]) {
+        const {HEADER} = this;
         DB.ActiveFolder.set(id);
         this.state.activeFolder = id;
         mode.first = true;
+        HEADER && (HEADER.state.folderSectionVisible = false);
         this.reloadData({ send: false });
     }
     // send is sendUpdateToBC
@@ -148,9 +152,10 @@ export default class UINOTES extends React.Component {
 
         return (
             <div className="UI-notes-manager" >
-                <div className="header">
+                <Header  UI={this} />
+                {/* <div className="header">
                     <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name}</div>
-                </div>
+                </div> */}
                 <div className="sections">
                     <FolderSection UI={this} />
 

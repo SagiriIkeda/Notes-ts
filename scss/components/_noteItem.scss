@@ -4,7 +4,8 @@
     flex-wrap: wrap;
     padding: 13px;
     height: fit-content;
-    width: 240px;
+    // width: 240px;
+    width: var(--notes-width);
     position: relative;
     z-index: 1;
     user-select: none;
@@ -270,5 +271,16 @@
     &::-webkit-scrollbar-thumb {
         border-radius: 5px;
         background: #08c7e0;
+    }
+}
+
+
+@media (max-width: $mobile-size) {
+    .notes-items-container {
+        --notes-width: 47%;
+        .note-item {
+            width: unset;
+        }
+        // background: red;
     }
 }

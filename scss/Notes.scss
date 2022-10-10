@@ -1,3 +1,6 @@
+:root {
+    --shadow-color:#0000005c;
+}
 * {
     font-family: 'Lato', sans-serif;
     padding: 0;
@@ -11,6 +14,11 @@ body {
 }
 
 $primary:#00bdd6;
+
+
+$mobile-size: 630px;
+$mobile-min-size: 340px;
+
 
 .text {
     color: var(--primary);
@@ -28,26 +36,6 @@ $primary:#00bdd6;
     overflow: hidden;
     user-select: none;
 }
-// Header
-.header {
-    position: sticky;
-    padding: 10px 0px;
-    background: #333333;
-    transition:border-radius ease .5s ;
-    display: flex;
-    justify-content: center;
-    z-index: 30;
-    .foldername {
-        color: var(--primary);
-        font-size: 24px;
-        font-weight: bold;
-        text-transform: capitalize;
-        padding: 0px 15px;
-        display: flex;
-        align-items: center;
-    }
-}
-
 //Sections
 
 .UI-notes-manager {
@@ -190,6 +178,8 @@ $primary:#00bdd6;
 }
 
 //imports
+@import "components/Header";
+
 @import "sweetalert";
 //components
 @import "components/Editor";

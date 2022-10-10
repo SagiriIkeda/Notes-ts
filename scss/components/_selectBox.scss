@@ -55,3 +55,40 @@
     }
     
 }
+
+
+
+@media (max-width: $mobile-size) {
+
+    .SelectBox {
+        position: fixed;
+        // width: 10;
+        left: 0;
+        right: 0;
+        .titles {
+            display: none;
+        }
+        border-radius: 20px 20px 0px 0px;
+        .div {
+            .item {
+                padding: 5px !important;
+                display: grid;
+                justify-items: center;
+                font-size: 14px;
+                background: none !important;
+                font-weight: 100;
+                
+                .material-icons {
+                    margin-right: 0px;
+                    // color: white !important;
+                }
+                &:hover {
+                    color: var(--primary);
+                    
+                    // background: transparentize($color: $primary, $amount: 0.6);
+                }
+                // background: red;
+            }
+        }
+    }
+}

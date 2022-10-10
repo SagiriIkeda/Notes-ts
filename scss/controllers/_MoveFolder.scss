@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     $line: #6e6e6e;
-    // pointer-events: none;
+    pointer-events: none;
     &.active{
         pointer-events: initial;
     }
@@ -26,6 +26,7 @@
         animation: OpenJSONMENUAnimation cubic-bezier(0.190, 1.000, 0.220, 1.000) .5s;
         box-shadow: 2px -3px 20px -6px #0000006e;
         z-index: 51;
+        pointer-events: initial;
         .Nav {
             padding: $pad;
             border-bottom: 1px solid $line;
@@ -67,6 +68,8 @@
                     word-break: break-all;
                     font-size: 14px;
                     strong {
+                        margin: 0px 5px;
+            
                         font-weight: 100;
                         color: var(--primary);
                     }
@@ -144,6 +147,26 @@
                     border: 1px solid #62b4db;
                     color: #62b4db;
                 }
+                &.__originFolder {
+                    opacity: .5;
+                    pointer-events: none;
+                    // cursor: c;
+                    background: #292929;
+                    strong {
+                        display: flex;
+                        align-items: center;
+                        color: var(--primary);
+                        // padding-left: 20px;
+                        font-weight: 100;
+                        font-size: 14px;
+                    }
+
+                    .material-icons:nth-child(3) {
+                        display: none;
+                    }
+                }
+
+
                 i:nth-child(1) {
                     margin-right: 10px;
                 }
@@ -154,7 +177,7 @@
                 border-radius: 8px;
             }
             &::-webkit-scrollbar-thumb {
-                background: #666666;
+                background: #9b8b8b;
                 border-radius: 8px;
 
             }
@@ -175,6 +198,7 @@
                 color: grey;
                 i {
                     width: 120px;
+                    height: 120px;
                     font-size: 120px;
                 }
                 span {
@@ -210,16 +234,28 @@
         }
 
     }
-    .shadow {
-        position: absolute;
-        inset: 0;
-        background: #1a19192c;
-        z-index: 50;
-        &.noaction {
-            pointer-events: none;
-        }
+}
+
+.__MOVEFOLDER-shadow {
+    position: absolute;
+    inset: 0;
+    // background: #1a19192c;
+    background: var(--shadow-color);
+    // background: red;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity ease .25s;
+    pointer-events: none;
+    &.__open {
+        opacity: 1;
+        pointer-events: initial;
+    }
+    &.noaction {
+        opacity: 0;
+        pointer-events: none;
     }
 }
+
 
 @keyframes Shake {
     0% {
@@ -254,5 +290,22 @@
     }
     100% {
         transform: translateX(0px);
+    }
+}
+
+
+@media (max-width: $mobile-size) {
+    .MoveFolder {
+        width: calc(100% - 20px) !important ;
+        .footer {
+            grid-template-columns: 1fr 1fr !important;
+            span {
+                grid-column: span 2;
+            }
+            .btn {
+                justify-content: center;
+                // text-align: center;
+            }
+        }
     }
 }

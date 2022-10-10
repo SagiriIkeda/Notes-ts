@@ -13,6 +13,7 @@ import { AuxList } from "../../AuxMenu/item";
 import EditorsBar from "./Bar";
 import Tooltip, { Theme } from "../../../../libraries/Tooltips/Tooltips2";
 import { EDITORCONFIG } from "../../../interfaces/config";
+import Screen from "../../../util/Screen";
 
 
 interface EditorProps {
@@ -49,7 +50,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     editor_input_name = createRef<HTMLInputElement>();
     editor_window = createRef<HTMLDivElement>();
     content_editable_input = createRef<HTMLDivElement>();
-    // windowElm = createRef<HTMLDivElement>();
 
     data: Note;
     invoker: OpenEditor;
@@ -212,7 +212,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (content_editable_input.current) {
             content_editable_input.current.innerHTML = data.content;
         }
-        
+
         document.addEventListener('selectionchange', Selection.SelectionChange);
         this.MaxCampHeight(true);
 
@@ -274,14 +274,21 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             document.removeEventListener('selectionchange', Selection.SelectionChange);
 
             windowEditor?.classList.add("closing");
-            windowEditor?.animate([
-                { transform: `scale(1)`, opacity: "1" },
-                { transform: `scale(0.8)`, opacity: "0" },
-            ], {
-                duration: ANIMATION_TIME,
-                easing: "ease",
-                fill: "forwards",
-            })
+            windowEditor?.animate(
+                Screen.isMobile() ?
+                    [ // Animación en mobil
+                        { transform: `translate(0)`},
+                        { transform: `translate(100%)`},
+                    ] :
+                    [ // Animación en pc
+                        { transform: `scale(1)`, opacity: "1" },
+                        { transform: `scale(0.8)`, opacity: "0" },
+                    ]
+                , {
+                    duration: ANIMATION_TIME,
+                    easing: "ease",
+                    fill: "forwards",
+                })
 
             setTimeout(() => {
                 this.setState({

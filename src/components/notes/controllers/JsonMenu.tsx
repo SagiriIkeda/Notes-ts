@@ -18,6 +18,7 @@ export default class JsonMenu extends React.Component<JsonMenuProps, JsonMenuSta
         opend: false,
     }
     container = createRef<HTMLDivElement>()
+    shadow = createRef<HTMLDivElement>()
     UI: UINOTES;
 
     constructor(props: JsonMenuProps) {
@@ -39,6 +40,10 @@ export default class JsonMenu extends React.Component<JsonMenuProps, JsonMenuSta
     closeAnimation() {
         return new Promise((resolve, reject) => {
             const container = this.container.current;
+            const shadow = this.shadow.current;
+            if(shadow) {
+                shadow.classList.remove("__open");
+            }
             if (container) {
                 container.setAttribute("data-closing", "true");
                 setTimeout(() => {
@@ -57,8 +62,9 @@ export default class JsonMenu extends React.Component<JsonMenuProps, JsonMenuSta
         const { data } = state;
         if (state.opend && data) {
             return (
+                <>
+                <div className="__JSONMENU-shadow __open" ref={this.shadow}  onClick={this.closeAnimation}></div>
                 <div className="JSONMENU">
-                    <div className="shadow" onClick={this.closeAnimation}></div>
                     <div className="container" ref={this.container}>
                         <div className="__header">
                             <div className="__title"><Mat>description</Mat> Note</div>
@@ -83,7 +89,10 @@ export default class JsonMenu extends React.Component<JsonMenuProps, JsonMenuSta
                         </div>
                     </div>
                 </div>
+                </>
             );
         }
+        
+        return (<div className="__JSONMENU-shadow"></div>)
     }
 }

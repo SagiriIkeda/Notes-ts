@@ -150,74 +150,83 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         if (state.opend) {
             const size = UI.state.selectes.size;
             return (
-                <div className="MoveFolderContainer">
-                    <div className="shadow" ref={this.shadow} onClick={this.close} ></div>
-                    <div className="MoveFolder" ref={this.container} >
-                        <div className="Nav">
-                            <div className="MoveTitle">
-                                <h2><Mat>drive_file_move_rtl</Mat>  Mover
-                                    <span>de <strong>{getFolderName(UI.state.activeFolder)}</strong>
-                                        {state.selected && (<> a <strong>{getFolderName(state.selected)}</strong></>)}
-                                    </span>
-                                </h2>
-                                <Mat onClick={this.close}>close</Mat>
-                            </div>
-                            <label className="searchFolderBar">
-                                <Mat>search</Mat>
-                                <input type="text" maxLength={50} placeholder="Buscar Carpetas..." onInput={this.search} ref={this.searchInput} />
-                                {(state.search != "") && (
-                                    <Mat onClick={this.cancelSearch}>close</Mat>
-                                )}
-                            </label>
-
-                        </div>
-                        <div className="FoldersSection">
-                            {(state.search != "" && Folders.length == 0) && (
-                                <div className="centerFolders">
-                                    <Mat>search_off</Mat>
-                                    <span>No hay Carpetas con "{state.search}"</span>
+                <>
+                    <div className="__MOVEFOLDER-shadow __open" ref={this.shadow} onClick={this.close} ></div>
+                    <div className="MoveFolderContainer">
+                        <div className="MoveFolder" ref={this.container} >
+                            <div className="Nav">
+                                <div className="MoveTitle">
+                                    <h2><Mat>drive_file_move_rtl</Mat>  Mover
+                                        <span>de <strong>{getFolderName(UI.state.activeFolder)}</strong>
+                                            {state.selected && (<> a <strong>{getFolderName(state.selected)}</strong></>)}
+                                        </span>
+                                    </h2>
+                                    <Mat onClick={this.close}>close</Mat>
                                 </div>
-                            )}
-                            {Folders.map(folder =>
-                                <MoveFolderItem key={folder.id} MF={this} data={folder} />
-                            )}
-                        </div>
-                        <div className="footer">
-                            <span>
-                                <div className={(state.noSelectioned == true) ? "NoSelected" : ""}>{(state.selected != "") ? DB.Folders.get(state.selected)?.name : "Selecciona una carpeta..."} </div>
-                                <br />
-                                <p>{size} {(size > 1) ? "Notas Seleccionadas" : "Nota Seleccionada"}</p>
-                            </span>
-                            <div className="btn" onClick={this.close}>Cancelar</div>
-                            <div className="btn act" onClick={this.moveNotes}>Mover</div>
+                                <label className="searchFolderBar">
+                                    <Mat>search</Mat>
+                                    <input type="text" maxLength={50} placeholder="Buscar Carpetas..." onInput={this.search} ref={this.searchInput} />
+                                    {(state.search != "") && (
+                                        <Mat onClick={this.cancelSearch}>close</Mat>
+                                    )}
+                                </label>
+
+                            </div>
+                            <div className="FoldersSection">
+                                {(state.search != "" && Folders.length == 0) && (
+                                    <div className="centerFolders">
+                                        <Mat>search_off</Mat>
+                                        <span>No hay Carpetas con "{state.search}"</span>
+                                    </div>
+                                )}
+                                {Folders.map(folder =>
+                                    <MoveFolderItem key={folder.id} MF={this} data={folder} />
+                                )}
+                            </div>
+                            <div className="footer">
+                                <span>
+                                    <div className={(state.noSelectioned == true) ? "NoSelected" : ""}>{(state.selected != "") ? DB.Folders.get(state.selected)?.name : "Selecciona una carpeta..."} </div>
+                                    <br />
+                                    <p>{size} {(size > 1) ? "Notas Seleccionadas" : "Nota Seleccionada"}</p>
+                                </span>
+                                <div className="btn" onClick={this.close}>Cancelar</div>
+                                <div className="btn act" onClick={this.moveNotes}>Mover</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </>
             )
         }
+
+        return (<div className="__MOVEFOLDER-shadow" ref={this.shadow}></div>)
     }
 }
 
 function MoveFolderItem(props: { data: Folder, MF: MoveFolder }) {
     const { MF, data } = props;
 
-    function setFolder() {
-        MF.setFolder(data.id)
-    }
+    const isOrigin = MF.UI.state.activeFolder == data.id
 
-    if (MF.UI.state.activeFolder != data.id) {
-        return (
-            <div className={`folder ${(MF.state.selected == data.id) ? "Selected" : ""}`} onClick={setFolder}>
-                <Mat>folder</Mat>
-                <span>{data.name}</span>
-                {(MF.state.selected == data.id) ? (
+    function setFolder() {
+        !isOrigin && MF.setFolder(data.id)
+    }
+    let className = "folder";
+
+    if (MF.state.selected == data.id) className += " Selected";
+    if (isOrigin) className += " __originFolder";
+
+
+    return (
+        <div className={className} onClick={setFolder}>
+            <Mat>folder</Mat>
+            <span>{data.name}</span>
+            {(isOrigin) ? (<strong>Carpeta de Origen</strong>) :
+                (MF.state.selected == data.id) ? (
                     <Mat>check_circle</Mat>
                 ) : (
                     <Mat>radio_button_unchecked</Mat>
-                )}
-            </div>
-        )
-    }
-
-    return <></>;
+                )
+            }
+        </div>
+    )
 }

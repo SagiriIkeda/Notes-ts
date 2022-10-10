@@ -1,0 +1,41 @@
+
+.ui-header {
+    position: sticky;
+    padding: 10px 20px;
+    background: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+
+    .current-folder-name {
+        color: var(--primary);
+        font-size: 24px;
+        font-weight: bold;
+        text-transform: capitalize;
+        padding: 0px 15px;
+        display: flex;
+        align-items: center;
+    }
+
+
+    .material-icons {
+        display: none;
+        color: var(--primary);
+        cursor: pointer;
+
+    }
+
+
+
+
+}
+
+@media (max-width: $mobile-size) {
+    .ui-header {
+        justify-content: space-between;
+        .material-icons {
+            display: initial;
+        }
+    }
+}

@@ -10,6 +10,7 @@ import timeAgo from "../../../libraries/timeAgo/timeAgo";
 import UINOTES from "../UI"
 import OpenEditor, { OpenLimitedEditor } from "./Editor/OpenEditor";
 import { Mat } from "../prefabs";
+import Screen from "../../util/Screen";
 
 export const mode = {
     first: true,
@@ -84,8 +85,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 Notes.remove(data.id);
 
                 Socket.send({
-                    data:null,
-                    event:"note-delete",
+                    data: null,
+                    event: "note-delete",
                     id: data.id,
                 })
 
@@ -187,17 +188,19 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
         this.UI.AUX?.set(AUXFORNOTE, event, "NotesAux")
     }
 
-    onClick(event: React.MouseEvent) {
+    onClick(event: React.MouseEvent | React.TouchEvent) {
         const eventTarget = event.target as HTMLDivElement;
-        if(eventTarget.classList.contains("__aux-icon")) return;
+        if (eventTarget.classList.contains("__aux-icon")) return;
         const { UI } = this;
+        
+        if ((event as React.MouseEvent).buttons == 1 || event.type == "touchstart") {
 
-        if (event.buttons == 1) {
             const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
+            const note = this.note.current;
 
             this.isAnimating = true;
 
-            this.note.current?.animate([{ scale: 0.9 }, { scale: 1 }], {
+            note?.animate([{ scale: 0.9 }, { scale: 1 }], {
                 duration: 1000,
                 easing: bezier,
             })
@@ -215,12 +218,13 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                     clearInterval(clicks);
                     this.select();
                     UI.SelectMode.setMode(true);
+                    note?.removeEventListener('mouseup', mouseup);
                 }
             }, 3);
 
             const mouseup = (e: MouseEvent) => {
-                this.note.current?.removeEventListener('mouseleave', mouseup)
-                this.note.current?.removeEventListener('mouseup', mouseup)
+                note?.removeEventListener('mouseleave', mouseup);
+                note?.removeEventListener('mouseup', mouseup);
                 clearInterval(clicks);
                 ms = 0;
                 if (ms < menutime && e.type != "mouseleave") {
@@ -241,8 +245,8 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 }
 
             }
-            this.note.current?.addEventListener('mouseleave', mouseup)
-            this.note.current?.addEventListener('mouseup', mouseup)
+            note?.addEventListener('mouseleave', mouseup)
+            note?.addEventListener('mouseup', mouseup)
         }
     }
 
@@ -274,12 +278,13 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             <div
                 className={className}
                 onMouseDown={this.onClick}
+                onTouchStart={this.onClick}
                 onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}
             >
-                
-                <Mat className={"__aux-icon"+(this.UI.state.SelectMode ? " __select-mode":"")} onClick={this.AuxEvent} >more_vert</Mat>
+
+                <Mat className={"__aux-icon" + (this.UI.state.SelectMode ? " __select-mode" : "")} onClick={this.AuxEvent} >more_vert</Mat>
                 <div className="note__content" dangerouslySetInnerHTML={{ __html: content }}></div>
                 {(more) && (<div className="more">...</div>)}
                 <div className="note__date">{timeAgo(data.time)}</div>

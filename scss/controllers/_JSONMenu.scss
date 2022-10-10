@@ -8,14 +8,10 @@
     justify-content: center;
     align-items: center;
     z-index: 500;
-
-    .shadow {
-        position: absolute;
-        inset: 0;
-        background: #1a19192c;
-        z-index: 50;
-    }
+    pointer-events: none;
+    
     .container {
+        pointer-events: all;
         z-index: 51;
         display: flex;
         flex-wrap: nowrap;
@@ -113,6 +109,23 @@
     }
 }
 
+.__JSONMENU-shadow {
+    position: fixed;
+    inset: 0;
+    // background: #1a19192c;
+    background: var(--shadow-color);
+    // background: red;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity ease .25s;
+    z-index: 50;
+    &.__open {
+        opacity: 1;
+        pointer-events: all !important;
+    }
+}
+
+
 @keyframes CloseJSONMENUAnimation {
     0% {
         opacity: 1;
@@ -131,5 +144,13 @@
     100% {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+@media (max-width: $mobile-size) {
+    .JSONMENU {
+        .container {
+            width: calc(100% - 20px);
+        }
     }
 }

@@ -38,13 +38,28 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
         classes += " active";
     }
 
-    function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-        const eventTarget = e.target as HTMLDivElement ; 
-        
-        if (e.buttons == 1 && !eventTarget.classList.contains("__action-icon")) {
-            const folderItem = itemfolder.current as HTMLDivElement ;
+    function onMouseDown(e: React.MouseEvent<HTMLDivElement> | React.TouchEvent) {
+        const eventTarget = e.target as HTMLDivElement;
+        const MouseEvent = e as React.MouseEvent;
+        const TouchEvent = e as React.TouchEvent;
+
+        const isMouse = e.type == "mousedown";
+
+        /**!
+         * DRAG EN TOUCHEVENT AÚN ES EXPERIMENTAL Y NO ESTÁ COMPLETAMENTE IMPLEMENTADO (09/10/2022)
+         * POR LO TANTO SE RETIRÓ LA FUNCIÓN EN TOUCHEVENT TEMPORALMENNTE
+        */
+
+        // if ((MouseEvent.buttons == 1 || e.type == "touchstart") && !eventTarget.classList.contains("__action-icon")) {
+        if ((MouseEvent.buttons == 1) && !eventTarget.classList.contains("__action-icon")) {
+            const folderItem = itemfolder.current as HTMLDivElement;
             const father = folderItem.parentElement as HTMLElement;
-            const offsetYdiff = e.nativeEvent.offsetY;
+
+            const rectH = itemfolder.current?.getBoundingClientRect().top as number;
+
+            const clientY = (isMouse ? MouseEvent.nativeEvent : TouchEvent.changedTouches[0]).clientY;
+
+            const offsetYdiff = clientY - rectH;
 
             let isDragInitialized = false;
 
@@ -59,7 +74,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         const voidElm = document.createElement("div");
                         voidElm.className = "VoidPlaceHolderIndicator";
                         voidElm.style.height = folderRect.height + "px";
-                        
+
                         folderItem.parentNode?.insertBefore(voidElm, folderItem);
                         //alinear la posición actual para q sea fixed y no absoluta
                         AlignFolderTargetPositionToMouse(e.nativeEvent)
@@ -71,16 +86,22 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
 
                         //agregar eventos
                         document.addEventListener('mousemove', AlignFolderTargetPositionToMouse);
+                        document.addEventListener('touchmove', AlignFolderTargetPositionToMouse);
+
                         document.addEventListener('mouseup', EndDrag);
+                        document.addEventListener('touchend', EndDrag);
+
                         father.querySelectorAll('.folder-item').forEach(sitem => {
                             //agregarle el evento "Sortable"a todos los folders para que se detecte
                             sitem.addEventListener('mouseover', Sortable)
                         })
 
-                        function AlignFolderTargetPositionToMouse(e: MouseEvent) {
+                        function AlignFolderTargetPositionToMouse(e: MouseEvent | TouchEvent) {
+
+                            const clientY = (isMouse ? (e as MouseEvent) : (e as TouchEvent).changedTouches[0]).clientY;
                             //prohibir que el elemento se pase a menos de 0
-                            if (e.clientY - offsetYdiff < 0) return;
-                            const actual = e.clientY - offsetYdiff;
+                            if (clientY - offsetYdiff < 0) return;
+                            const actual = clientY - offsetYdiff;
                             //prohibir que el elemento se desborde a más del alto de la pantalla
                             if (actual > window.innerHeight) return;
 
@@ -160,7 +181,11 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                             })
 
                             document.removeEventListener('mousemove', AlignFolderTargetPositionToMouse);
+                            document.removeEventListener('touchmove', AlignFolderTargetPositionToMouse);
+
                             document.removeEventListener('mouseup', EndDrag);
+                            document.removeEventListener('touchend', EndDrag);
+
                         }
                         //Actualizar la grid
                         vGrid.UpdateElementPositions();
@@ -231,6 +256,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
         <div
             className={classes}
             onMouseDown={onMouseDown}
+            // onTouchStart={onMouseDown}
             onAuxClick={AuxEvent}
             ref={itemfolder}
         >
