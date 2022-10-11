@@ -18,6 +18,8 @@ interface FolderProp {
     createFolder: () => void,
 }
 
+export let EnableFolderSectionDrag = true;
+
 interface HTMLFolderElement extends HTMLDivElement {
     identifier?: string
 }
@@ -46,25 +48,30 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
         const isMouse = e.type == "mousedown";
 
         /**!
-         * DRAG EN TOUCHEVENT AÚN ES EXPERIMENTAL Y NO ESTÁ COMPLETAMENTE IMPLEMENTADO (09/10/2022)
-         * POR LO TANTO SE RETIRÓ LA FUNCIÓN EN TOUCHEVENT TEMPORALMENNTE
+         * DRAG EN TOUCHEVENT AÚN ES EXPERIMENTAL Y NO ESTÁ COMPLETAMENTE IMPLEMENTADO (10/10/2022)
+         * FUNCIÓN EN FASE BETA `TEMPORALMENTE SE RETIRÓ POSIBILIDAD DE DRAG PARA CERRAR EL FOLDERSECTION`
         */
 
-        // if ((MouseEvent.buttons == 1 || e.type == "touchstart") && !eventTarget.classList.contains("__action-icon")) {
-        if ((MouseEvent.buttons == 1) && !eventTarget.classList.contains("__action-icon")) {
+        if ((MouseEvent.buttons == 1 || e.type == "touchstart") && !eventTarget.classList.contains("__action-icon")) {
+            // if ((MouseEvent.buttons == 1) && !eventTarget.classList.contains("__action-icon")) {
             const folderItem = itemfolder.current as HTMLDivElement;
             const father = folderItem.parentElement as HTMLElement;
 
             const rectH = itemfolder.current?.getBoundingClientRect().top as number;
 
             const clientY = (isMouse ? MouseEvent.nativeEvent : TouchEvent.changedTouches[0]).clientY;
-
             const offsetYdiff = clientY - rectH;
 
             let isDragInitialized = false;
 
+            EnableFolderSectionDrag = false;
+
             function startDrag() {
                 isDragInitialized = true;
+                const folderList = [...father.querySelectorAll('.folder-item') as NodeListOf<HTMLFolderElement>];
+                let __cachedLastTarget: HTMLFolderElement | undefined;
+                let timeout: number;
+
                 if (grid) {
                     const vGrid = grid.current;
                     if (vGrid) {
@@ -91,12 +98,15 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         document.addEventListener('mouseup', EndDrag);
                         document.addEventListener('touchend', EndDrag);
 
-                        father.querySelectorAll('.folder-item').forEach(sitem => {
+
+                        folderList.forEach(sitem => {
                             //agregarle el evento "Sortable"a todos los folders para que se detecte
                             sitem.addEventListener('mouseover', Sortable)
                         })
 
+
                         function AlignFolderTargetPositionToMouse(e: MouseEvent | TouchEvent) {
+                            EnableFolderSectionDrag = false;
 
                             const clientY = (isMouse ? (e as MouseEvent) : (e as TouchEvent).changedTouches[0]).clientY;
                             //prohibir que el elemento se pase a menos de 0
@@ -111,11 +121,36 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                                 duration: 0,
                                 fill: "forwards",
                             })
+
+                            if (!isMouse) {
+                                clearTimeout(timeout);
+
+                                timeout = setTimeout(() => {
+                                    const target = folderList.find((e) => {
+                                        if (e != folderItem) {
+                                            const { top, height } = e.getBoundingClientRect();
+                                            return (clientY >= top && clientY <= (top + height));
+                                        }
+                                        return false;
+                                    })
+
+                                    if (__cachedLastTarget != target) {
+
+                                        __cachedLastTarget = target;
+
+                                        if (target != undefined) {
+                                            Sortable({ target });
+                                        }
+                                    }
+                                }, 4)
+                            }
                         }
 
                         let LastVoidPositionY = folderRect.top + folderRect.height;
 
-                        function Sortable(e: Event) {
+                        // function Sortable(e: Event) {
+                        function Sortable(e: Event | { target: HTMLDivElement }) {
+
                             const target = e.target as HTMLDivElement;
                             let sibling = target;
                             const folderRect = target.getBoundingClientRect()
@@ -133,6 +168,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         }
 
                         function EndDrag() {
+
                             itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             //Ajustar la posición para que pase de "fixed" a "absolute" sin que sea un cambio brusco
                             const fatherRect = father.getBoundingClientRect();
@@ -160,6 +196,8 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
 
 
                             setTimeout(() => {
+                                EnableFolderSectionDrag = true;
+
                                 //Quitar las clases de animación
                                 father.classList.remove("__dragStateOut");
                                 folderItem.classList.remove("__dragStateOut");
@@ -179,6 +217,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                                 data: null,
                                 event: "update-app"
                             })
+                            UI.reloadData({ send: false, update: false })
 
                             document.removeEventListener('mousemove', AlignFolderTargetPositionToMouse);
                             document.removeEventListener('touchmove', AlignFolderTargetPositionToMouse);
@@ -201,6 +240,9 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
 
 
             function cancelAction() {
+                EnableFolderSectionDrag = true;
+                // console.log(EnableFolderSectionDrag,"cancel");
+
                 clearTimeout(timeout);
                 itemfolder.current?.removeEventListener('mouseup', cancelAction);
 
@@ -256,7 +298,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
         <div
             className={classes}
             onMouseDown={onMouseDown}
-            // onTouchStart={onMouseDown}
+            onTouchStart={onMouseDown}
             onAuxClick={AuxEvent}
             ref={itemfolder}
         >

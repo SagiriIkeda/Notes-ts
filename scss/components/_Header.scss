@@ -36,6 +36,11 @@
         justify-content: space-between;
         .material-icons {
             display: initial;
+
+        }
+        .UserBtn {
+            pointer-events: none;
+            opacity: 0;
         }
     }
 }

@@ -24,6 +24,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
     dragtime = 0;
 
     container = createRef<HTMLDivElement>();
+    shadow = createRef<HTMLDivElement>();
 
     startY = 0;
 
@@ -54,6 +55,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
 
     close() {
         this.container.current?.removeEventListener("touchstart", this.StartDragableContainer);
+        this.shadow.current?.removeEventListener("touchstart", this.StartDragableContainer);
 
         clearTimeout(this.dragtime);
         window.removeEventListener('mouseup', this.comprobateOutsideClick);
@@ -70,9 +72,11 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         event.preventDefault();
         if (Screen.isMobile()) {
             const container = this.container.current as HTMLDivElement;
+            const shadow = this.shadow.current as HTMLDivElement;
 
             this.dragtime = setTimeout(() => {
                 container.addEventListener("touchstart", this.StartDragableContainer)
+                shadow.addEventListener("touchstart", this.StartDragableContainer)
             }, 250);
 
             return this.setOptions(options);
@@ -119,7 +123,7 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
 
     StartDragableContainer(e: TouchEvent) {
         const container = this.container.current as HTMLDivElement;
-        const firstTouch = e.targetTouches[0]
+        const firstTouch = e.targetTouches[0];
 
         if (this.startY == 0) this.startY = firstTouch.clientY;
 
@@ -145,7 +149,6 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
 
         function EndDrag(e: TouchEvent) {
             self.startY = 0;
-            // console.log(e);
 
             const touch = e.changedTouches[0];
 
@@ -153,38 +156,31 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
             //moved
             const translateY = (clientY - startY) / container.getBoundingClientRect().height * 100;
 
-            // console.log(translateY);
-            if (translateY > 50) {
-                self.close();
-
-                // container.style.translate = "";
-            } 
             container.animate({ translate: "0px 0px" }, {
                 easing: "ease",
                 duration: 100,
             })
+
             .addEventListener("finish", () => {
                 container.style.translate = "";
             })
-            // else {
-            // }
 
 
-            // console.log("terminó");
+            if (translateY > 50) {
+                self.close();
+            } 
 
+
+            
 
             document.removeEventListener("touchmove", StartDrag);
             document.removeEventListener("touchend", EndDrag);
         }
     }
 
-
-
-
     render() {
         const { state } = this;
         const { type } = state;
-
 
         return (
             <div className="aux-fixer-container" data-open={state.opend}>
@@ -200,33 +196,8 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
                         ))
                     }
                 </div>
-                <div className="__aux-shadow" onClick={this.close} ></div>
+                <div className="__aux-shadow" onClick={this.close} ref={this.shadow}  ></div>
             </div>
         )
-
-        // if (state.opend) {
-        //     return (
-
-        //         <>
-        //             <div className="AuxContainer" style={{ left: state.left, top: state.top }}>
-
-        //                 {(state.options.length != 0) ? (
-        //                     <div className="TextAction">Accion...</div>
-        //                 ) : (
-        //                     <div className="TextAction Noaction">No hay Acciones</div>
-        //                 )}
-        //                 {
-        //                     state.options.map((option, index) => (
-        //                         <AuxBtn data={option} AUX={this} key={`${type}-${index}`} />
-        //                     ))
-        //                 }
-        //             </div>
-        //             <div className="__aux-shadow __opend"></div>
-        //         </>
-        //     )
-        // }
-
-        // return (<div className="__aux-shadow"></div>)
-
     }
 }

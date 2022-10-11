@@ -385,11 +385,12 @@
         }
         .menu-items-container {
             // padding: 0px 20px;
-            width: 100%;
+            max-width: 100%;
             overflow: auto;
             margin-top: 10px;
             display: flex;
             gap: 20px;
+            padding: 3px;
         }
         .themeBtn {
             display: flex;

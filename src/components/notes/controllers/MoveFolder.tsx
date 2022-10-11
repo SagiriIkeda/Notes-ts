@@ -1,9 +1,10 @@
-import React, { FormEvent, SyntheticEvent } from "react";
+import React, { SyntheticEvent } from "react";
 import { createRef } from "react";
 import DB from "../../../db/database";
 import Folder from "../../../interfaces/folder";
 import { Mat } from "../../prefabs";
 import UINOTES from "../../UI";
+import MoveFolderItem from "./MoveFolderItem";
 
 interface MoveFolderProps {
     UI: UINOTES,
@@ -28,16 +29,17 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         noSelectioned: false,
         opend: false
     }
+
     UI: UINOTES
 
     constructor(props: MoveFolderProps) {
         super(props);
-        this.moveNotes = this.moveNotes.bind(this);
+
 
         this.UI = props.UI;
-
         this.UI.MOVEFOLDER = this;
 
+        this.moveNotes = this.moveNotes.bind(this);
         this.setFolder = this.setFolder.bind(this);
 
         this.search = this.search.bind(this);
@@ -45,8 +47,6 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
         this.setFolder = this.setFolder.bind(this);
         this.moveNotes = this.moveNotes.bind(this);
         this.close = this.close.bind(this);
-        // console.log("ea");
-
     }
 
     close() {
@@ -200,33 +200,4 @@ export default class MoveFolder extends React.Component<MoveFolderProps, MoveFol
 
         return (<div className="__MOVEFOLDER-shadow" ref={this.shadow}></div>)
     }
-}
-
-function MoveFolderItem(props: { data: Folder, MF: MoveFolder }) {
-    const { MF, data } = props;
-
-    const isOrigin = MF.UI.state.activeFolder == data.id
-
-    function setFolder() {
-        !isOrigin && MF.setFolder(data.id)
-    }
-    let className = "folder";
-
-    if (MF.state.selected == data.id) className += " Selected";
-    if (isOrigin) className += " __originFolder";
-
-
-    return (
-        <div className={className} onClick={setFolder}>
-            <Mat>folder</Mat>
-            <span>{data.name}</span>
-            {(isOrigin) ? (<strong>Carpeta de Origen</strong>) :
-                (MF.state.selected == data.id) ? (
-                    <Mat>check_circle</Mat>
-                ) : (
-                    <Mat>radio_button_unchecked</Mat>
-                )
-            }
-        </div>
-    )
 }

@@ -11,9 +11,9 @@ import OpenEditor, { OpenLimitedEditor } from "./notes/Editor/OpenEditor";
 import SelectMode from "./notes/controllers/SelectMode";
 import AuxMenu from "./AuxMenu/Menu";
 import JsonMenu from "./notes/controllers/JsonMenu";
+import MoveFolder from "./notes/controllers/MoveFolder";
 
 import { mode } from "./notes/NoteItem";
-import MoveFolder from "./notes/controllers/MoveFolder";
 import Note from "../interfaces/notes";
 import EditorsBar from "./notes/Editor/Bar";
 import { DevEditors } from "./notes/Editor/Editor";

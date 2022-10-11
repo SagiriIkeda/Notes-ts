@@ -3,7 +3,7 @@ import DB from "../../db/database";
 import { Mat } from "../prefabs";
 
 import Folder from "../../interfaces/folder";
-import FolderItem from "../../components/folders/FolderItem";
+import FolderItem, { EnableFolderSectionDrag } from "../../components/folders/FolderItem";
 
 import UI from "../UI";
 import createFolder from "./util/createFolder";
@@ -56,49 +56,69 @@ export default function FolderSection({ UI }: FolderSectionProps) {
     }
 
     function InitializeDrag(e: React.TouchEvent<HTMLDivElement>) {
+        if (!EnableFolderSectionDrag) return;
+
+
+        const target = e.target as HTMLDivElement;
+
+        if (target.className == "material-icons closeBtn") return;
+
+
+        const section = sectionRef.current as HTMLDivElement;
+        const shadow = shadowRef.current as HTMLDivElement;
+        const ELEMENT_WIDTH = 250;
+
+        const isDragger = target.className == "__folder-section-dragable-indicator";
+
+        const { clientX: firstTouchX, clientY: firstTouchY } = e.changedTouches[0];
+
+        const Xdiff = (section.offsetLeft + section.offsetWidth) - firstTouchX;
+
+        if (!isDragger && (firstTouchX < 130 || firstTouchY < 100)) return;
 
         document.addEventListener("touchmove", DragMove);
         document.addEventListener("touchend", EndDrag);
-        const section = sectionRef.current;
-        const shadow = shadowRef.current as HTMLDivElement;
-        const target = e.target as HTMLDivElement;
-        
-        const isDragger = target.className == "__folder-section-dragable-indicator";
-
-        console.log(isDragger);
-        
 
         let isMoved = false;
 
         function DragMove(e: TouchEvent) {
-            const { clientX } = e.changedTouches[0];
-            if(clientX > 5) {
+            // const { clientX } = e.changedTouches[0];
+            let clientX = e.changedTouches[0].clientX;
+
+            if (!isDragger) {
+                clientX += clientX - Xdiff;
+            }
+
+            if (clientX > 5) {
                 isMoved = true;
                 clearTimeout(timeToOpen);
             }
 
-            if (section && clientX < 251) {
-                const percent = clientX / 250;
+            if (section && clientX < (ELEMENT_WIDTH + 1)) {
+                const percent = clientX / ELEMENT_WIDTH;
                 // const sh
                 shadow.style.transition = "none";
-                shadow.style.opacity = (percent < 0) ? "" : percent.toString();
-                section.style.translate = `${clientX}px 0px`;
+                shadow.style.opacity = (percent < 0) ? "0" : percent.toString();
+
+                section.style.transition = `none`;
+                section.style.left = `${clientX - ELEMENT_WIDTH}px`;
             }
         }
 
         const timeToOpen = setTimeout(() => {
-            if(isMoved == false) {
-                if(section) {
-                    const anim = section.animate({ translate: "10px" }, {
+            if (isMoved == false && isDragger) {
+                if (section) {
+                    const left = `-${ELEMENT_WIDTH - 10}px`;
+                    const anim = section.animate({ left: left }, {
                         easing: "ease",
                         duration: 100,
                     })
                     anim.addEventListener("finish", () => {
-                        section.style.translate = `10px 0px`;
+                        section.style.left = left;
                     })
                 }
             }
-        },200)
+        }, 200)
 
 
         function EndDrag(e: TouchEvent) {
@@ -109,24 +129,23 @@ export default function FolderSection({ UI }: FolderSectionProps) {
 
             //LIMITE PARA ABIR
             if (section) {
+                // section.style.translate = "left ease 100ms";
                 section.style.transition = "left ease 100ms";
+                section.style.left = "";
 
-                const anim = section.animate({ translate: "0px" }, {
-                    easing: "ease",
-                    duration: 100,
-                })
-                anim.addEventListener("finish", () => {
+                setTimeout(() => {
                     section.style.transition = "";
-                    section.style.translate = "";
-                })
-                shadow.style.transition = "";
+                }, 100);
 
+                shadow.style.transition = "";
                 shadow.style.opacity = "";
-            
-                HEADER?.toggleFoldersSection(clientX >= 130);
+
+                if (isMoved) {
+                    HEADER?.toggleFoldersSection(clientX >= 130);
+
+                }
 
             }
-
         }
     }
 
@@ -140,7 +159,10 @@ export default function FolderSection({ UI }: FolderSectionProps) {
 
     return (
         <>
-            <div className="folders-section" ref={sectionRef} >
+            <div className="folders-section"
+                ref={sectionRef}
+            // onTouchStart={InitializeDrag}  
+            >
                 <div className="__header">
                     <h2 className="__name">
                         <Mat>folder</Mat> Carpetas
