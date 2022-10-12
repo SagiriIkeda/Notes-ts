@@ -11,13 +11,11 @@ export default class EditorSelection {
     timetorange = 0;
 
     constructor({ Editor }: EditorSelectionProperties) {
-
         this.Editor = Editor;
 
         this.SelectionChange = this.SelectionChange.bind(this);
         this.getSelectionHtml = this.getSelectionHtml.bind(this);
         this.preventPasteHTML = this.preventPasteHTML.bind(this);
-
     }
 
     SelectionChange(e: any) {
@@ -43,26 +41,9 @@ export default class EditorSelection {
                         underline: false,
                     }
 
-                    if (html.search(/<i>.*?<\/i>/gim) != -1 || parenttag == "I") {
-                        cachedTextures.italic = true;
-                    } else {
-                        cachedTextures.italic = false;
-                    }
-
-                    if (html.search(/<u>.*?<\/u>/gim) != -1 || parenttag == "U") {
-                        cachedTextures.underline = true;
-
-                    } else {
-                        cachedTextures.underline = false;
-                    }
-
-                    if (html.search(/<b>.*?<\/b>/gim) != -1 || parenttag == "B") {
-                        cachedTextures.bold = true;
-
-                    } else {
-                        cachedTextures.bold = false;
-                    }
-
+                    cachedTextures.italic = (html.search(/<i>.*?<\/i>/) != -1 || parenttag == "I")
+                    cachedTextures.underline = (html.search(/<u>.*?<\/u>/) != -1 || parenttag == "U");
+                    cachedTextures.bold = (html.search(/<b>.*?<\/b>/) != -1 || parenttag == "B");
 
                     if (parenttag == "B" || parenttag == "I" || parenttag == "U") {
                         const ActualRange = document.getSelection();

@@ -191,16 +191,39 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
     onClick(event: React.MouseEvent | React.TouchEvent) {
         const eventTarget = event.target as HTMLDivElement;
         if (eventTarget.classList.contains("__aux-icon")) return;
-        const { UI } = this;
+
+        const containerSection = document.querySelector(".notes-items-container") as HTMLDivElement;
+        const startScrollY = containerSection.scrollTop;
         
+        const { UI } = this;
+
+        const isTouch = event.type == "touchstart";
+
+        if(Screen._isMobile && !isTouch) return;
+
         if ((event as React.MouseEvent).buttons == 1 || event.type == "touchstart") {
 
             const bezier = 'cubic-bezier(0.230, 1.000, 0.320, 1.000)';
-            const note = this.note.current;
+            const note = this.note.current as HTMLDivElement;
+
+            function isTouchOnElement(e: TouchEvent) {
+                const { clientY, clientX } = e.changedTouches[0];
+                const { height, top, width, left } = note.getBoundingClientRect();
+                return (
+                    clientY >= top && clientY <= (top + height) &&
+                    clientX >= left && clientX <= (left + width)
+                )
+            }
+
+            function removeListeners() {
+                note?.removeEventListener('mouseleave', mouseup);
+                note?.removeEventListener('mouseup', mouseup);
+                document.removeEventListener('touchend', mouseup);
+            }
 
             this.isAnimating = true;
 
-            note?.animate([{ scale: 0.9 }, { scale: 1 }], {
+            note.animate([{ transform: "scale(0.9)" }, { transform: "scale(1)" }], {
                 duration: 1000,
                 easing: bezier,
             })
@@ -211,24 +234,29 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
             clearTimeout(globalInterval)
             //timer
             let ms = 0;
-            let menutime = 150;
+            const menutime = 150;
             let clicks = setInterval(() => {
                 ms += 1;
                 if (ms >= menutime) {
                     clearInterval(clicks);
                     this.select();
                     UI.SelectMode.setMode(true);
-                    note?.removeEventListener('mouseup', mouseup);
+                    removeListeners();
                 }
             }, 3);
 
-            const mouseup = (e: MouseEvent) => {
-                note?.removeEventListener('mouseleave', mouseup);
-                note?.removeEventListener('mouseup', mouseup);
+            const mouseup = (e: MouseEvent | TouchEvent) => {
+                removeListeners();
                 clearInterval(clicks);
                 ms = 0;
                 if (ms < menutime && e.type != "mouseleave") {
+                    if (isTouch && !isTouchOnElement(e as TouchEvent)) return;
+                    const finalScrollY = containerSection.scrollTop;
+
+                    if(startScrollY != finalScrollY) return;
+
                     if (UI.state.SelectMode == false) {
+                    
                         this.OpenNote();
                     } else {
                         if (!UI.state.selectes.has(this.props.data.id)) {
@@ -245,8 +273,9 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 }
 
             }
-            note?.addEventListener('mouseleave', mouseup)
-            note?.addEventListener('mouseup', mouseup)
+            note.addEventListener('mouseleave', mouseup);
+            note.addEventListener('mouseup', mouseup);
+            document.addEventListener('touchend', mouseup);
         }
     }
 
@@ -279,9 +308,11 @@ export default class NoteItem extends React.Component<NoteItemProps>  {
                 className={className}
                 onMouseDown={this.onClick}
                 onTouchStart={this.onClick}
+
                 onAuxClick={this.AuxEvent}
                 ref={this.note}
                 data-theme={data.theme}
+                // {...{[Screen._isMobile ? "onTouchStart" : "onMouseDown"]:this.onClick}}
             >
 
                 <Mat className={"__aux-icon" + (this.UI.state.SelectMode ? " __select-mode" : "")} onClick={this.AuxEvent} >more_vert</Mat>

@@ -56,6 +56,7 @@ export default function FolderSection({ UI }: FolderSectionProps) {
     }
 
     function InitializeDrag(e: React.TouchEvent<HTMLDivElement>) {
+        e.preventDefault();
         if (!EnableFolderSectionDrag) return;
 
 
@@ -82,6 +83,7 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         let isMoved = false;
 
         function DragMove(e: TouchEvent) {
+            e.preventDefault();
             // const { clientX } = e.changedTouches[0];
             let clientX = e.changedTouches[0].clientX;
 
@@ -149,9 +151,6 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         }
     }
 
-
-
-
     function closeMenu() {
         HEADER?.toggleFoldersSection(false);
     }
@@ -161,7 +160,8 @@ export default function FolderSection({ UI }: FolderSectionProps) {
         <>
             <div className="folders-section"
                 ref={sectionRef}
-            // onTouchStart={InitializeDrag}  
+                // onTouchStart={InitializeDrag}  
+
             >
                 <div className="__header">
                     <h2 className="__name">
@@ -171,7 +171,7 @@ export default function FolderSection({ UI }: FolderSectionProps) {
                 </div>
                 <div className="container" onAuxClick={AuxForFolderSection}>
                     <FolderItem createFolder={createFolderAux} UI={UI} key={FOLDERSCONFIG.DEFAULT_ID} data={DB.Folders.get(FOLDERSCONFIG.DEFAULT_ID) as Folder} />
-                    <VerticalGrid ref={grid} afterUpdate={afterUpdate} >
+                    <VerticalGrid ref={grid} afterUpdate={afterUpdate}>
                         {Folders.map((fold) => {
                             if (fold.id != FOLDERSCONFIG.DEFAULT_ID) {
                                 return (<FolderItem grid={grid} createFolder={createFolderAux} UI={UI} key={fold.id} data={fold} />)
@@ -181,7 +181,11 @@ export default function FolderSection({ UI }: FolderSectionProps) {
                 </div>
                 <div className="CreateBtn" onClick={createFolderAux}>Nueva Carpeta</div>
             </div>
-            <div className="__folder-section-dragable-indicator" onTouchStart={InitializeDrag} ></div>
+
+            {/* <div className="__folder-section-dragable-indicator"
+                onTouchStart={preventResize}
+            ></div> */}
+
             <div className="__folder-section-shadow" onClick={closeMenu} ref={shadowRef} ></div>
         </>
     )

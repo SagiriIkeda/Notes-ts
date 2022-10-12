@@ -53,6 +53,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         return (
             <div className="ui-header" data-folder={this.state.folderSectionVisible} ref={this.container}  >
                 <Mat className="FolderBtn" onClick={this.toggleFoldersSection}  >folder</Mat>
+                {/* <div className="current-folder-name">{currentFolder}</div> */}
                 <div className="current-folder-name">{currentFolder}</div>
                 <Mat className="UserBtn" >add</Mat>
             </div>

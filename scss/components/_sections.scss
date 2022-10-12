@@ -1,6 +1,7 @@
 .sections {
     display: grid;
-    grid-template-columns: 250px 0 1fr;
+    // grid-template-columns: 250px 0 1fr;
+    grid-template-columns: 250px 1fr;
     overflow: hidden;
     .folders-section {
         display: grid;
@@ -294,6 +295,7 @@
         .__header .closeBtn {
             display: initial !important;
         }
+
     }
     .ui-header[data-folder="true"] {
         & + .sections {
@@ -323,18 +325,29 @@
         }
         .notes-sections {
             grid-template-rows: auto 1fr;
+            .search {
+                // background: red;
+                &__container {
+                    width: 90%;
+                    background: #2c2c2c;
+                }
+            }
         }
         
     }
-    .__folder-section-dragable-indicator {
-        // content: '';
-        width: 5px;
-        // background: red;
-        height: 100%;
-        position: fixed;
-        left: 0; 
-        z-index: 41;
-    }
+
+
+    // .__folder-section-dragable-indicator {
+    //     // display: none;
+    //     background: red;
+    //     // height: 100%;
+    //     position: fixed;
+    //     inset: 0;
+    //     z-index: 70;
+    //     &:active {
+    //         background: blue;
+    //     }
+    // }
 
 
     .FloatBtn {

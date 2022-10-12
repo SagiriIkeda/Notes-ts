@@ -85,12 +85,12 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
         window.removeEventListener('mouseup', this.comprobateOutsideClick);
         window.removeEventListener('mousedown', this.comprobateOutsideClick);
         let { x, y } = { x: event.clientX, y: event.clientY };
-        let width = 210;
-        let height = (options.length * 39 - 5) + 27 + 20;
+        const width = 210;
+        const height = (options.length * 39 - 5) + 27 + 20;
 
         const rect = document.body.getBoundingClientRect()
-        let maxw = rect.width;
-        let maxh = rect.height;
+        const maxw = rect.width;
+        const maxh = rect.height;
 
         if ((x + width) - maxw >= 0) {
             x = x - width;
@@ -122,8 +122,20 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
 
 
     StartDragableContainer(e: TouchEvent) {
+        const target = e.target as HTMLDivElement;
+
+        const HOVER_AUXOP_CLASS = "__hoverState";
+
+        const isAuxOptionTarget = target.classList.contains("aux-option");
+        if (isAuxOptionTarget) {
+            target.classList.add(HOVER_AUXOP_CLASS)
+        }
+
+        e.preventDefault();
         const container = this.container.current as HTMLDivElement;
         const firstTouch = e.targetTouches[0];
+
+        const { clientX: startClientX, clientY: startClientY } = firstTouch;
 
         if (this.startY == 0) this.startY = firstTouch.clientY;
 
@@ -141,37 +153,38 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
             const translateY = clientY - startY;
 
             if (translateY > 0) {
-                container.style.translate = `0px ${translateY}px`;
+                container.style.transform = `translateY(${translateY}px)`;
             }
         }
 
 
-
         function EndDrag(e: TouchEvent) {
+            const touch = e.changedTouches[0];
+            const { clientY, clientX } = touch;
+
+            const isEqualPosition = (startClientY == clientY && startClientX == clientX);
             self.startY = 0;
 
-            const touch = e.changedTouches[0];
-
-            const { clientY } = touch;
             //moved
             const translateY = (clientY - startY) / container.getBoundingClientRect().height * 100;
 
-            container.animate({ translate: "0px 0px" }, {
+            container.animate({ transform: "translateY(0px)" }, {
                 easing: "ease",
                 duration: 100,
             })
 
-            .addEventListener("finish", () => {
-                container.style.translate = "";
-            })
+                .addEventListener("finish", () => {
+                    container.style.transform = "";
+                })
 
+            if (isAuxOptionTarget) {
+                target.classList.remove(HOVER_AUXOP_CLASS);
+                (isEqualPosition) && target.click(); 
+            }
 
-            if (translateY > 50) {
+            if (translateY > 50 || (isEqualPosition && !isAuxOptionTarget)) {
                 self.close();
-            } 
-
-
-            
+            }
 
             document.removeEventListener("touchmove", StartDrag);
             document.removeEventListener("touchend", EndDrag);
@@ -196,7 +209,9 @@ export default class AuxMenu extends React.Component<AuxMenuProps> {
                         ))
                     }
                 </div>
-                <div className="__aux-shadow" onClick={this.close} ref={this.shadow}  ></div>
+                {/* <div className="__aux-shadow" onClick={this.close} ref={this.shadow}  ></div> */}
+                {/* <div className="__aux-shadow" onMouseUp={this.close} ref={this.shadow}  ></div> */}
+                <div className="__aux-shadow" ref={this.shadow}  ></div>
             </div>
         )
     }

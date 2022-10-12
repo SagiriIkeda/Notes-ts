@@ -70,12 +70,10 @@ export default class OpenEditor {
 
     setTheme(theme: Themes) {
         const { EditorInstance, TabInstance, data } = this;
+        data.theme = theme;
 
-        if (EditorInstance && TabInstance) {
-            data.theme = theme;
-            EditorInstance.setState({ theme })
-            TabInstance.setState({ theme })
-        }
+        EditorInstance?.setState({ theme })
+        TabInstance?.setState({ theme })
     }
 
     Save() {

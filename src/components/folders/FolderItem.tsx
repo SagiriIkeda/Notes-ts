@@ -10,6 +10,7 @@ import renameFolder from "./util/renameFolder";
 import Socket from "../../socket";
 import VerticalGrid, { GridConfig } from "./Grid";
 import { FOLDERSCONFIG } from "../../interfaces/config";
+import Screen from "../../util/Screen";
 
 interface FolderProp {
     data: Folder,
@@ -41,19 +42,28 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
     }
 
     function onMouseDown(e: React.MouseEvent<HTMLDivElement> | React.TouchEvent) {
+
         const eventTarget = e.target as HTMLDivElement;
         const MouseEvent = e as React.MouseEvent;
         const TouchEvent = e as React.TouchEvent;
 
-        const isMouse = e.type == "mousedown";
+        const isMouse = (e.type == "mousedown");
+        const isTouch = (e.type == "touchstart");
+
+        if (Screen.isMobile() && isMouse) return;
 
         /**!
-         * DRAG EN TOUCHEVENT AÚN ES EXPERIMENTAL Y NO ESTÁ COMPLETAMENTE IMPLEMENTADO (10/10/2022)
-         * FUNCIÓN EN FASE BETA `TEMPORALMENTE SE RETIRÓ POSIBILIDAD DE DRAG PARA CERRAR EL FOLDERSECTION`
+         * //DRAG EN TOUCHEVENT AÚN ES EXPERIMENTAL Y NO ESTÁ COMPLETAMENTE IMPLEMENTADO (10/10/2022)
+         *  //--- FUNCIÓN EN FASE BETA `TEMPORALMENTE SE RETIRÓ POSIBILIDAD DE DRAG PARA CERRAR EL FOLDERSECTION`
+         * 
+         * @now12_10_2022
+         * SE RETIRÓ LA FUNCIÓN DRAG DEBIDO A LA MAXIMIZACIÓN 
+         * Y MINIMIZACIÓN EN NAVEGADORES MOBILE LAGEABAN LA ANIMACIÓN (12/10/2022)
+         * 
         */
 
-        if ((MouseEvent.buttons == 1 || e.type == "touchstart") && !eventTarget.classList.contains("__action-icon")) {
-            // if ((MouseEvent.buttons == 1) && !eventTarget.classList.contains("__action-icon")) {
+        // if ((MouseEvent.buttons == 1 || isTouch) && !eventTarget.classList.contains("__action-icon")) {
+        if ((MouseEvent.buttons == 1 || isTouch) && !eventTarget.classList.contains("__action-icon")) {
             const folderItem = itemfolder.current as HTMLDivElement;
             const father = folderItem.parentElement as HTMLElement;
 
@@ -95,6 +105,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         document.addEventListener('mousemove', AlignFolderTargetPositionToMouse);
                         document.addEventListener('touchmove', AlignFolderTargetPositionToMouse);
 
+
                         document.addEventListener('mouseup', EndDrag);
                         document.addEventListener('touchend', EndDrag);
 
@@ -106,6 +117,8 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
 
 
                         function AlignFolderTargetPositionToMouse(e: MouseEvent | TouchEvent) {
+                            // e.preventDefault();
+
                             EnableFolderSectionDrag = false;
 
                             const clientY = (isMouse ? (e as MouseEvent) : (e as TouchEvent).changedTouches[0]).clientY;
@@ -122,7 +135,8 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                                 fill: "forwards",
                             })
 
-                            if (!isMouse) {
+                            //Simular MouseOver en Mobile
+                            if (isTouch) {
                                 clearTimeout(timeout);
 
                                 timeout = setTimeout(() => {
@@ -150,7 +164,6 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
 
                         // function Sortable(e: Event) {
                         function Sortable(e: Event | { target: HTMLDivElement }) {
-
                             const target = e.target as HTMLDivElement;
                             let sibling = target;
                             const folderRect = target.getBoundingClientRect()
@@ -168,7 +181,6 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                         }
 
                         function EndDrag() {
-
                             itemfolder.current?.removeEventListener('mouseup', cancelAction);
                             //Ajustar la posición para que pase de "fixed" a "absolute" sin que sea un cambio brusco
                             const fatherRect = father.getBoundingClientRect();
@@ -217,6 +229,7 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                                 data: null,
                                 event: "update-app"
                             })
+
                             UI.reloadData({ send: false, update: false })
 
                             document.removeEventListener('mousemove', AlignFolderTargetPositionToMouse);
@@ -231,20 +244,40 @@ export default function FolderItem({ UI, data, createFolder, grid }: FolderProp)
                     }
                 }
             }
+
+            document.addEventListener('touchend', cancelAction);
             itemfolder.current?.addEventListener('mouseup', cancelAction);
 
             const timeout = setTimeout(() => {
-                itemfolder.current?.removeEventListener('mouseup', cancelAction);
-                startDrag();
+                if(isMouse) {
+                    document.removeEventListener('touchend', cancelAction);
+                    itemfolder.current?.removeEventListener('mouseup', cancelAction);
+                    startDrag();
+                }
             }, 225);
 
 
-            function cancelAction() {
+            function cancelAction(e: TouchEvent | MouseEvent) {
+                const isTouch = e.type == "touchend";
+
                 EnableFolderSectionDrag = true;
-                // console.log(EnableFolderSectionDrag,"cancel");
 
                 clearTimeout(timeout);
+                document.removeEventListener('touchend', cancelAction);
                 itemfolder.current?.removeEventListener('mouseup', cancelAction);
+
+                if (isTouch) {
+                    const TouchEvent = e as TouchEvent;
+                    const { clientY, clientX } = TouchEvent.changedTouches[0];
+                    const folder = itemfolder.current as HTMLFolderElement;
+
+                    const { height, top, width, left } = folder.getBoundingClientRect();
+
+                    if(!(
+                        clientY >= top && clientY <= (top + height) &&
+                        clientX >= left && clientX <= (left + width)
+                    )) return;
+                }
 
                 if (!isDragInitialized) {
                     UI.changeSelectedFolder(data.id);

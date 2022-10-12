@@ -53,7 +53,7 @@
             margin-bottom: 0px !important;
         }
         cursor: pointer;
-        &:hover{
+        &:hover, &.__hoverState{
             background: #2ab9db !important;
             color: white;
             .min{
@@ -72,7 +72,7 @@
         }
         margin: 0px;
         &.danger {
-            &:hover {
+            &:hover, &.__hoverState {
                 background: #db2a2a !important;
             }
         }
@@ -94,6 +94,9 @@
     opacity: 0;
     z-index: 99;
     transition: opacity ease .25s;
+    // &:hover {
+    //     background: red;
+    // }
 }
 
 

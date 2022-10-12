@@ -54,6 +54,7 @@ export default function NotesSection({ UI }: NoteSectionProps) {
             UI.AUX?.set(obj, event, "NewNoteAux");
         }
     }
+    
     return (
         <>
             <div className={`selectedIndicate ${(isSelectMode) ? "visible" : ""}`}>

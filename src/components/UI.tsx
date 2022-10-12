@@ -153,9 +153,6 @@ export default class UINOTES extends React.Component {
         return (
             <div className="UI-notes-manager" >
                 <Header  UI={this} />
-                {/* <div className="header">
-                    <div className="foldername">{(DB.Folders.get(state.activeFolder) as Folder)?.name}</div>
-                </div> */}
                 <div className="sections">
                     <FolderSection UI={this} />
 

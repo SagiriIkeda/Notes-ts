@@ -79,7 +79,7 @@ export default class VerticalGrid extends React.Component<GridProps> {
         const { props } = this;
 
         return (
-            <div className="VerticalGrid" ref={this.container} >
+            <div className="VerticalGrid" ref={this.container}>
                 {props.children}
             </div>
         );

@@ -59,6 +59,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
     chached_update_received?: Note;
 
+    // lastHeight = Screen.getHeight();
+
+
     public state;
 
     constructor(props: EditorProps) {
@@ -106,6 +109,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.AuxCamp = this.AuxCamp.bind(this);
         this.onClickUpdateReceived = this.onClickUpdateReceived.bind(this);
         this.ctrlKeyEvents = this.ctrlKeyEvents.bind(this);
+
+        this.resizedWindow = this.resizedWindow.bind(this);
     }
 
     onClickUpdateReceived() {
@@ -147,11 +152,10 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         const content_editable_input = this.content_editable_input.current;
         const { invoker } = this.props;
         if (content_editable_input) {
-
+            // this.MaxCampHeight();
             invoker.data.content = content_editable_input.innerHTML;
 
             this.state.saved = invoker.data.content == invoker.lastest_save;
-
             const value = content_editable_input.innerText;
             this.setState({ charact: value.length })
         }
@@ -212,12 +216,15 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (content_editable_input.current) {
             content_editable_input.current.innerHTML = data.content;
         }
-
+        // alert(Screen._isMobile)
+        Screen._isMobile && window.addEventListener('resize', this.resizedWindow);
+        // window.removeEventListener('resize', this.resizedWindow);
+        // window.addEventListener('resize', this.resizedWindow);
         document.addEventListener('selectionchange', Selection.SelectionChange);
-        this.MaxCampHeight(true);
+        // this.MaxCampHeight(true);
+        this.MaxCampHeight(!Screen._isMobile);
 
         if (windowEditor) {
-
             windowEditor.style.minWidth = `${EDITORCONFIG.MIN_WIDTH}px`;
             windowEditor.style.height = `${data.position.height}px`;
             windowEditor.style.width = `${data.position.width}px`;
@@ -271,6 +278,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
             const ANIMATION_TIME = 300;
 
+            Screen._isMobile && window.removeEventListener('resize', this.resizedWindow);
             document.removeEventListener('selectionchange', Selection.SelectionChange);
 
             windowEditor?.classList.add("closing");
@@ -426,6 +434,20 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         }
         UI.AUX?.set(obj, event, "AuxCamp");
     }
+
+
+    resizedWindow() {
+        
+        // const c = this.editor_note_name_container.current;
+
+        // if(c) {
+        //     c.focus();
+        // }
+
+        this.MaxCampHeight();
+    }
+
+
 
     render() {
         const { state, Movement, Selection, invoker } = this;

@@ -24,7 +24,7 @@ interface SocketEventFunction extends Function {
     SocketIdentifier?: string;
 }
 
-const clientId = crypto.randomUUID();
+const clientId = crypto.randomUUID ? crypto.randomUUID() : "SocketIdNotSupported-" + Date.now();
 
 class Socket {
     static clientId = clientId;
@@ -36,7 +36,7 @@ class Socket {
         bc.postMessage(data)
     }
 
-    static on<E extends keyof EventType>(event: E, fn: (data: SendData<EventType[E],E>) => void, id?: string) {
+    static on<E extends keyof EventType>(event: E, fn: (data: SendData<EventType[E], E>) => void, id?: string) {
         const identifier = event + (id ? `+${id}` : "");
         const reference = fn as SocketEventFunction;
 

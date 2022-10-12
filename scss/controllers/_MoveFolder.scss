@@ -60,7 +60,7 @@
                     // height: 100%;
                     // text-justify:;
                     padding-left: 10px;
-                    font-weight: 100;
+                    font-weight: 400;
                     font-family: 'Lato';
                     white-space:nowrap;
                     text-overflow: ellipsis;
@@ -70,7 +70,7 @@
                     strong {
                         margin: 0px 5px;
             
-                        font-weight: 100;
+                        font-weight: 400;
                         color: var(--primary);
                     }
                 }
@@ -157,7 +157,7 @@
                         align-items: center;
                         color: var(--primary);
                         // padding-left: 20px;
-                        font-weight: 100;
+                        font-weight: 400;
                         font-size: 14px;
                     }
 
@@ -237,10 +237,12 @@
 }
 
 .__MOVEFOLDER-shadow {
-    position: absolute;
+    position: fixed;
+
     inset: 0;
     // background: #1a19192c;
     background: var(--shadow-color);
+    // background: red;
     // background: red;
     z-index: 50;
     opacity: 0;
@@ -296,7 +298,10 @@
 
 @media (max-width: $mobile-size) {
     .MoveFolder {
-        width: calc(100% - 20px) !important ;
+        position: fixed;
+        inset: 0;
+        width: unset !important;
+        height: unset !important;
         .footer {
             grid-template-columns: 1fr 1fr !important;
             span {
@@ -304,7 +309,6 @@
             }
             .btn {
                 justify-content: center;
-                // text-align: center;
             }
         }
     }
